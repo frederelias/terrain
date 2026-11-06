@@ -15,89 +15,62 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 <style>
-/* ---------- Jetons ---------- */
 :root{
-  --bark:#1F3D2B;      /* vert forêt profond : barre, texte fort */
-  --moss:#4C6B4A;      /* vert mousse : secondaire */
-  --field:#E9EDE4;     /* gris-vert clair : fond des panneaux */
-  --paper:#FFFFFF;
-  --boot:#E0A422;      /* jaune botte : l'action principale */
-  --ink:#17201A;
-  --ink-2:#5A665C;
-  --line:#C9D1C4;
-  --ok:#2E7D4F;
-  --warn:#B4541E;
-  --sheet-radius:18px;
-  --sat:env(safe-area-inset-top,0px);
-  --sab:env(safe-area-inset-bottom,0px);
+  --bark:#1F3D2B; --moss:#4C6B4A; --field:#E9EDE4; --paper:#FFFFFF; --boot:#E0A422;
+  --ink:#17201A; --ink-2:#5A665C; --line:#C9D1C4; --ok:#2E7D4F; --warn:#B4541E; --gps:#1E6FD9;
+  --sat:env(safe-area-inset-top,0px); --sab:env(safe-area-inset-bottom,0px);
   font-family:"Atkinson Hyperlegible",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{height:100%;margin:0;background:var(--field);color:var(--ink);overflow:hidden}
 button{font:inherit;cursor:pointer;border:0;background:none;color:inherit}
 
-/* ---------- Carte ---------- */
 #map{position:fixed;inset:0;background:#DDE3D6}
 .leaflet-container{font-family:inherit}
 .leaflet-control-attribution{font-size:9px;opacity:.75}
-.leaflet-top{top:calc(var(--sat) + 60px)}
-.leaflet-bar a{width:40px;height:40px;line-height:40px;font-size:20px}
+.leaflet-control-zoom{display:none}
 
-/* ---------- Barre haute ---------- */
-.topbar{
-  position:fixed;top:0;left:0;right:0;z-index:1000;
-  padding:calc(var(--sat) + 8px) 12px 8px;
-  background:var(--bark);color:#fff;
-  display:flex;align-items:center;gap:8px;
-}
-.topbar h1{font-size:18px;font-weight:700;margin:0;letter-spacing:.2px;flex:1}
+/* Barre haute */
+.topbar{position:fixed;top:0;left:0;right:0;z-index:1000;padding:calc(var(--sat) + 8px) 12px 8px;background:var(--bark);color:#fff;display:flex;align-items:center;gap:8px}
+.topbar h1{font-size:18px;font-weight:700;margin:0;flex:1;white-space:nowrap}
 .topbar h1 small{font-weight:400;opacity:.7;font-size:13px;margin-left:6px}
-.chip{
-  padding:8px 11px;border-radius:999px;font-size:13px;font-weight:700;
-  background:rgba(255,255,255,.12);color:#fff;border:1px solid rgba(255,255,255,.25);
-  min-height:36px;
-}
+.chip{padding:8px 11px;border-radius:999px;font-size:13px;font-weight:700;background:rgba(255,255,255,.12);color:#fff;border:1px solid rgba(255,255,255,.25);min-height:36px;white-space:nowrap}
 .chip[aria-pressed="true"]{background:var(--boot);color:var(--ink);border-color:var(--boot)}
+.chip svg{width:18px;height:18px;vertical-align:-4px}
 
-/* ---------- Bouton principal ---------- */
-.scan{
-  position:fixed;z-index:1000;left:50%;transform:translateX(-50%);
-  bottom:calc(var(--sab) + 24px);
-  min-width:220px;height:60px;padding:0 26px;border-radius:30px;
-  background:var(--boot);color:var(--ink);font-size:19px;font-weight:700;
-  box-shadow:0 8px 24px rgba(23,32,26,.28);
-  display:flex;align-items:center;justify-content:center;gap:10px;
-  transition:transform .15s ease;
-}
-.scan:active{transform:translateX(-50%) scale(.97)}
+/* Recherche */
+.search{position:fixed;left:0;right:0;z-index:1001;top:calc(var(--sat) + 56px);padding:8px 12px;background:var(--bark);display:none;gap:8px}
+.search.open{display:flex}
+.search input{flex:1;font:inherit;font-size:16px;padding:10px 12px;border-radius:12px;border:0}
+.search button{background:var(--boot);color:var(--ink);font-weight:700;border-radius:12px;padding:0 14px}
+
+/* Viseur central + anneau de scan */
+.pin{position:fixed;left:50%;top:50%;z-index:900;pointer-events:none;transform:translate(-50%,-100%)}
+.pin svg{width:34px;height:44px;filter:drop-shadow(0 2px 3px rgba(0,0,0,.35))}
+.ring{position:fixed;left:50%;top:50%;z-index:890;pointer-events:none;transform:translate(-50%,-50%);border:2px dashed var(--boot);border-radius:50%;box-shadow:0 0 0 2px rgba(255,255,255,.6) inset}
+.ring span{position:absolute;left:50%;transform:translateX(-50%);bottom:-28px;background:var(--bark);color:#fff;font-size:12px;font-weight:700;padding:3px 8px;border-radius:999px;white-space:nowrap}
+
+/* Boussole */
+.compass{position:fixed;right:12px;top:calc(var(--sat) + 64px);z-index:1000;width:56px;height:56px;border-radius:50%;background:var(--paper);box-shadow:0 4px 14px rgba(23,32,26,.18);display:flex;align-items:center;justify-content:center}
+.compass svg{width:44px;height:44px;transition:transform .12s linear}
+.compass .deg{position:absolute;bottom:-18px;left:50%;transform:translateX(-50%);font-size:11px;font-weight:700;color:var(--bark);white-space:nowrap}
+.compass.off svg{opacity:.35}
+
+/* Boutons bas */
+.bottom{position:fixed;left:0;right:0;bottom:calc(var(--sab) + 18px);z-index:1000;display:flex;align-items:center;justify-content:center;gap:12px;padding:0 12px;pointer-events:none}
+.bottom>*{pointer-events:auto}
+.round{width:56px;height:56px;border-radius:50%;background:var(--paper);color:var(--gps);box-shadow:0 6px 18px rgba(23,32,26,.22);display:flex;align-items:center;justify-content:center}
+.round svg{width:26px;height:26px}
+.round.carnet{color:var(--bark);position:relative;font-size:11px;font-weight:700;flex-direction:column;gap:1px}
+.round.carnet svg{width:20px;height:20px}
+.count{position:absolute;top:-4px;right:-4px;background:var(--bark);color:#fff;border-radius:999px;min-width:20px;height:20px;font-size:11px;line-height:20px;text-align:center;padding:0 5px}
+.scan{height:60px;padding:0 26px;border-radius:30px;background:var(--boot);color:var(--ink);font-size:19px;font-weight:700;box-shadow:0 8px 24px rgba(23,32,26,.28);display:flex;align-items:center;gap:10px;transition:transform .15s}
+.scan:active{transform:scale(.97)}
 .scan[disabled]{opacity:.65}
 .scan svg{width:22px;height:22px}
 
-.tabs{
-  position:fixed;z-index:1000;right:12px;bottom:calc(var(--sab) + 30px);
-  display:flex;flex-direction:column;gap:8px;
-}
-.tabs button{
-  width:48px;height:48px;border-radius:14px;background:var(--paper);color:var(--bark);
-  box-shadow:0 4px 14px rgba(23,32,26,.18);font-weight:700;font-size:12px;
-  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;
-  position:relative;
-}
-.tabs button svg{width:20px;height:20px}
-.tabs .count{
-  position:absolute;top:-6px;right:-6px;background:var(--bark);color:#fff;
-  border-radius:999px;min-width:20px;height:20px;font-size:11px;line-height:20px;text-align:center;padding:0 5px;
-}
-
-/* ---------- Feuille basse ---------- */
-.sheet{
-  position:fixed;left:0;right:0;bottom:0;z-index:1100;
-  background:var(--paper);border-radius:var(--sheet-radius) var(--sheet-radius) 0 0;
-  box-shadow:0 -10px 40px rgba(23,32,26,.22);
-  max-height:78vh;display:flex;flex-direction:column;
-  transform:translateY(105%);transition:transform .22s ease;
-  padding-bottom:var(--sab);
-}
+/* Feuilles */
+.sheet{position:fixed;left:0;right:0;bottom:0;z-index:1100;background:var(--paper);border-radius:18px 18px 0 0;box-shadow:0 -10px 40px rgba(23,32,26,.22);max-height:78vh;display:flex;flex-direction:column;transform:translateY(105%);transition:transform .22s ease;padding-bottom:var(--sab)}
 .sheet.open{transform:translateY(0)}
 .sheet .grip{width:44px;height:5px;border-radius:3px;background:var(--line);margin:10px auto 4px}
 .sheet header{display:flex;align-items:flex-start;gap:10px;padding:6px 18px 10px;border-bottom:1px solid var(--line)}
@@ -106,57 +79,33 @@ button{font:inherit;cursor:pointer;border:0;background:none;color:inherit}
 .sheet header p{margin:4px 0 0;color:var(--ink-2);font-size:14px}
 .close{width:40px;height:40px;border-radius:12px;background:var(--field);font-size:20px;flex:none}
 .sheet .body{overflow:auto;padding:12px 18px 18px;-webkit-overflow-scrolling:touch}
-
 .facts{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:0 0 14px}
 .fact{background:var(--field);border-radius:12px;padding:10px 12px}
-.fact b{display:block;font-size:19px;line-height:1.1}
+.fact b{display:block;font-size:19px;line-height:1.15}
 .fact span{font-size:12px;color:var(--ink-2)}
 .fact.wide{grid-column:1/-1}
-.fact.tenure-pub{background:#FBE9DE;color:var(--warn)}
-.fact.tenure-priv{background:#E2F1E7;color:var(--ok)}
-
+.fact.bad{background:#FBE9DE;color:var(--warn)} .fact.good{background:#E2F1E7;color:var(--ok)}
 .actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
-.actions a,.actions button{
-  display:flex;align-items:center;justify-content:center;gap:6px;text-align:center;
-  min-height:50px;padding:8px 10px;border-radius:12px;font-weight:700;font-size:15px;
-  background:var(--bark);color:#fff;text-decoration:none;
-}
-.actions .quiet{background:var(--field);color:var(--bark)}
-.actions .wide{grid-column:1/-1}
-
+.actions a,.actions button{display:flex;align-items:center;justify-content:center;gap:6px;text-align:center;min-height:50px;padding:8px 10px;border-radius:12px;font-weight:700;font-size:15px;background:var(--bark);color:#fff;text-decoration:none}
+.actions .quiet{background:var(--field);color:var(--bark)} .actions .wide{grid-column:1/-1}
 .sheet h3{font-size:14px;margin:14px 0 6px;color:var(--ink-2);font-weight:700}
-textarea,select,input{
-  width:100%;font:inherit;font-size:16px;padding:10px 12px;border:1px solid var(--line);
-  border-radius:12px;background:var(--paper);color:var(--ink);
-}
+textarea,select,input.f{width:100%;font:inherit;font-size:16px;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:var(--paper);color:var(--ink)}
 textarea{min-height:72px;resize:vertical}
-.row{display:flex;gap:8px;align-items:center}
-.row>*{flex:1}
-
-/* ---------- Carnet ---------- */
+.row{display:flex;gap:8px;align-items:center} .row>*{flex:1}
 .list{list-style:none;margin:0;padding:0}
 .list li{display:flex;gap:10px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line)}
-.list li .t{flex:1;min-width:0}
-.list li b{display:block;font-size:17px}
-.list li span{font-size:13px;color:var(--ink-2);display:block}
+.list li .t{flex:1;min-width:0} .list li b{display:block;font-size:17px} .list li span{font-size:13px;color:var(--ink-2);display:block}
 .list li .st{font-size:12px;font-weight:700;padding:4px 8px;border-radius:999px;background:var(--field);color:var(--bark);white-space:nowrap}
-.list li .st.i{background:#FFF1CF;color:#7A5300}
-.list li .st.c{background:#E2F1E7;color:var(--ok)}
+.list li .st.i{background:#FFF1CF;color:#7A5300} .list li .st.c{background:#E2F1E7;color:var(--ok)}
 .empty{color:var(--ink-2);padding:16px 0;text-align:center;line-height:1.4}
-
-/* ---------- Toast ---------- */
-.toast{
-  position:fixed;left:50%;transform:translateX(-50%);top:calc(var(--sat) + 68px);z-index:1200;
-  background:var(--ink);color:#fff;padding:10px 16px;border-radius:12px;font-size:14px;
-  opacity:0;transition:opacity .2s;pointer-events:none;max-width:90vw;text-align:center
-}
+.toast{position:fixed;left:50%;transform:translateX(-50%);top:calc(var(--sat) + 68px);z-index:1200;background:var(--ink);color:#fff;padding:10px 16px;border-radius:12px;font-size:14px;opacity:0;transition:opacity .2s;pointer-events:none;max-width:88vw;text-align:center}
 .toast.show{opacity:1}
-
-/* ---------- Carte : styles vectoriels ---------- */
 .lot-label{font-weight:700;font-size:11px;color:var(--bark);text-shadow:0 0 3px #fff,0 0 3px #fff;white-space:nowrap}
-.me{width:18px;height:18px;border-radius:50%;background:#1E6FD9;border:3px solid #fff;box-shadow:0 0 0 6px rgba(30,111,217,.25)}
-
-@media (prefers-reduced-motion:reduce){.sheet,.scan{transition:none}}
+.me{width:16px;height:16px;border-radius:50%;background:var(--gps);border:3px solid #fff;box-shadow:0 0 0 5px rgba(30,111,217,.25)}
+.legend{position:fixed;left:12px;bottom:calc(var(--sab) + 90px);z-index:1000;background:rgba(255,255,255,.92);border-radius:10px;padding:6px 10px;font-size:12px;display:none;gap:10px}
+.legend.show{display:flex}
+.legend i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:4px;vertical-align:-1px;border:1.5px solid var(--bark)}
+@media (prefers-reduced-motion:reduce){.sheet,.scan,.compass svg{transition:none}}
 button:focus-visible,a:focus-visible{outline:3px solid var(--boot);outline-offset:2px}
 </style>
 </head>
@@ -165,34 +114,39 @@ button:focus-visible,a:focus-visible{outline:3px solid var(--boot);outline-offse
 <div id="map" role="application" aria-label="Carte"></div>
 
 <div class="topbar">
-  <h1>Terrain <small>repérage de lots</small></h1>
-  <button class="chip" id="btnBase" aria-pressed="false" title="Fond de carte">Satellite</button>
-  <button class="chip" id="btnBaux" aria-pressed="true" title="Baux sur terres publiques">Baux</button>
+  <h1>Terrain <small>repérage</small></h1>
+  <button class="chip" id="btnSearch" aria-pressed="false" title="Chercher une adresse ou un code postal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg></button>
+  <button class="chip" id="btnBase" aria-pressed="false">Satellite</button>
+  <button class="chip" id="btnBaux" aria-pressed="true">Baux</button>
 </div>
+<form class="search" id="search">
+  <input id="q" type="search" placeholder="Code postal, adresse ou lieu" autocomplete="off" enterkeyhint="search">
+  <button type="submit">Aller</button>
+</form>
 
-<button class="scan" id="btnScan">
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/><circle cx="12" cy="12" r="8"/></svg>
-  Scanner ici
+<button class="compass off" id="compass" aria-label="Boussole">
+  <svg viewBox="0 0 44 44"><circle cx="22" cy="22" r="20" fill="none" stroke="#C9D1C4" stroke-width="2"/><path d="M22 5 L27 22 L22 20 L17 22 Z" fill="#B4541E"/><path d="M22 39 L27 22 L22 24 L17 22 Z" fill="#C9D1C4"/><text x="22" y="14" text-anchor="middle" font-size="9" font-weight="700" fill="#1F3D2B">N</text></svg>
+  <span class="deg" id="deg">boussole</span>
 </button>
 
-<div class="tabs">
-  <button id="btnCarnet" aria-label="Carnet">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 3h11l3 3v15H5z"/><path d="M8 8h8M8 12h8M8 16h5"/></svg>
-    Carnet<span class="count" id="carnetCount" hidden>0</span>
-  </button>
+<div class="pin" aria-hidden="true"><svg viewBox="0 0 34 44"><path d="M17 1C8 1 1 8 1 17c0 11 16 26 16 26s16-15 16-26C33 8 26 1 17 1z" fill="#1E6FD9" stroke="#fff" stroke-width="2"/><circle cx="17" cy="17" r="6" fill="#fff"/></svg></div>
+<div class="ring" id="ring" aria-hidden="true"><span id="ringLabel">250 m</span></div>
+<div class="legend" id="legend"><span><i style="background:#E0A422"></i>sans adresse civique</span><span><i style="background:#B8BFB5"></i>bâti</span></div>
+
+<div class="bottom">
+  <button class="round" id="btnMe" aria-label="Aller à ma position"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="12" cy="12" r="3" fill="currentColor"/><circle cx="12" cy="12" r="8"/><path d="M12 1v3M12 20v3M1 12h3M20 12h3"/></svg></button>
+  <button class="scan" id="btnScan"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="12" cy="12" r="9" stroke-dasharray="3 3"/><circle cx="12" cy="12" r="3"/></svg><span>Scanner</span></button>
+  <button class="round carnet" id="btnCarnet" aria-label="Carnet"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 3h11l3 3v15H5z"/><path d="M8 8h8M8 12h8M8 16h5"/></svg>Carnet<span class="count" id="carnetCount" hidden>0</span></button>
 </div>
 
-<!-- Fiche de lot -->
 <section class="sheet" id="sheetLot" aria-hidden="true">
   <div class="grip"></div>
-  <header>
-    <div class="t"><h2 id="lotNo">—</h2><p id="lotWhere">—</p></div>
-    <button class="close" id="closeLot" aria-label="Fermer">×</button>
-  </header>
+  <header><div class="t"><h2 id="lotNo">—</h2><p id="lotWhere">—</p></div><button class="close" id="closeLot" aria-label="Fermer">×</button></header>
   <div class="body">
     <div class="facts">
       <div class="fact"><b id="lotHa">—</b><span>hectares</span></div>
       <div class="fact"><b id="lotArp">—</b><span>arpents carrés</span></div>
+      <div class="fact wide" id="lotAddr"><b>—</b><span>adresses civiques sur le lot</span></div>
       <div class="fact wide" id="lotTenure"><b>—</b><span>tenure (indicatif)</span></div>
     </div>
     <div class="actions">
@@ -205,11 +159,7 @@ button:focus-visible,a:focus-visible{outline:3px solid var(--boot);outline-offse
     <h3>Note de terrain</h3>
     <textarea id="lotNote" placeholder="Accès par chemin forestier, ruisseau au nord, aucune construction visible…"></textarea>
     <div class="row" style="margin-top:8px">
-      <select id="lotStatus">
-        <option value="v">À revoir</option>
-        <option value="i">Intéressant</option>
-        <option value="c">Propriétaire contacté</option>
-      </select>
+      <select id="lotStatus"><option value="v">À revoir</option><option value="i">Intéressant</option><option value="c">Propriétaire contacté</option></select>
       <button id="saveLot" class="chip" style="background:var(--boot);color:var(--ink);border:0;min-height:44px;font-size:15px">Ajouter au carnet</button>
     </div>
     <h3>Lettre au propriétaire</h3>
@@ -217,19 +167,12 @@ button:focus-visible,a:focus-visible{outline:3px solid var(--boot);outline-offse
   </div>
 </section>
 
-<!-- Carnet -->
 <section class="sheet" id="sheetCarnet" aria-hidden="true">
   <div class="grip"></div>
-  <header>
-    <div class="t"><h2>Carnet</h2><p>Lots marqués, stockés dans ce téléphone seulement</p></div>
-    <button class="close" id="closeCarnet" aria-label="Fermer">×</button>
-  </header>
+  <header><div class="t"><h2>Carnet</h2><p>Lots marqués, stockés dans ce téléphone seulement</p></div><button class="close" id="closeCarnet" aria-label="Fermer">×</button></header>
   <div class="body">
     <ul class="list" id="carnetList"></ul>
-    <div class="actions" style="margin-top:14px">
-      <button id="exportCsv">Exporter en CSV</button>
-      <button id="shareCsv" class="quiet">Partager</button>
-    </div>
+    <div class="actions" style="margin-top:14px"><button id="exportCsv">Exporter en CSV</button><button id="shareCsv" class="quiet">Partager</button></div>
   </div>
 </section>
 
@@ -237,261 +180,201 @@ button:focus-visible,a:focus-visible{outline:3px solid var(--boot);outline-offse
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script>
-/* =====================================================================
-   CONFIG — à ajuster au besoin
-   ===================================================================== */
+/* ============================ CONFIG ============================ */
 const CONFIG = {
-  // Rayon du scan autour de la position (mètres)
-  scanRadius: 250,
-  // Services web gouvernementaux (gratuits, sans clé)
+  ringFraction: 0.70,      // diamètre de l'anneau = 70 % du plus petit côté de l'écran ; pince pour agrandir/réduire
+  maxRadius: 1500,         // rayon maximal du scan (m) pour rester sous la limite des services
+  coneLength: 150, coneHalfAngle: 25,
   cadastre: 'https://geo.environnement.gouv.qc.ca/donnees/rest/services/Reference/Cadastre_allege/MapServer',
   sda:      'https://servicescarto.mrnf.gouv.qc.ca/pes/rest/services/Territoire/SDA_WMS/MapServer',
   baux:     'https://servicescarto.mrnf.gouv.qc.ca/pes/rest/services/Territoire/Droits_fonciers_WMS/MapServer',
-  // Portails officiels
+  adresses: 'https://servicescarto.mern.gouv.qc.ca/pes/rest/services/Territoire/AQ_ADRESSES_WMS/MapServer',
+  geocode:  'https://servicescarto.mrnf.gouv.qc.ca/pes/rest/services/Territoire/Adresse_Geocodage/GeocodeServer',
   infolot:  'https://appli.foncier.gouv.qc.ca/infolot/',
   registre: 'https://www.registrefoncier.gouv.qc.ca',
-  // Visualiseurs de rôle d'évaluation par MRC — colle ici l'URL de la carte
-  // interactive de chaque MRC (laisser vide = recherche web automatique).
-  roles: {
-    'argenteuil': '',
-    'pays-d\'en-haut': '',
-    'matawinie': '',
-    'd\'autray': ''
-  }
+  // Visualiseurs de rôle par MRC : colle l'URL de la carte interactive ; {lot} sera remplacé par le numéro si l'outil l'accepte.
+  roles: { 'argenteuil':'', "pays-d'en-haut":'', 'matawinie':'', "d'autray":'' }
 };
 
-/* =====================================================================
-   Carte
-   ===================================================================== */
-const map = L.map('map', { zoomControl:true, attributionControl:true }).setView([46.05, -74.15], 10);
-
-const baseOSM = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-  maxZoom:19, attribution:'© OpenStreetMap'
-});
-const baseSat = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-  maxZoom:19, attribution:'Imagerie © Esri, Maxar, Earthstar'
-});
+/* ============================ Carte ============================ */
+const map = L.map('map',{zoomControl:false}).setView([46.05,-74.15],10);
+const baseOSM = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© OpenStreetMap'});
+const baseSat = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{maxZoom:19,attribution:'Imagerie © Esri, Maxar, Earthstar'});
 baseOSM.addTo(map);
 
-// Couche ArcGIS "export" servie en tuiles (fonctionne avec tout MapServer)
 const ArcGISExport = L.TileLayer.extend({
-  initialize(base, layers, opts){ this._base=base; this._layers=layers; L.TileLayer.prototype.initialize.call(this,'',opts); },
-  getTileUrl(c){
-    const n = Math.pow(2,c.z), half=20037508.342789244, res = (2*half)/n;
+  initialize(base,layers,opts){ this._base=base; this._layers=layers; L.TileLayer.prototype.initialize.call(this,'',opts); },
+  getTileUrl(c){ const n=Math.pow(2,c.z), half=20037508.342789244, res=(2*half)/n;
     const minx=-half+c.x*res, maxx=minx+res, maxy=half-c.y*res, miny=maxy-res;
-    return `${this._base}/export?bbox=${minx},${miny},${maxx},${maxy}&bboxSR=3857&imageSR=3857&size=256,256&format=png32&transparent=true&dpi=96&layers=show:${this._layers}&f=image`;
-  }
+    return `${this._base}/export?bbox=${minx},${miny},${maxx},${maxy}&bboxSR=3857&imageSR=3857&size=256,256&format=png32&transparent=true&dpi=96&layers=show:${this._layers}&f=image`; }
 });
-const lyrCadastre = new ArcGISExport(CONFIG.cadastre, '0', { maxZoom:19, minZoom:13, opacity:.9, attribution:'Cadastre © Gouv. du Québec' }).addTo(map);
-const lyrBaux     = new ArcGISExport(CONFIG.baux, '0,1',   { maxZoom:19, minZoom:10, opacity:.85 }).addTo(map);
-const lyrMuni     = new ArcGISExport(CONFIG.sda, '2',      { maxZoom:19, minZoom:9,  opacity:.6 }).addTo(map);
+const lyrCadastre = new ArcGISExport(CONFIG.cadastre,'0',{maxZoom:19,minZoom:13,opacity:.9,attribution:'Cadastre © Gouv. du Québec'}).addTo(map);
+const lyrBaux     = new ArcGISExport(CONFIG.baux,'0,1',{maxZoom:19,minZoom:10,opacity:.85}).addTo(map);
+const lyrMuni     = new ArcGISExport(CONFIG.sda,'2',{maxZoom:19,minZoom:9,opacity:.6}).addTo(map);
+const scanGroup = L.layerGroup().addTo(map), coneGroup = L.layerGroup().addTo(map);
 
-const scanGroup = L.layerGroup().addTo(map);
-let meMarker = null, meCircle = null, selected = null;
-
-/* =====================================================================
-   Requêtes ArcGIS REST (JSON/GeoJSON, sans clé)
-   ===================================================================== */
-async function query(base, layerId, params){
-  const p = new URLSearchParams({ f:'geojson', inSR:'4326', outSR:'4326', spatialRel:'esriSpatialRelIntersects', returnGeometry:'true', outFields:'*', ...params });
-  const r = await fetch(`${base}/${layerId}/query?${p}`);
-  if(!r.ok) throw new Error(`HTTP ${r.status}`);
-  const j = await r.json();
-  if(j.error) throw new Error(j.error.message||'Erreur service');
-  return j;
+/* ============================ Requêtes ============================ */
+async function query(base,layerId,params){
+  const p=new URLSearchParams({f:'geojson',inSR:'4326',outSR:'4326',spatialRel:'esriSpatialRelIntersects',returnGeometry:'true',outFields:'*',...params});
+  const r=await fetch(`${base}/${layerId}/query?${p}`); if(!r.ok) throw new Error(`HTTP ${r.status}`);
+  const j=await r.json(); if(j.error) throw new Error(j.error.message||'Erreur service'); return j;
 }
-const ptParams = (lat,lng) => ({ geometry:`${lng},${lat}`, geometryType:'esriGeometryPoint' });
+const ptParams=(lat,lng)=>({geometry:`${lng},${lat}`,geometryType:'esriGeometryPoint'});
+const around=(base,layer,lat,lng,r,extra={})=>query(base,layer,{...ptParams(lat,lng),distance:String(r),units:'esriSRUnit_Meter',...extra});
+const lotAt=(lat,lng)=>query(CONFIG.cadastre,0,ptParams(lat,lng));
+const muniAt=(lat,lng)=>query(CONFIG.sda,2,{...ptParams(lat,lng),returnGeometry:'false'});
+const bauxAt=(lat,lng)=>query(CONFIG.baux,1,{...ptParams(lat,lng),returnGeometry:'false'});
+const addrInEnvelope=b=>query(CONFIG.adresses,0,{geometry:`${b.getWest()},${b.getSouth()},${b.getEast()},${b.getNorth()}`,geometryType:'esriGeometryEnvelope'});
 
-async function lotsAround(lat,lng,radius){
-  return query(CONFIG.cadastre, 0, { ...ptParams(lat,lng), distance:String(radius), units:'esriSRUnit_Meter' });
+/* ============================ Géométrie ============================ */
+const rad=d=>d*Math.PI/180;
+function ringArea(c){const R=6378137;let a=0,n=c.length;if(n<3)return 0;for(let i=0;i<n;i++){const p1=c[i],p2=c[(i+1)%n];a+=(rad(p2[0])-rad(p1[0]))*(2+Math.sin(rad(p1[1]))+Math.sin(rad(p2[1])));}return Math.abs(a*R*R/2);}
+function polyArea(g){if(!g)return 0;if(g.type==='Polygon')return g.coordinates.reduce((s,r,i)=>i?s-ringArea(r):ringArea(r),0);if(g.type==='MultiPolygon')return g.coordinates.reduce((s,p)=>s+p.reduce((t,r,i)=>i?t-ringArea(r):ringArea(r),0),0);return 0;}
+function inRing(pt,ring){let ok=false;for(let i=0,j=ring.length-1;i<ring.length;j=i++){const xi=ring[i][0],yi=ring[i][1],xj=ring[j][0],yj=ring[j][1];if(((yi>pt[1])!==(yj>pt[1]))&&(pt[0]<(xj-xi)*(pt[1]-yi)/(yj-yi)+xi))ok=!ok;}return ok;}
+function inPoly(pt,g){if(!g)return false;const polys=g.type==='Polygon'?[g.coordinates]:g.type==='MultiPolygon'?g.coordinates:[];return polys.some(p=>inRing(pt,p[0])&&!p.slice(1).some(h=>inRing(pt,h)));}
+function destination(lat,lng,bearing,dist){const R=6371000,b=rad(bearing),la=rad(lat),lo=rad(lng),d=dist/R;const la2=Math.asin(Math.sin(la)*Math.cos(d)+Math.cos(la)*Math.sin(d)*Math.cos(b));const lo2=lo+Math.atan2(Math.sin(b)*Math.sin(d)*Math.cos(la),Math.cos(d)-Math.sin(la)*Math.sin(la2));return [la2*180/Math.PI,lo2*180/Math.PI];}
+const fmt=(n,d=2)=>n.toLocaleString('fr-CA',{maximumFractionDigits:d,minimumFractionDigits:d});
+function addrLabel(p){const k=Object.keys(p);const civ=k.find(x=>/CIV/i.test(x)),odo=k.find(x=>/ODON|RUE|VOIE/i.test(x));return [civ&&p[civ],odo&&p[odo]].filter(Boolean).join(' ');}
+
+/* ============================ Anneau de scan ============================ */
+const ring=document.getElementById('ring'), ringLabel=document.getElementById('ringLabel');
+function ringPx(){ const h=innerHeight-120, w=innerWidth; return Math.min(w,h)*CONFIG.ringFraction/2; }
+function ringMeters(){ const c=map.getCenter(), p=map.latLngToContainerPoint(c); return Math.min(CONFIG.maxRadius, map.distance(c, map.containerPointToLatLng(p.add([ringPx(),0])))); }
+function drawRing(){ const px=ringPx(); ring.style.width=ring.style.height=px*2+'px'; const m=ringMeters(); ringLabel.textContent = m>=1000? fmt(m/1000,1)+' km' : Math.round(m)+' m'; }
+map.on('zoom move resize',drawRing); window.addEventListener('resize',drawRing); drawRing();
+
+/* ============================ Position ============================ */
+let me=null, meMarker=null, meCircle=null;
+function locate(){return new Promise((res,rej)=>{if(!navigator.geolocation)return rej(new Error('Pas de GPS dans ce navigateur'));
+  navigator.geolocation.getCurrentPosition(p=>res(p.coords),e=>rej(new Error(e.code===1?'Accès à la position refusé. Autorise-le dans les réglages du navigateur.':'Position introuvable — attends un fix GPS et réessaie.')),{enableHighAccuracy:true,timeout:15000,maximumAge:5000});});}
+function showMe(c){ me=[c.latitude,c.longitude];
+  if(meMarker){meMarker.setLatLng(me);meCircle.setLatLng(me).setRadius(c.accuracy||10);}
+  else{meMarker=L.marker(me,{icon:L.divIcon({className:'',html:'<div class="me"></div>',iconSize:[16,16],iconAnchor:[8,8]}),zIndexOffset:1000}).addTo(map);
+       meCircle=L.circle(me,{radius:c.accuracy||10,color:'#1E6FD9',weight:1,fillOpacity:.08}).addTo(map);} }
+document.getElementById('btnMe').onclick=async()=>{ try{ const c=await locate(); showMe(c); map.setView(me,Math.max(map.getZoom(),16)); drawCone(); }catch(e){toast(e.message);} };
+// Suivi en continu, discret (met à jour le point bleu et le cône sans bouger la carte)
+if(navigator.geolocation) navigator.geolocation.watchPosition(p=>{showMe(p.coords);drawCone();},()=>{},{enableHighAccuracy:true,maximumAge:3000});
+
+/* ============================ Boussole ============================ */
+let heading=null, compassOn=false;
+const compassEl=document.getElementById('compass'), degEl=document.getElementById('deg'), needle=compassEl.querySelector('svg');
+function onOrient(e){ let h=null;
+  if(typeof e.webkitCompassHeading==='number') h=e.webkitCompassHeading;                // iOS
+  else if(e.absolute!==false && typeof e.alpha==='number') h=(360-e.alpha)%360;            // Android (absolu)
+  if(h===null) return; heading=h; needle.style.transform=`rotate(${-h}deg)`; degEl.textContent=Math.round(h)+'°'; drawCone(); }
+let coneT=0; function drawCone(){ if(heading===null||!me) return; const now=Date.now(); if(now-coneT<150) return; coneT=now;
+  const pts=[me]; for(let a=-CONFIG.coneHalfAngle;a<=CONFIG.coneHalfAngle;a+=5) pts.push(destination(me[0],me[1],heading+a,CONFIG.coneLength));
+  coneGroup.clearLayers(); L.polygon(pts,{color:'#1E6FD9',weight:1,fillColor:'#1E6FD9',fillOpacity:.18,interactive:false}).addTo(coneGroup); }
+async function enableCompass(){
+  try{ if(typeof DeviceOrientationEvent!=='undefined' && typeof DeviceOrientationEvent.requestPermission==='function'){ const r=await DeviceOrientationEvent.requestPermission(); if(r!=='granted') throw new Error('refusé'); }
+    if('ondeviceorientationabsolute' in window) window.addEventListener('deviceorientationabsolute',onOrient); else window.addEventListener('deviceorientation',onOrient);
+    compassOn=true; compassEl.classList.remove('off'); degEl.textContent='…'; toast('Boussole activée — le cône bleu montre où tu pointes');
+  }catch{ toast('Boussole indisponible sur cet appareil'); }
 }
-async function lotAt(lat,lng){ return query(CONFIG.cadastre, 0, ptParams(lat,lng)); }
-async function muniAt(lat,lng){ return query(CONFIG.sda, 2, { ...ptParams(lat,lng), returnGeometry:'false' }); }
-async function bauxAt(lat,lng){ return query(CONFIG.baux, 1, { ...ptParams(lat,lng), returnGeometry:'false' }); }
+compassEl.onclick=()=>{ if(!compassOn) enableCompass(); else { compassOn=false; compassEl.classList.add('off'); degEl.textContent='boussole'; heading=null; coneGroup.clearLayers(); window.removeEventListener('deviceorientationabsolute',onOrient); window.removeEventListener('deviceorientation',onOrient); } };
+// Sur Android, la boussole marche souvent sans permission : on tente discrètement au chargement
+if(typeof DeviceOrientationEvent!=='undefined' && typeof DeviceOrientationEvent.requestPermission!=='function') enableCompass();
 
-/* =====================================================================
-   Géométrie : superficie géodésique
-   ===================================================================== */
-const rad = d => d*Math.PI/180;
-function ringArea(c){ const R=6378137; let a=0,n=c.length; if(n<3) return 0;
-  for(let i=0;i<n;i++){ const p1=c[i],p2=c[(i+1)%n]; a+=(rad(p2[0])-rad(p1[0]))*(2+Math.sin(rad(p1[1]))+Math.sin(rad(p2[1]))); }
-  return Math.abs(a*R*R/2); }
-function polyArea(g){ if(!g) return 0;
-  if(g.type==='Polygon') return g.coordinates.reduce((s,r,i)=> i? s-ringArea(r) : ringArea(r), 0);
-  if(g.type==='MultiPolygon') return g.coordinates.reduce((s,p)=> s + p.reduce((t,r,i)=> i? t-ringArea(r) : ringArea(r),0), 0);
-  return 0; }
-const fmt = (n,d=2) => n.toLocaleString('fr-CA',{maximumFractionDigits:d,minimumFractionDigits:d});
-
-/* =====================================================================
-   Position
-   ===================================================================== */
-function locate(){
-  return new Promise((res,rej)=>{
-    if(!navigator.geolocation) return rej(new Error('Pas de GPS dans ce navigateur'));
-    navigator.geolocation.getCurrentPosition(p=>res(p.coords), e=>rej(new Error(e.code===1?'Accès à la position refusé. Autorise-le dans les réglages du navigateur.':'Position introuvable — attends un fix GPS et réessaie.')), { enableHighAccuracy:true, timeout:15000, maximumAge:5000 });
-  });
-}
-
-/* =====================================================================
-   Scan
-   ===================================================================== */
-const btnScan = document.getElementById('btnScan');
-btnScan.addEventListener('click', async ()=>{
-  btnScan.disabled = true; btnScan.lastChild.textContent = ' Recherche…';
+/* ============================ Recherche ============================ */
+const searchForm=document.getElementById('search'), q=document.getElementById('q');
+document.getElementById('btnSearch').onclick=e=>{ const open=searchForm.classList.toggle('open'); e.currentTarget.setAttribute('aria-pressed',open); if(open) q.focus(); };
+searchForm.onsubmit=async e=>{ e.preventDefault(); const text=q.value.trim(); if(!text) return; q.blur();
   try{
-    const c = await locate();
-    const lat=c.latitude, lng=c.longitude;
-    if(meMarker){ meMarker.setLatLng([lat,lng]); meCircle.setLatLng([lat,lng]).setRadius(c.accuracy||10); }
-    else{
-      meMarker = L.marker([lat,lng],{icon:L.divIcon({className:'',html:'<div class="me"></div>',iconSize:[18,18],iconAnchor:[9,9]}),zIndexOffset:1000}).addTo(map);
-      meCircle = L.circle([lat,lng],{radius:c.accuracy||10,color:'#1E6FD9',weight:1,fillOpacity:.08}).addTo(map);
-    }
-    map.setView([lat,lng], Math.max(map.getZoom(),16));
-    await scanAt(lat,lng);
-  }catch(e){ toast(e.message); }
-  finally{ btnScan.disabled=false; btnScan.lastChild.textContent=' Scanner ici'; }
-});
+    let hit=null;
+    try{ const r=await fetch(`${CONFIG.geocode}/findAddressCandidates?${new URLSearchParams({SingleLine:text,outSR:'4326',maxLocations:'1',f:'json'})}`); const j=await r.json(); const c=j.candidates?.[0]; if(c) hit=[c.location.y,c.location.x,c.address]; }catch{}
+    if(!hit){ const r=await fetch(`https://nominatim.openstreetmap.org/search?${new URLSearchParams({q:text+', Québec, Canada',format:'json',limit:'1'})}`); const j=await r.json(); if(j[0]) hit=[+j[0].lat,+j[0].lon,j[0].display_name.split(',').slice(0,2).join(',')]; }
+    if(!hit) return toast('Lieu introuvable');
+    map.setView([hit[0],hit[1]],15); toast(hit[2]); searchForm.classList.remove('open'); document.getElementById('btnSearch').setAttribute('aria-pressed',false);
+  }catch{ toast('Recherche indisponible'); } };
 
-// Tap sur la carte = identifier le lot sous le doigt
-map.on('click', async e=>{ if(map.getZoom()<13){ toast('Zoome davantage pour voir les lots'); return; } await identify(e.latlng.lat, e.latlng.lng); });
+/* ============================ Scan ============================ */
+const btnScan=document.getElementById('btnScan'), legend=document.getElementById('legend');
+let lastMuni=null;
+btnScan.onclick=async()=>{ const c=map.getCenter(), r=ringMeters(); btnScan.disabled=true; btnScan.lastElementChild.textContent='Recherche…';
+  try{ await scanAt(c.lat,c.lng,r); }catch(e){ toast('Service indisponible : '+e.message); }
+  finally{ btnScan.disabled=false; btnScan.lastElementChild.textContent='Scanner'; } };
 
-async function scanAt(lat,lng){
-  scanGroup.clearLayers();
-  const [lots, muni] = await Promise.all([ lotsAround(lat,lng,CONFIG.scanRadius), muniAt(lat,lng).catch(()=>null) ]);
-  const m = muni?.features?.[0]?.properties;
-  if(!lots.features.length){
-    toast(m ? `Aucun lot cadastré dans ${CONFIG.scanRadius} m — ${m.MUS_NM_MUN}. Territoire probablement non cadastré (public).` : `Aucun lot cadastré dans ${CONFIG.scanRadius} m.`);
-    return;
-  }
-  let here = null;
+async function scanAt(lat,lng,radius){
+  scanGroup.clearLayers(); legend.classList.remove('show');
+  const [lots,addrs,muni]=await Promise.all([ around(CONFIG.cadastre,0,lat,lng,radius), around(CONFIG.adresses,0,lat,lng,radius+60).catch(()=>({features:[]})), muniAt(lat,lng).catch(()=>null) ]);
+  lastMuni=muni?.features?.[0]?.properties||null;
+  L.circle([lat,lng],{radius,color:'#E0A422',weight:1,dashArray:'4 4',fill:false,interactive:false}).addTo(scanGroup);
+  if(!lots.features.length){ toast(lastMuni?`Aucun lot cadastré dans ${Math.round(radius)} m — ${lastMuni.MUS_NM_MUN}. Territoire probablement public (non cadastré).`:`Aucun lot cadastré dans ${Math.round(radius)} m.`); return; }
+  const pts=addrs.features.map(f=>f.geometry.coordinates);
+  let vacant=0;
   lots.features.forEach(f=>{
-    const layer = L.geoJSON(f,{ style:{color:'#1F3D2B',weight:2,fillColor:'#E0A422',fillOpacity:.12} });
-    const ha = polyArea(f.geometry)/10000;
-    layer.bindTooltip(`${f.properties.NO_LOT}<br>${fmt(ha,1)} ha`,{permanent:true,direction:'center',className:'lot-label'});
-    layer.on('click', ev=>{ L.DomEvent.stopPropagation(ev); openLot(f, m); });
+    const built=pts.some(p=>inPoly(p,f.geometry)); if(!built) vacant++;
+    f._built=built;
+    const layer=L.geoJSON(f,{style:{color:'#1F3D2B',weight:2,fillColor:built?'#B8BFB5':'#E0A422',fillOpacity:built?.25:.28}});
+    layer.bindTooltip(`${f.properties.NO_LOT}<br>${fmt(polyArea(f.geometry)/10000,1)} ha`,{permanent:true,direction:'center',className:'lot-label'});
+    layer.on('click',ev=>{L.DomEvent.stopPropagation(ev);openLot(f,lastMuni);});
     layer.addTo(scanGroup);
-    if(!here && layer.getBounds().contains([lat,lng])) here = f;
   });
-  toast(`${lots.features.length} lot${lots.features.length>1?'s':''} dans ${CONFIG.scanRadius} m${m?' — '+m.MUS_NM_MUN:''}`);
-  if(here) openLot(here, m);
+  legend.classList.add('show');
+  toast(`${lots.features.length} lots dans ${Math.round(radius)} m · ${vacant} sans adresse civique${lastMuni?' · '+lastMuni.MUS_NM_MUN:''}`);
 }
+map.on('click',async e=>{ if(map.getZoom()<13){toast('Zoome davantage pour voir les lots');return;} await identify(e.latlng.lat,e.latlng.lng); });
+async function identify(lat,lng){ try{
+  const [lots,muni]=await Promise.all([lotAt(lat,lng),muniAt(lat,lng).catch(()=>null)]);
+  const f=lots.features[0], m=muni?.features?.[0]?.properties;
+  if(!f){toast(m?`Aucun lot cadastré ici — ${m.MUS_NM_MUN}. Probablement terre publique non cadastrée.`:'Aucun lot cadastré ici.');return;}
+  scanGroup.clearLayers(); legend.classList.remove('show');
+  L.geoJSON(f,{style:{color:'#1F3D2B',weight:3,fillColor:'#E0A422',fillOpacity:.18}}).addTo(scanGroup); openLot(f,m);
+}catch(e){toast('Service indisponible : '+e.message);} }
 
-async function identify(lat,lng){
-  try{
-    const [lots, muni] = await Promise.all([ lotAt(lat,lng), muniAt(lat,lng).catch(()=>null) ]);
-    const f = lots.features[0], m = muni?.features?.[0]?.properties;
-    if(!f){ toast(m ? `Aucun lot cadastré ici — ${m.MUS_NM_MUN}. Probablement terre publique non cadastrée.` : 'Aucun lot cadastré ici.'); return; }
-    scanGroup.clearLayers();
-    L.geoJSON(f,{style:{color:'#1F3D2B',weight:3,fillColor:'#E0A422',fillOpacity:.18}}).addTo(scanGroup);
-    openLot(f, m);
-  }catch(e){ toast('Service indisponible : '+e.message); }
-}
+/* ============================ Fiche ============================ */
+const $=id=>document.getElementById(id);
+const sheetLot=$('sheetLot'), sheetCarnet=$('sheetCarnet'); let selected=null;
+function show(s){s.classList.add('open');s.setAttribute('aria-hidden','false');} function hide(s){s.classList.remove('open');s.setAttribute('aria-hidden','true');}
+$('closeLot').onclick=()=>hide(sheetLot); $('closeCarnet').onclick=()=>hide(sheetCarnet);
+function roleUrl(m,lot){ const mrc=(m?.MUS_NM_MRC||'').toLowerCase();
+  for(const k in CONFIG.roles){ if(mrc.includes(k)&&CONFIG.roles[k]) return CONFIG.roles[k].replace('{lot}',encodeURIComponent(lot||'')); }
+  return `https://duckduckgo.com/?q=${encodeURIComponent(`rôle d'évaluation carte interactive ${m?.MUS_NM_MUN||''} MRC ${m?.MUS_NM_MRC||''}`)}`; }
 
-/* =====================================================================
-   Fiche de lot
-   ===================================================================== */
-const $ = id => document.getElementById(id);
-const sheetLot = $('sheetLot'), sheetCarnet = $('sheetCarnet');
-function show(s){ s.classList.add('open'); s.setAttribute('aria-hidden','false'); }
-function hide(s){ s.classList.remove('open'); s.setAttribute('aria-hidden','true'); }
-$('closeLot').onclick = ()=>hide(sheetLot);
-$('closeCarnet').onclick = ()=>hide(sheetCarnet);
-
-function roleUrl(m){
-  const mrc = (m?.MUS_NM_MRC||'').toLowerCase();
-  for(const k in CONFIG.roles){ if(mrc.includes(k) && CONFIG.roles[k]) return CONFIG.roles[k]; }
-  const q = encodeURIComponent(`rôle d'évaluation carte interactive ${m?.MUS_NM_MUN||''} MRC ${m?.MUS_NM_MRC||''}`);
-  return `https://duckduckgo.com/?q=${q}`;
-}
-
-async function openLot(f, m){
-  const no = f.properties.NO_LOT;
-  const area = polyArea(f.geometry);
-  const b = L.geoJSON(f).getBounds().getCenter();
-  selected = { lot:no, muni:m?.MUS_NM_MUN||'', mrc:m?.MUS_NM_MRC||'', lat:b.lat, lng:b.lng, ha:area/10000 };
-  $('lotNo').textContent = `Lot ${no}`;
-  $('lotWhere').textContent = m ? `${m.MUS_NM_MUN} · MRC ${m.MUS_NM_MRC}` : 'Municipalité inconnue';
-  $('lotHa').textContent = fmt(area/10000);
-  $('lotArp').textContent = fmt(area/3418.89,1);
-  $('lnkInfolot').href = CONFIG.infolot;
-  $('lnkRegistre').href = CONFIG.registre;
-  $('lnkRole').href = roleUrl(m);
-  const site = m?.SITE_WEB ? (m.SITE_WEB.startsWith('http')?m.SITE_WEB:'https://'+m.SITE_WEB) : null;
-  $('lnkMuni').href = site || roleUrl(m);
-  $('lnkMuni').textContent = site ? `Site de ${m.MUS_NM_MUN}${m.TELEPHONE?' · '+m.TELEPHONE:''}` : 'Site de la municipalité';
-  const saved = carnet.find(x=>x.lot===no);
-  $('lotNote').value = saved?.note||''; $('lotStatus').value = saved?.status||'v';
-  $('saveLot').textContent = saved ? 'Mettre à jour' : 'Ajouter au carnet';
-  const t = $('lotTenure'); t.className='fact wide'; t.querySelector('b').textContent='Vérification…';
+async function openLot(f,m){
+  const no=f.properties.NO_LOT, area=polyArea(f.geometry), gj=L.geoJSON(f), b=gj.getBounds(), c=b.getCenter();
+  selected={lot:no,muni:m?.MUS_NM_MUN||'',mrc:m?.MUS_NM_MRC||'',lat:c.lat,lng:c.lng,ha:area/10000};
+  $('lotNo').textContent=`Lot ${no}`; $('lotWhere').textContent=m?`${m.MUS_NM_MUN} · MRC ${m.MUS_NM_MRC}`:'Municipalité inconnue';
+  $('lotHa').textContent=fmt(area/10000); $('lotArp').textContent=fmt(area/3418.89,1);
+  $('lnkInfolot').href=CONFIG.infolot; $('lnkRegistre').href=CONFIG.registre; $('lnkRole').href=roleUrl(m,no);
+  const site=m?.SITE_WEB?(m.SITE_WEB.startsWith('http')?m.SITE_WEB:'https://'+m.SITE_WEB):null;
+  $('lnkMuni').href=site||roleUrl(m,no); $('lnkMuni').textContent=site?`Site de ${m.MUS_NM_MUN}${m.TELEPHONE?' · '+m.TELEPHONE:''}`:'Site de la municipalité';
+  const saved=carnet.find(x=>x.lot===no); $('lotNote').value=saved?.note||''; $('lotStatus').value=saved?.status||'v'; $('saveLot').textContent=saved?'Mettre à jour':'Ajouter au carnet';
+  const t=$('lotTenure'), a=$('lotAddr'); t.className='fact wide'; a.className='fact wide'; t.querySelector('b').textContent='Vérification…'; a.querySelector('b').textContent='Vérification…';
   show(sheetLot);
-  try{
-    const bx = await bauxAt(b.lat,b.lng);
-    const n = bx.features?.length||0;
-    if(n){ t.classList.add('tenure-pub'); t.querySelector('b').textContent=`Bail sur terre publique (${n})`; }
-    else { t.classList.add('tenure-priv'); t.querySelector('b').textContent='Aucun bail public — lot probablement privé'; }
-  }catch{ t.querySelector('b').textContent='Tenure non vérifiée (service hors ligne)'; }
+  addrInEnvelope(b).then(r=>{ const inside=r.features.filter(x=>inPoly(x.geometry.coordinates,f.geometry)); if(!inside.length){a.classList.add('good');a.querySelector('b').textContent='Aucune — probablement non bâti';} else {a.classList.add('bad');a.querySelector('b').textContent=`${inside.length} : ${inside.slice(0,2).map(x=>addrLabel(x.properties)).filter(Boolean).join(', ')||'adresse présente'}`;} })
+    .catch(()=>{a.querySelector('b').textContent='Non vérifié (service hors ligne)';});
+  bauxAt(c.lat,c.lng).then(bx=>{ const n=bx.features?.length||0; if(n){t.classList.add('bad');t.querySelector('b').textContent=`Bail sur terre publique (${n})`;} else {t.classList.add('good');t.querySelector('b').textContent='Aucun bail public — lot probablement privé';} })
+    .catch(()=>{t.querySelector('b').textContent='Non vérifiée (service hors ligne)';});
 }
+$('copyLot').onclick=()=>copy(selected?.lot||'','Numéro de lot copié — colle-le dans Infolot ou le Registre');
+['lnkInfolot','lnkRegistre','lnkRole'].forEach(id=>$(id).addEventListener('click',()=>{if(selected)copy(selected.lot,null);}));
 
-$('copyLot').onclick = ()=>copy(selected?.lot||'', 'Numéro de lot copié — colle-le dans Infolot ou le Registre');
-['lnkInfolot','lnkRegistre','lnkRole'].forEach(id=> $(id).addEventListener('click', ()=>{ if(selected) copy(selected.lot, null); }));
-
-/* =====================================================================
-   Carnet (localStorage — reste dans l'appareil)
-   ===================================================================== */
-let carnet = [];
-try{ carnet = JSON.parse(localStorage.getItem('terrain.carnet')||'[]'); }catch{ carnet=[]; }
-function persist(){ try{ localStorage.setItem('terrain.carnet', JSON.stringify(carnet)); }catch{ toast('Stockage local indisponible'); } renderCount(); }
-function renderCount(){ const c=$('carnetCount'); c.textContent=carnet.length; c.hidden=!carnet.length; }
-renderCount();
-
-$('saveLot').onclick = ()=>{
-  if(!selected) return;
-  const rec = { ...selected, note:$('lotNote').value.trim(), status:$('lotStatus').value, date:new Date().toISOString().slice(0,10) };
-  const i = carnet.findIndex(x=>x.lot===rec.lot);
-  if(i>=0) carnet[i]=rec; else carnet.unshift(rec);
-  persist(); toast('Enregistré dans le carnet'); $('saveLot').textContent='Mettre à jour';
-};
-
-const STATUS = { v:['À revoir',''], i:['Intéressant','i'], c:['Contacté','c'] };
-$('btnCarnet').onclick = ()=>{ renderCarnet(); hide(sheetLot); show(sheetCarnet); };
-function renderCarnet(){
-  const ul=$('carnetList'); ul.innerHTML='';
-  if(!carnet.length){ ul.innerHTML='<li class="empty">Rien encore. Scanne un lot, écris une note, ajoute-le ici.</li>'; return; }
-  carnet.forEach(r=>{
-    const li=document.createElement('li');
-    li.innerHTML=`<div class="t"><b>Lot ${r.lot}</b><span>${r.muni||'—'} · ${fmt(r.ha,1)} ha · ${r.date}</span>${r.note?`<span>${esc(r.note)}</span>`:''}</div>
-      <span class="st ${STATUS[r.status][1]}">${STATUS[r.status][0]}</span>
-      <button class="close" aria-label="Retirer" data-lot="${r.lot}">×</button>`;
-    li.querySelector('.t').onclick=()=>{ hide(sheetCarnet); map.setView([r.lat,r.lng],16); identify(r.lat,r.lng); };
-    li.querySelector('button').onclick=()=>{ carnet=carnet.filter(x=>x.lot!==r.lot); persist(); renderCarnet(); };
-    ul.appendChild(li);
-  });
-}
-function esc(s){ return s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
-
-function csv(){
-  const head=['lot','municipalite','mrc','hectares','statut','note','date','lat','lng'];
+/* ============================ Carnet ============================ */
+let carnet=[]; try{carnet=JSON.parse(localStorage.getItem('terrain.carnet')||'[]');}catch{carnet=[];}
+function persist(){try{localStorage.setItem('terrain.carnet',JSON.stringify(carnet));}catch{toast('Stockage local indisponible');}renderCount();}
+function renderCount(){const c=$('carnetCount');c.textContent=carnet.length;c.hidden=!carnet.length;} renderCount();
+$('saveLot').onclick=()=>{ if(!selected)return; const rec={...selected,note:$('lotNote').value.trim(),status:$('lotStatus').value,date:new Date().toISOString().slice(0,10)};
+  const i=carnet.findIndex(x=>x.lot===rec.lot); if(i>=0)carnet[i]=rec; else carnet.unshift(rec); persist(); toast('Enregistré dans le carnet'); $('saveLot').textContent='Mettre à jour'; };
+const STATUS={v:['À revoir',''],i:['Intéressant','i'],c:['Contacté','c']};
+$('btnCarnet').onclick=()=>{renderCarnet();hide(sheetLot);show(sheetCarnet);};
+function esc(s){return s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+function renderCarnet(){ const ul=$('carnetList'); ul.innerHTML=''; if(!carnet.length){ul.innerHTML='<li class="empty">Rien encore. Scanne, touche un lot, écris une note, ajoute-le ici.</li>';return;}
+  carnet.forEach(r=>{ const li=document.createElement('li');
+    li.innerHTML=`<div class="t"><b>Lot ${r.lot}</b><span>${r.muni||'—'} · ${fmt(r.ha,1)} ha · ${r.date}</span>${r.note?`<span>${esc(r.note)}</span>`:''}</div><span class="st ${STATUS[r.status][1]}">${STATUS[r.status][0]}</span><button class="close" aria-label="Retirer">×</button>`;
+    li.querySelector('.t').onclick=()=>{hide(sheetCarnet);map.setView([r.lat,r.lng],16);identify(r.lat,r.lng);};
+    li.querySelector('button').onclick=()=>{carnet=carnet.filter(x=>x.lot!==r.lot);persist();renderCarnet();};
+    ul.appendChild(li); }); }
+function csv(){ const head=['lot','municipalite','mrc','hectares','statut','note','date','lat','lng'];
   const rows=carnet.map(r=>[r.lot,r.muni,r.mrc,r.ha.toFixed(3),STATUS[r.status][0],r.note,r.date,r.lat.toFixed(6),r.lng.toFixed(6)].map(v=>`"${String(v??'').replace(/"/g,'""')}"`).join(','));
-  return '\ufeff'+[head.join(','),...rows].join('\n');
-}
-$('exportCsv').onclick=()=>{
-  if(!carnet.length) return toast('Carnet vide');
-  const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([csv()],{type:'text/csv;charset=utf-8'})); a.download=`terrain-${new Date().toISOString().slice(0,10)}.csv`; a.click();
-};
-$('shareCsv').onclick=async()=>{
-  if(!carnet.length) return toast('Carnet vide');
-  const file=new File([csv()],'terrain.csv',{type:'text/csv'});
-  if(navigator.canShare?.({files:[file]})) { try{ await navigator.share({files:[file],title:'Carnet Terrain'}); }catch{} }
-  else copy(csv(),'CSV copié dans le presse-papier');
-};
+  return '\ufeff'+[head.join(','),...rows].join('\n'); }
+$('exportCsv').onclick=()=>{ if(!carnet.length)return toast('Carnet vide'); const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([csv()],{type:'text/csv;charset=utf-8'})); a.download=`terrain-${new Date().toISOString().slice(0,10)}.csv`; a.click(); };
+$('shareCsv').onclick=async()=>{ if(!carnet.length)return toast('Carnet vide'); const file=new File([csv()],'terrain.csv',{type:'text/csv'});
+  if(navigator.canShare?.({files:[file]})){try{await navigator.share({files:[file],title:'Carnet Terrain'});}catch{}} else copy(csv(),'CSV copié dans le presse-papier'); };
 
-/* =====================================================================
-   Lettre type
-   ===================================================================== */
-$('copyLetter').onclick=()=>{
-  if(!selected) return;
-  const d=new Date().toLocaleDateString('fr-CA',{year:'numeric',month:'long',day:'numeric'});
-  const txt=`Montréal, le ${d}
+/* ============================ Lettre ============================ */
+$('copyLetter').onclick=()=>{ if(!selected)return; const d=new Date().toLocaleDateString('fr-CA',{year:'numeric',month:'long',day:'numeric'});
+  copy(`Montréal, le ${d}
 
 Objet : votre terrain — lot ${selected.lot}, ${selected.muni||'[municipalité]'}
 
@@ -506,23 +389,13 @@ Vous pouvez me joindre par téléphone au [votre numéro] ou par courriel à [vo
 Merci de votre attention,
 
 [Votre nom]
-[Votre adresse]`;
-  copy(txt,'Lettre copiée — colle-la dans Notes ou Word');
-};
+[Votre adresse]`,'Lettre copiée — colle-la dans Notes ou Word'); };
 
-/* =====================================================================
-   Utilitaires
-   ===================================================================== */
-async function copy(t,msg){ try{ await navigator.clipboard.writeText(t); if(msg) toast(msg); }catch{ if(msg) toast('Copie impossible — note le numéro : '+t); } }
-let toastT; function toast(m){ const t=$('toast'); t.textContent=m; t.classList.add('show'); clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove('show'),3500); }
-
-// Fond de carte & couches
-let sat=false;
-$('btnBase').onclick=e=>{ sat=!sat; e.currentTarget.setAttribute('aria-pressed',sat); if(sat){ map.removeLayer(baseOSM); baseSat.addTo(map); } else { map.removeLayer(baseSat); baseOSM.addTo(map); } lyrMuni.bringToFront(); lyrBaux.bringToFront(); lyrCadastre.bringToFront(); };
-let baux=true;
-$('btnBaux').onclick=e=>{ baux=!baux; e.currentTarget.setAttribute('aria-pressed',baux); baux? lyrBaux.addTo(map) : map.removeLayer(lyrBaux); };
-
-// Service worker (coquille de l'app hors ligne ; les cartes exigent le réseau)
+/* ============================ Utilitaires ============================ */
+async function copy(t,msg){try{await navigator.clipboard.writeText(t);if(msg)toast(msg);}catch{if(msg)toast('Copie impossible — note le numéro : '+t);}}
+let toastT; function toast(m){const t=$('toast');t.textContent=m;t.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('show'),4000);}
+let sat=false; $('btnBase').onclick=e=>{sat=!sat;e.currentTarget.setAttribute('aria-pressed',sat);if(sat){map.removeLayer(baseOSM);baseSat.addTo(map);}else{map.removeLayer(baseSat);baseOSM.addTo(map);}lyrMuni.bringToFront();lyrBaux.bringToFront();lyrCadastre.bringToFront();};
+let baux=true; $('btnBaux').onclick=e=>{baux=!baux;e.currentTarget.setAttribute('aria-pressed',baux);baux?lyrBaux.addTo(map):map.removeLayer(lyrBaux);};
 if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{});
 </script>
 </body>
