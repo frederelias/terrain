@@ -100,6 +100,7 @@ textarea{min-height:72px;resize:vertical}
 .empty{color:var(--ink-2);padding:16px 0;text-align:center;line-height:1.4}
 .toast{position:fixed;left:50%;transform:translateX(-50%);top:calc(var(--sat) + 68px);z-index:1200;background:var(--ink);color:#fff;padding:10px 16px;border-radius:12px;font-size:14px;opacity:0;transition:opacity .2s;pointer-events:none;max-width:88vw;text-align:center}
 .toast.show{opacity:1}
+.saved-pin{width:14px;height:14px;border-radius:50%;background:#2E7D4F;border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.4)}
 .lot-label{font-weight:700;font-size:11px;color:var(--bark);text-shadow:0 0 3px #fff,0 0 3px #fff;white-space:nowrap}
 .me{width:16px;height:16px;border-radius:50%;background:var(--gps);border:3px solid #fff;box-shadow:0 0 0 5px rgba(30,111,217,.25)}
 .legend{position:fixed;left:12px;bottom:calc(var(--sab) + 90px);z-index:1000;background:rgba(255,255,255,.92);border-radius:10px;padding:6px 10px;font-size:12px;display:none;gap:10px}
@@ -156,6 +157,12 @@ button:focus-visible,a:focus-visible{outline:3px solid var(--boot);outline-offse
       <a id="lnkRole" target="_blank" rel="noopener">Rôle d'évaluation</a>
       <a id="lnkMuni" target="_blank" rel="noopener" class="quiet wide">Site de la municipalité</a>
     </div>
+    <h3>Propriétaire (une fois trouvé au rôle ou au Registre)</h3>
+    <input class="f" id="lotOwner" placeholder="Nom tel qu'inscrit">
+    <div class="actions" style="margin-top:8px">
+      <a id="lnkC411" target="_blank" rel="noopener" class="quiet">Canada411</a>
+      <a id="lnkNoms" target="_blank" rel="noopener" class="quiet">Index des noms</a>
+    </div>
     <h3>Note de terrain</h3>
     <textarea id="lotNote" placeholder="Accès par chemin forestier, ruisseau au nord, aucune construction visible…"></textarea>
     <div class="row" style="margin-top:8px">
@@ -211,7 +218,7 @@ const ArcGISExport = L.TileLayer.extend({
 const lyrCadastre = new ArcGISExport(CONFIG.cadastre,'0',{maxZoom:19,minZoom:13,opacity:.9,attribution:'Cadastre © Gouv. du Québec'}).addTo(map);
 const lyrBaux     = new ArcGISExport(CONFIG.baux,'0,1',{maxZoom:19,minZoom:10,opacity:.85}).addTo(map);
 const lyrMuni     = new ArcGISExport(CONFIG.sda,'2',{maxZoom:19,minZoom:9,opacity:.6}).addTo(map);
-const scanGroup = L.layerGroup().addTo(map), coneGroup = L.layerGroup().addTo(map);
+const scanGroup = L.layerGroup().addTo(map), coneGroup = L.layerGroup().addTo(map), savedGroup = L.layerGroup().addTo(map);
 
 /* ============================ Requêtes ============================ */
 async function query(base,layerId,params){
@@ -344,7 +351,7 @@ async function openLot(f,m){
   $('lnkInfolot').href=CONFIG.infolot; $('lnkRegistre').href=CONFIG.registre; $('lnkRole').href=roleUrl(m,no);
   const site=m?.SITE_WEB?(m.SITE_WEB.startsWith('http')?m.SITE_WEB:'https://'+m.SITE_WEB):null;
   $('lnkMuni').href=site||roleUrl(m,no); $('lnkMuni').textContent=site?`Site de ${m.MUS_NM_MUN}${m.TELEPHONE?' · '+m.TELEPHONE:''}`:'Site de la municipalité';
-  const saved=carnet.find(x=>x.lot===no); $('lotNote').value=saved?.note||''; $('lotStatus').value=saved?.status||'v'; $('saveLot').textContent=saved?'Mettre à jour':'Ajouter au carnet';
+  const saved=carnet.find(x=>x.lot===no); $('lotOwner').value=saved?.owner||''; ownerLinks(); $('lotNote').value=saved?.note||''; $('lotStatus').value=saved?.status||'v'; $('saveLot').textContent=saved?'Mettre à jour':'Ajouter au carnet';
   const t=$('lotTenure'), a=$('lotAddr'); t.className='fact wide'; a.className='fact wide'; t.querySelector('b').textContent='Vérification…'; a.querySelector('b').textContent='Vérification…';
   show(sheetLot);
   addrInEnvelope(b).then(r=>{ const inside=r.features.filter(x=>inPoly(x.geometry.coordinates,f.geometry)); if(!inside.length){a.classList.add('good');a.querySelector('b').textContent='Aucune — probablement non bâti';} else {a.classList.add('bad');a.querySelector('b').textContent=`${inside.length} : ${inside.slice(0,2).map(x=>addrLabel(x.properties)).filter(Boolean).join(', ')||'adresse présente'}`;} })
@@ -352,6 +359,11 @@ async function openLot(f,m){
   bauxAt(c.lat,c.lng).then(bx=>{ const n=bx.features?.length||0; if(n){t.classList.add('bad');t.querySelector('b').textContent=`Bail sur terre publique (${n})`;} else {t.classList.add('good');t.querySelector('b').textContent='Aucun bail public — lot probablement privé';} })
     .catch(()=>{t.querySelector('b').textContent='Non vérifiée (service hors ligne)';});
 }
+function ownerLinks(){ const n=$('lotOwner').value.trim(); const where=selected?.muni||'';
+  $('lnkC411').href = n ? `https://www.canada411.ca/search/si/1/${encodeURIComponent(n)}/${encodeURIComponent(where)}` : 'https://www.canada411.ca';
+  $('lnkNoms').href = CONFIG.registre; }
+$('lotOwner').addEventListener('input',ownerLinks);
+$('lnkNoms').addEventListener('click',()=>{ const n=$('lotOwner').value.trim(); if(n) copy(n,'Nom copié — colle-le dans l\'Index des noms'); });
 $('copyLot').onclick=()=>copy(selected?.lot||'','Numéro de lot copié — colle-le dans Infolot ou le Registre');
 ['lnkInfolot','lnkRegistre','lnkRole'].forEach(id=>$(id).addEventListener('click',()=>{if(selected)copy(selected.lot,null);}));
 
@@ -359,19 +371,21 @@ $('copyLot').onclick=()=>copy(selected?.lot||'','Numéro de lot copié — colle
 let carnet=[]; try{carnet=JSON.parse(localStorage.getItem('terrain.carnet')||'[]');}catch{carnet=[];}
 function persist(){try{localStorage.setItem('terrain.carnet',JSON.stringify(carnet));}catch{toast('Stockage local indisponible');}renderCount();}
 function renderCount(){const c=$('carnetCount');c.textContent=carnet.length;c.hidden=!carnet.length;} renderCount();
-$('saveLot').onclick=()=>{ if(!selected)return; const rec={...selected,note:$('lotNote').value.trim(),status:$('lotStatus').value,date:new Date().toISOString().slice(0,10)};
-  const i=carnet.findIndex(x=>x.lot===rec.lot); if(i>=0)carnet[i]=rec; else carnet.unshift(rec); persist(); restyleScan(); toast('Enregistré dans le carnet'); $('saveLot').textContent='Mettre à jour'; };
+function renderSaved(){ savedGroup.clearLayers(); carnet.forEach(r=>{ const mk=L.marker([r.lat,r.lng],{icon:L.divIcon({className:'',html:'<div class="saved-pin"></div>',iconSize:[14,14],iconAnchor:[7,7]})}).addTo(savedGroup);
+  mk.bindTooltip(`Lot ${r.lot}${r.owner?' · '+esc(r.owner):''}`); mk.on('click',ev=>{L.DomEvent.stopPropagation(ev);identify(r.lat,r.lng);}); }); } renderSaved();
+$('saveLot').onclick=()=>{ if(!selected)return; const rec={...selected,owner:$('lotOwner').value.trim(),note:$('lotNote').value.trim(),status:$('lotStatus').value,date:new Date().toISOString().slice(0,10)};
+  const i=carnet.findIndex(x=>x.lot===rec.lot); if(i>=0)carnet[i]=rec; else carnet.unshift(rec); persist(); restyleScan(); renderSaved(); toast('Enregistré dans le carnet'); $('saveLot').textContent='Mettre à jour'; };
 const STATUS={v:['À revoir',''],i:['Intéressant','i'],c:['Contacté','c']};
 $('btnCarnet').onclick=()=>{renderCarnet();hide(sheetLot);show(sheetCarnet);};
 function esc(s){return s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
 function renderCarnet(){ const ul=$('carnetList'); ul.innerHTML=''; if(!carnet.length){ul.innerHTML='<li class="empty">Rien encore. Scanne, touche un lot, écris une note, ajoute-le ici.</li>';return;}
   carnet.forEach(r=>{ const li=document.createElement('li');
-    li.innerHTML=`<div class="t"><b>Lot ${r.lot}</b><span>${r.muni||'—'} · ${fmt(r.ha,1)} ha · ${r.date}</span>${r.note?`<span>${esc(r.note)}</span>`:''}</div><span class="st ${STATUS[r.status][1]}">${STATUS[r.status][0]}</span><button class="close" aria-label="Retirer">×</button>`;
+    li.innerHTML=`<div class="t"><b>Lot ${r.lot}</b><span>${r.muni||'—'} · ${fmt(r.ha,1)} ha · ${r.date}</span>${r.owner?`<span>${esc(r.owner)}</span>`:''}${r.note?`<span>${esc(r.note)}</span>`:''}</div><span class="st ${STATUS[r.status][1]}">${STATUS[r.status][0]}</span><button class="close" aria-label="Retirer">×</button>`;
     li.querySelector('.t').onclick=()=>{hide(sheetCarnet);map.setView([r.lat,r.lng],16);identify(r.lat,r.lng);};
-    li.querySelector('button').onclick=()=>{carnet=carnet.filter(x=>x.lot!==r.lot);persist();restyleScan();renderCarnet();};
+    li.querySelector('button').onclick=()=>{carnet=carnet.filter(x=>x.lot!==r.lot);persist();restyleScan();renderSaved();renderCarnet();};
     ul.appendChild(li); }); }
-function csv(){ const head=['lot','municipalite','mrc','hectares','statut','note','date','lat','lng'];
-  const rows=carnet.map(r=>[r.lot,r.muni,r.mrc,r.ha.toFixed(3),STATUS[r.status][0],r.note,r.date,r.lat.toFixed(6),r.lng.toFixed(6)].map(v=>`"${String(v??'').replace(/"/g,'""')}"`).join(','));
+function csv(){ const head=['lot','municipalite','mrc','hectares','proprietaire','statut','note','date','lat','lng'];
+  const rows=carnet.map(r=>[r.lot,r.muni,r.mrc,r.ha.toFixed(3),r.owner||'',STATUS[r.status][0],r.note,r.date,r.lat.toFixed(6),r.lng.toFixed(6)].map(v=>`"${String(v??'').replace(/"/g,'""')}"`).join(','));
   return '\ufeff'+[head.join(','),...rows].join('\n'); }
 $('exportCsv').onclick=()=>{ if(!carnet.length)return toast('Carnet vide'); const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([csv()],{type:'text/csv;charset=utf-8'})); a.download=`terrain-${new Date().toISOString().slice(0,10)}.csv`; a.click(); };
 $('shareCsv').onclick=async()=>{ if(!carnet.length)return toast('Carnet vide'); const file=new File([csv()],'terrain.csv',{type:'text/csv'});
