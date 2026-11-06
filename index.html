@@ -96,7 +96,7 @@ textarea{min-height:72px;resize:vertical}
 .list li{display:flex;gap:10px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line)}
 .list li .t{flex:1;min-width:0} .list li b{display:block;font-size:17px} .list li span{font-size:13px;color:var(--ink-2);display:block}
 .list li .st{font-size:12px;font-weight:700;padding:4px 8px;border-radius:999px;background:var(--field);color:var(--bark);white-space:nowrap}
-.list li .st.i{background:#FFF1CF;color:#7A5300} .list li .st.c{background:#E2F1E7;color:var(--ok)}
+.list li .st.r{background:#E3ECF8;color:#1E4F8F} .list li .st.i{background:#FFF1CF;color:#7A5300} .list li .st.c{background:#E2F1E7;color:var(--ok)}
 .empty{color:var(--ink-2);padding:16px 0;text-align:center;line-height:1.4}
 .toast{position:fixed;left:50%;transform:translateX(-50%);top:calc(var(--sat) + 68px);z-index:1200;background:var(--ink);color:#fff;padding:10px 16px;border-radius:12px;font-size:14px;opacity:0;transition:opacity .2s;pointer-events:none;max-width:88vw;text-align:center}
 .toast.show{opacity:1}
@@ -153,7 +153,7 @@ button:focus-visible,a:focus-visible{outline:3px solid var(--boot);outline-offse
     <div class="actions">
       <button id="copyLot" class="quiet">Copier le n° de lot</button>
       <a id="lnkInfolot" target="_blank" rel="noopener" class="quiet">Infolot</a>
-      <a id="lnkRegistre" target="_blank" rel="noopener">Registre foncier</a>
+      <button id="markRegistre">Vérifier au Registre ce soir</button>
       <a id="lnkRole" target="_blank" rel="noopener">Rôle d'évaluation</a>
       <a id="lnkMuni" target="_blank" rel="noopener" class="quiet wide">Site de la municipalité</a>
     </div>
@@ -166,7 +166,7 @@ button:focus-visible,a:focus-visible{outline:3px solid var(--boot);outline-offse
     <h3>Note de terrain</h3>
     <textarea id="lotNote" placeholder="Accès par chemin forestier, ruisseau au nord, aucune construction visible…"></textarea>
     <div class="row" style="margin-top:8px">
-      <select id="lotStatus"><option value="v">À revoir</option><option value="i">Intéressant</option><option value="c">Propriétaire contacté</option></select>
+      <select id="lotStatus"><option value="v">À revoir</option><option value="r">Registre à faire</option><option value="i">Intéressant</option><option value="c">Propriétaire contacté</option></select>
       <button id="saveLot" class="chip" style="background:var(--boot);color:var(--ink);border:0;min-height:44px;font-size:15px">Ajouter au carnet</button>
     </div>
     <h3>Lettre au propriétaire</h3>
@@ -179,7 +179,7 @@ button:focus-visible,a:focus-visible{outline:3px solid var(--boot);outline-offse
   <header><div class="t"><h2>Carnet</h2><p>Lots marqués, stockés dans ce téléphone seulement</p></div><button class="close" id="closeCarnet" aria-label="Fermer">×</button></header>
   <div class="body">
     <ul class="list" id="carnetList"></ul>
-    <div class="actions" style="margin-top:14px"><button id="exportCsv">Exporter en CSV</button><button id="shareCsv" class="quiet">Partager</button></div>
+    <div class="actions" style="margin-top:14px"><button id="exportCsv">Exporter en CSV</button><button id="shareCsv" class="quiet">Partager</button><button id="copyRegistre" class="quiet wide">Copier la liste « Registre à faire »</button></div>
   </div>
 </section>
 
@@ -348,7 +348,7 @@ async function openLot(f,m){
   selected={lot:no,muni:m?.MUS_NM_MUN||'',mrc:m?.MUS_NM_MRC||'',lat:c.lat,lng:c.lng,ha:area/10000};
   $('lotNo').textContent=`Lot ${no}`; $('lotWhere').textContent=m?`${m.MUS_NM_MUN} · MRC ${m.MUS_NM_MRC}`:'Municipalité inconnue';
   $('lotHa').textContent=fmt(area/10000); $('lotArp').textContent=fmt(area/3418.89,1);
-  $('lnkInfolot').href=CONFIG.infolot; $('lnkRegistre').href=CONFIG.registre; $('lnkRole').href=roleUrl(m,no);
+  $('lnkInfolot').href=CONFIG.infolot; $('lnkRole').href=roleUrl(m,no);
   const site=m?.SITE_WEB?(m.SITE_WEB.startsWith('http')?m.SITE_WEB:'https://'+m.SITE_WEB):null;
   $('lnkMuni').href=site||roleUrl(m,no); $('lnkMuni').textContent=site?`Site de ${m.MUS_NM_MUN}${m.TELEPHONE?' · '+m.TELEPHONE:''}`:'Site de la municipalité';
   const saved=carnet.find(x=>x.lot===no); $('lotOwner').value=saved?.owner||''; ownerLinks(); $('lotNote').value=saved?.note||''; $('lotStatus').value=saved?.status||'v'; $('saveLot').textContent=saved?'Mettre à jour':'Ajouter au carnet';
@@ -364,8 +364,9 @@ function ownerLinks(){ const n=$('lotOwner').value.trim(); const where=selected?
   $('lnkNoms').href = CONFIG.registre; }
 $('lotOwner').addEventListener('input',ownerLinks);
 $('lnkNoms').addEventListener('click',()=>{ const n=$('lotOwner').value.trim(); if(n) copy(n,'Nom copié — colle-le dans l\'Index des noms'); });
+$('markRegistre').onclick=()=>{ if(!selected) return; $('lotStatus').value='r'; $('saveLot').click(); copy(selected.lot,null); toast('Lot ajouté à la liste « Registre à faire »'); };
 $('copyLot').onclick=()=>copy(selected?.lot||'','Numéro de lot copié — colle-le dans Infolot ou le Registre');
-['lnkInfolot','lnkRegistre','lnkRole'].forEach(id=>$(id).addEventListener('click',()=>{if(selected)copy(selected.lot,null);}));
+['lnkInfolot','lnkRole'].forEach(id=>$(id).addEventListener('click',()=>{if(selected)copy(selected.lot,null);}));
 
 /* ============================ Carnet ============================ */
 let carnet=[]; try{carnet=JSON.parse(localStorage.getItem('terrain.carnet')||'[]');}catch{carnet=[];}
@@ -375,7 +376,7 @@ function renderSaved(){ savedGroup.clearLayers(); carnet.forEach(r=>{ const mk=L
   mk.bindTooltip(`Lot ${r.lot}${r.owner?' · '+esc(r.owner):''}`); mk.on('click',ev=>{L.DomEvent.stopPropagation(ev);identify(r.lat,r.lng);}); }); } renderSaved();
 $('saveLot').onclick=()=>{ if(!selected)return; const rec={...selected,owner:$('lotOwner').value.trim(),note:$('lotNote').value.trim(),status:$('lotStatus').value,date:new Date().toISOString().slice(0,10)};
   const i=carnet.findIndex(x=>x.lot===rec.lot); if(i>=0)carnet[i]=rec; else carnet.unshift(rec); persist(); restyleScan(); renderSaved(); toast('Enregistré dans le carnet'); $('saveLot').textContent='Mettre à jour'; };
-const STATUS={v:['À revoir',''],i:['Intéressant','i'],c:['Contacté','c']};
+const STATUS={v:['À revoir',''],r:['Registre à faire','r'],i:['Intéressant','i'],c:['Contacté','c']};
 $('btnCarnet').onclick=()=>{renderCarnet();hide(sheetLot);show(sheetCarnet);};
 function esc(s){return s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
 function renderCarnet(){ const ul=$('carnetList'); ul.innerHTML=''; if(!carnet.length){ul.innerHTML='<li class="empty">Rien encore. Scanne, touche un lot, écris une note, ajoute-le ici.</li>';return;}
@@ -388,6 +389,7 @@ function csv(){ const head=['lot','municipalite','mrc','hectares','proprietaire'
   const rows=carnet.map(r=>[r.lot,r.muni,r.mrc,r.ha.toFixed(3),r.owner||'',STATUS[r.status][0],r.note,r.date,r.lat.toFixed(6),r.lng.toFixed(6)].map(v=>`"${String(v??'').replace(/"/g,'""')}"`).join(','));
   return '\ufeff'+[head.join(','),...rows].join('\n'); }
 $('exportCsv').onclick=()=>{ if(!carnet.length)return toast('Carnet vide'); const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([csv()],{type:'text/csv;charset=utf-8'})); a.download=`terrain-${new Date().toISOString().slice(0,10)}.csv`; a.click(); };
+$('copyRegistre').onclick=()=>{ const l=carnet.filter(r=>r.status==='r'); if(!l.length) return toast('Aucun lot marqué pour le Registre'); copy(l.map(r=>`${r.lot}\t${r.muni}`).join('\n'), `${l.length} lot(s) copié(s) — colle-les dans tes notes pour ce soir`); };
 $('shareCsv').onclick=async()=>{ if(!carnet.length)return toast('Carnet vide'); const file=new File([csv()],'terrain.csv',{type:'text/csv'});
   if(navigator.canShare?.({files:[file]})){try{await navigator.share({files:[file],title:'Carnet Terrain'});}catch{}} else copy(csv(),'CSV copié dans le presse-papier'); };
 
