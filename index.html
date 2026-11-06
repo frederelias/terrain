@@ -122,6 +122,20 @@ textarea{min-height:72px;resize:vertical}
 .toast{position:fixed;left:50%;transform:translateX(-50%);top:calc(var(--sat) + 68px);z-index:1200;background:var(--ink);color:#fff;padding:10px 16px;border-radius:12px;font-size:14px;opacity:0;transition:opacity .2s;pointer-events:none;max-width:88vw;text-align:center}
 .toast.show{opacity:1}
 .saved-pin{width:16px;height:16px;border-radius:50%;background:#2E7D4F;border:2.5px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.45)}
+.switch{display:flex;align-items:center;gap:10px;cursor:pointer;user-select:none;min-height:44px}
+.switch input{position:absolute;opacity:0;width:0;height:0}
+.switch .track{width:52px;height:30px;border-radius:999px;background:#C9D1C4;position:relative;transition:background .15s;flex:none}
+.switch .track::after{content:"";position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.3);transition:transform .15s}
+.switch input:checked+.track{background:#2E7D4F}
+.switch input:checked+.track::after{transform:translateX(22px)}
+.switch .lbl{font-weight:700;font-size:16px}
+.mode.inline{position:static;transform:none;box-shadow:none;background:var(--field);margin:0 0 8px;width:max-content}
+.mode.inline button{width:auto;padding:0 16px;font-size:14px}
+.sendrow{display:flex;gap:8px;margin-bottom:14px}
+.sendrow .send{flex:1;display:flex;align-items:center;justify-content:center;min-height:50px;border-radius:12px;font-weight:700;font-size:15px;background:var(--bark);color:#fff;text-decoration:none}
+.sendrow .send.disabled{opacity:.4;pointer-events:none}
+.sendrow .copyico{width:50px;height:50px;border-radius:12px;background:var(--field);color:var(--bark);display:flex;align-items:center;justify-content:center;flex:none}
+.sendrow .copyico svg{width:22px;height:22px}
 .stchips{display:flex;flex-wrap:wrap;gap:8px}
 .stchips button{display:flex;align-items:center;gap:6px;padding:8px 12px;border-radius:999px;border:1.5px solid var(--line);font-weight:700;font-size:14px;min-height:40px;background:var(--paper);color:var(--ink)}
 .stchips button i{width:12px;height:12px;border-radius:50%;display:inline-block}
@@ -189,13 +203,15 @@ button:focus-visible,a:focus-visible{outline:3px solid var(--boot);outline-offse
     <div class="actions">
       <button id="copyLot" class="quiet">Copier le n° de lot</button>
       <a id="lnkInfolot" target="_blank" rel="noopener" class="quiet">Infolot</a>
-      <button id="markRegistre">Vérifier au Registre ce soir</button>
+      <a id="lnkRegistre" target="_blank" rel="noopener">Registre foncier</a>
       <a id="lnkRole" target="_blank" rel="noopener">Rôle d'évaluation</a>
       <a id="lnkMuni" target="_blank" rel="noopener" class="quiet wide">Site de la municipalité</a>
     </div>
-    <h3>Statut</h3>
+    <div class="row" style="margin-top:4px">
+      <label class="switch"><input type="checkbox" id="lotVisited"><span class="track"></span><span class="lbl">À voir</span></label>
+    </div>
+    <h3>Tags</h3>
     <div class="stchips" id="stchips"></div>
-    <input type="hidden" id="lotStatus" value="v">
     <h3>Propriétaire</h3>
     <input class="f" id="lotOwner" placeholder="Nom tel qu'inscrit au rôle ou au Registre">
     <div class="row" style="margin-top:8px">
@@ -207,10 +223,10 @@ button:focus-visible,a:focus-visible{outline:3px solid var(--boot);outline-offse
       <a id="lnkNoms" target="_blank" rel="noopener" class="quiet">Index des noms</a>
     </div>
     <h3>Contacter le propriétaire</h3>
-    <div class="actions">
-      <a id="btnEmail" class="wide" href="#">Courriel avec la lettre prête</a>
-      <a id="btnSms" class="quiet" href="#">Texto</a>
-      <button id="copyLetter" class="quiet">Copier la lettre</button>
+    <div class="mode inline" id="chanSel" hidden><button id="chanMail" aria-pressed="true">Courriel</button><button id="chanSms" aria-pressed="false">Texto</button></div>
+    <div class="sendrow">
+      <a id="btnSend" class="send disabled" href="#">Envoyer la lettre</a>
+      <button id="copyLetter" class="copyico" aria-label="Copier la lettre et le destinataire"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg></button>
     </div>
     <h3>Note de terrain</h3>
     <textarea id="lotNote" placeholder="Accès par chemin forestier, ruisseau au nord, aucune construction visible…"></textarea>
@@ -224,7 +240,7 @@ button:focus-visible,a:focus-visible{outline:3px solid var(--boot);outline-offse
   <header><div class="t"><h2>Carnet</h2><p>Lots marqués, stockés dans ce téléphone seulement</p></div><button class="close" id="closeCarnet" aria-label="Fermer">×</button></header>
   <div class="body">
     <ul class="list" id="carnetList"></ul>
-    <div class="actions" style="margin-top:14px"><button id="exportCsv">Exporter en CSV</button><button id="shareCsv" class="quiet">Partager</button><button id="copyRegistre" class="quiet wide">Copier la liste « Registre à faire »</button></div>
+    <div class="actions" style="margin-top:14px"><button id="exportCsv">Exporter en CSV</button><button id="shareCsv" class="quiet">Partager</button><button id="copyRegistre" class="quiet wide">Copier les lots « Intéressant » sans propriétaire</button></div>
     <h3>Journal d'usage <span id="logCount" style="font-weight:400"></span></h3>
     <div class="actions"><button id="shareLog">Partager le rapport</button><button id="copyLog" class="quiet">Copier</button><button id="clearLog" class="quiet wide">Effacer le journal</button></div>
   </div>
@@ -262,8 +278,14 @@ window.addEventListener('error',e=>log('js_error',{msg:String(e.message).slice(0
 window.addEventListener('unhandledrejection',e=>log('js_error',{msg:String(e.reason?.message||e.reason).slice(0,160)}));
 document.addEventListener('visibilitychange',()=>log(document.hidden?'app_hide':'app_show'));
 
-const STATUS={v:['À voir','#8A948C'],s:['Visité','#2E7D4F'],i:['Intéressant','#E0A422'],r:['Registre à faire','#1E4F8F'],c:['Contacté','#6A3FB5'],e:['En vente','#C62828']};
+const TAGS={i:['Intéressant','#E0A422'],c:['Contacté','#6A3FB5'],e:['En vente','#C62828']};
+const STATUS={...TAGS,s:['Visité','#2E7D4F'],v:['À voir','#8A948C']};
+// Couleur d'un lot du carnet : priorité En vente > Contacté > Intéressant > Visité > À voir
+function keyOf(r){ const t=r.tags||[]; return t.includes('e')?'e':t.includes('c')?'c':t.includes('i')?'i':r.visited?'s':'v'; }
 const stColor=k=>(STATUS[k]||STATUS.v)[1];
+const labelOf=r=>[r.visited?'Visité':'À voir',...(r.tags||[]).map(k=>TAGS[k][0])].join(' · ');
+// Migration des anciens statuts
+function migrate(r){ if(r.tags) return r; const st=r.status; r.tags=['i','c','e'].includes(st)?[st]:[]; r.visited=st==='s'; delete r.status; return r; }
 
 /* ============================ Carte ============================ */
 const map = L.map('map',{zoomControl:false}).setView([46.05,-74.15],10);
@@ -392,7 +414,7 @@ async function scanAt(lat,lng,radius){
   return {lots:lots.features.length,vacant,muni:lastMuni?.MUS_NM_MUN};
 }
 function lotStyle(no,built){ const saved=carnet.find(x=>x.lot===no);
-  if(saved) return {color:stColor(saved.status),weight:4,fillColor:stColor(saved.status),fillOpacity:.3};
+  if(saved) return {color:stColor(keyOf(saved)),weight:4,fillColor:stColor(keyOf(saved)),fillOpacity:.3};
   return {color:'#1F3D2B',weight:2,fillColor:built?'#B8BFB5':'#E0A422',fillOpacity:built?.25:.28}; }
 function restyleScan(){ scanGroup.eachLayer(l=>{ if(l._lot) l.setStyle(lotStyle(l._lot,l._built)); }); }
 map.on('click',async e=>{ if(map.getZoom()<13){toast('Zoome davantage pour voir les lots');log('map_tap_too_far',{z:+map.getZoom().toFixed(1)});return;} log('map_tap'); await identify(e.latlng.lat,e.latlng.lng); });
@@ -418,10 +440,10 @@ async function openLot(f,m){
   selected={lot:no,muni:m?.MUS_NM_MUN||'',mrc:m?.MUS_NM_MRC||'',lat:c.lat,lng:c.lng,ha:area/10000,geom:f.geometry}; ctx.lot=no; log('lot_open',{lot:no,ha:+(area/10000).toFixed(2),muni:selected.muni});
   $('lotNo').textContent=`Lot ${no}`; $('lotWhere').textContent=m?`${m.MUS_NM_MUN} · MRC ${m.MUS_NM_MRC}`:'Municipalité inconnue';
   $('lotHa').textContent=fmt(area/10000); $('lotAc').textContent=fmt(area/4046.856,2); $('lotM2').textContent=fmt(area,0); $('lotFt2').textContent=fmt(area*10.7639,0);
-  $('lnkInfolot').href=CONFIG.infolot; $('lnkRole').href=roleUrl(m,no);
+  $('lnkInfolot').href=CONFIG.infolot; $('lnkRegistre').href=CONFIG.registre; $('lnkRole').href=roleUrl(m,no);
   const site=m?.SITE_WEB?(m.SITE_WEB.startsWith('http')?m.SITE_WEB:'https://'+m.SITE_WEB):null;
   $('lnkMuni').href=site||roleUrl(m,no); $('lnkMuni').textContent=site?`Site de ${m.MUS_NM_MUN}${m.TELEPHONE?' · '+m.TELEPHONE:''}`:'Site de la municipalité';
-  const saved=carnet.find(x=>x.lot===no); $('lotOwner').value=saved?.owner||''; $('lotEmail').value=saved?.email||''; $('lotPhone').value=saved?.phone||''; ownerLinks(); contactLinks(); $('lotNote').value=saved?.note||''; setStatus(saved?.status||'v'); $('saveLot').textContent=saved?'Mettre à jour':'Ajouter au carnet';
+  const saved=carnet.find(x=>x.lot===no); $('lotOwner').value=saved?.owner||''; $('lotEmail').value=saved?.email||''; $('lotPhone').value=saved?.phone||''; ownerLinks(); contactLinks(); $('lotNote').value=saved?.note||''; setTags(saved?.tags||[]); setVisited(saved?.visited); $('saveLot').textContent=saved?'Mettre à jour':'Ajouter au carnet';
   const t=$('lotTenure'), a=$('lotAddr'); t.className='fact wide'; t.hidden=true; a.className='fact wide'; a.querySelector('b').textContent='Vérification…';
   show(sheetLot);
   addrInEnvelope(b).then(r=>{ const inside=r.features.filter(x=>inPoly(x.geometry.coordinates,f.geometry)); if(!inside.length){a.classList.add('good');a.querySelector('b').textContent='Aucune — probablement non bâti';} else {a.classList.add('bad');a.querySelector('b').textContent=`${inside.length} : ${inside.slice(0,2).map(x=>addrLabel(x.properties)).filter(Boolean).join(', ')||'adresse présente'}`;} })
@@ -434,8 +456,11 @@ function ownerLinks(){ const n=$('lotOwner').value.trim(); const where=selected?
   $('lnkNoms').href = CONFIG.registre; }
 $('lotOwner').addEventListener('input',()=>{ownerLinks();contactLinks();});
 ['lotEmail','lotPhone'].forEach(id=>$(id).addEventListener('input',contactLinks));
-function setStatus(k){ $('lotStatus').value=k; $('stchips').querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.k===k)); }
-(function buildChips(){ const box=$('stchips'); box.innerHTML=''; Object.entries(STATUS).forEach(([k,[label,col]])=>{ const b=document.createElement('button'); b.type='button'; b.dataset.k=k; b.innerHTML=`<i style="background:${col}"></i>${label}`; b.onclick=()=>{setStatus(k);log('status',{k});}; box.appendChild(b); }); })();
+function getTags(){ return [...$('stchips').querySelectorAll('button[aria-pressed="true"]')].map(b=>b.dataset.k); }
+function setTags(tags){ $('stchips').querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',tags.includes(b.dataset.k))); }
+function setVisited(v){ $('lotVisited').checked=!!v; $('lotVisited').parentElement.querySelector('.lbl').textContent=v?'Visité':'À voir'; }
+$('lotVisited').addEventListener('change',e=>{ setVisited(e.target.checked); log('visited',{v:e.target.checked}); });
+(function buildChips(){ const box=$('stchips'); box.innerHTML=''; Object.entries(TAGS).forEach(([k,[label,col]])=>{ const b=document.createElement('button'); b.type='button'; b.dataset.k=k; b.setAttribute('aria-pressed','false'); b.innerHTML=`<i style="background:${col}"></i>${label}`; b.onclick=()=>{ const on=b.getAttribute('aria-pressed')!=='true'; b.setAttribute('aria-pressed',on); log('tag',{k,on}); }; box.appendChild(b); }); })();
 function letter(){ const d=new Date().toLocaleDateString('fr-CA',{year:'numeric',month:'long',day:'numeric'}); const who=$('lotOwner').value.trim();
   return {subject:`Votre terrain — lot ${selected.lot}, ${selected.muni||''}`.trim(),
   body:`Montréal, le ${d}
@@ -454,59 +479,62 @@ Merci de votre attention,
 
 [Votre nom]`,
   sms:`Bonjour${who?' '+who:''}, je m'appelle [votre nom]. Je m'intéresse à votre terrain boisé à ${selected.muni||''} (lot ${selected.lot}, env. ${fmt(selected.ha,1)} ha). Si vous pensiez un jour le vendre, j'aimerais en discuter, sans pression. Merci !`}; }
+let chan='mail';
+$('chanMail').onclick=()=>{chan='mail';contactLinks();}; $('chanSms').onclick=()=>{chan='sms';contactLinks();};
 function contactLinks(){ if(!selected) return; const L_=letter(), em=$('lotEmail').value.trim(), ph=$('lotPhone').value.trim().replace(/[^+\d]/g,'');
-  const e=$('btnEmail'), t=$('btnSms');
-  e.href=`mailto:${encodeURIComponent(em)}?subject=${encodeURIComponent(L_.subject)}&body=${encodeURIComponent(L_.body)}`; e.classList.toggle('disabled',!em); e.textContent=em?'Courriel avec la lettre prête':'Courriel (ajoute une adresse)';
-  t.href=`sms:${ph}?&body=${encodeURIComponent(L_.sms)}`; t.classList.toggle('disabled',!ph); }
-$('btnEmail').addEventListener('click',()=>{ if(selected) copy(letter().body,null); log('btn',{id:'btnEmail'}); });
-$('btnSms').addEventListener('click',()=>{ if(selected) copy(letter().sms,null); log('btn',{id:'btnSms'}); });
-['copyLot','lnkInfolot','lnkRole','lnkMuni','lnkC411','lnkNoms','copyLetter','markRegistre','exportCsv','shareCsv'].filter(id=>$(id)).forEach(id=>$(id).addEventListener('click',()=>log('btn',{id})));
+  const sel=$('chanSel'); sel.hidden=!(em&&ph); if(em&&!ph) chan='mail'; if(ph&&!em) chan='sms';
+  $('chanMail').setAttribute('aria-pressed',chan==='mail'); $('chanSms').setAttribute('aria-pressed',chan==='sms');
+  const b=$('btnSend'); const ok=(chan==='mail'&&em)||(chan==='sms'&&ph); b.classList.toggle('disabled',!ok);
+  b.href = chan==='mail' ? `mailto:${encodeURIComponent(em)}?subject=${encodeURIComponent(L_.subject)}&body=${encodeURIComponent(L_.body)}` : `sms:${ph}?&body=${encodeURIComponent(L_.sms)}`;
+  b.textContent = !em&&!ph ? 'Envoyer la lettre (ajoute courriel ou cellulaire)' : chan==='mail' ? 'Envoyer la lettre par courriel' : 'Envoyer par texto'; }
+$('btnSend').addEventListener('click',()=>{ if(!selected) return; copy(chan==='mail'?letter().body:letter().sms,null); log('btn',{id:'send_'+chan}); });
+['copyLot','lnkInfolot','lnkRegistre','lnkRole','lnkMuni','lnkC411','lnkNoms','copyLetter','exportCsv','shareCsv'].filter(id=>$(id)).forEach(id=>$(id).addEventListener('click',()=>log('btn',{id})));
 $('lnkNoms').addEventListener('click',()=>{ const n=$('lotOwner').value.trim(); if(n) copy(n,'Nom copié — colle-le dans l\'Index des noms'); });
-$('markRegistre').onclick=()=>{ if(!selected) return; setStatus('r'); $('saveLot').click(); copy(selected.lot,null); toast('Lot ajouté à la liste « Registre à faire »'); };
+
 $('copyLot').onclick=()=>copy(selected?.lot||'','Numéro de lot copié — colle-le dans Infolot ou le Registre');
-['lnkInfolot','lnkRole'].forEach(id=>$(id).addEventListener('click',()=>{if(selected)copy(selected.lot,null);}));
+['lnkInfolot','lnkRegistre','lnkRole'].forEach(id=>$(id).addEventListener('click',()=>{if(selected)copy(selected.lot,null);}));
 
 /* ============================ Carnet ============================ */
-let carnet=[]; try{carnet=JSON.parse(localStorage.getItem('terrain.carnet')||'[]');}catch{carnet=[];}
+let carnet=[]; try{carnet=JSON.parse(localStorage.getItem('terrain.carnet')||'[]').map(migrate);}catch{carnet=[];}
 function persist(){try{localStorage.setItem('terrain.carnet',JSON.stringify(carnet,(k,v)=>k==='_tried'?undefined:v));}catch{toast('Stockage local indisponible');}renderCount();}
 function renderCount(){const c=$('carnetCount');c.textContent=carnet.length;c.hidden=!carnet.length;} renderCount();
-function savedLabel(r){ return `<b>Lot ${r.lot}</b><br>${STATUS[r.status]?.[0]||''}${r.owner?'<br>'+esc(r.owner):''}${r.ha?'<br>'+fmt(r.ha,1)+' ha':''}`; }
+function savedLabel(r){ return `<b>Lot ${r.lot}</b><br>${labelOf(r)}${r.owner?'<br>'+esc(r.owner):''}${r.ha?'<br>'+fmt(r.ha,1)+' ha':''}`; }
 function renderSaved(){ savedGroup.clearLayers(); const zoomed=map.getZoom()>=14;
-  carnet.forEach(r=>{ const col=stColor(r.status);
+  carnet.forEach(r=>{ const col=stColor(keyOf(r));
     if(zoomed && r.geom){
       const pg=L.geoJSON({type:'Feature',geometry:r.geom},{style:{color:col,weight:4,fillColor:col,fillOpacity:.22}}).addTo(savedGroup);
       pg.bindTooltip(savedLabel(r),{permanent:true,direction:'center',className:'lot-label saved-label'});
       pg.on('click',ev=>{L.DomEvent.stopPropagation(ev);identify(r.lat,r.lng);});
     } else {
       const mk=L.marker([r.lat,r.lng],{icon:L.divIcon({className:'',html:`<div class="saved-pin" style="background:${col}"></div>`,iconSize:[16,16],iconAnchor:[8,8]})}).addTo(savedGroup);
-      mk.bindTooltip(`Lot ${r.lot} · ${STATUS[r.status]?.[0]||''}${r.owner?' · '+esc(r.owner):''}`); mk.on('click',ev=>{L.DomEvent.stopPropagation(ev);identify(r.lat,r.lng);});
+      mk.bindTooltip(`Lot ${r.lot} · ${labelOf(r)}${r.owner?' · '+esc(r.owner):''}`); mk.on('click',ev=>{L.DomEvent.stopPropagation(ev);identify(r.lat,r.lng);});
     } });
-  const used=[...new Set(carnet.map(r=>r.status))]; const lg=$('legendSaved'); lg.innerHTML=used.map(k=>`<span><i class="round" style="background:${stColor(k)}"></i>${STATUS[k]?.[0]||k}</span>`).join(''); lg.classList.toggle('show',used.length>0);
+  const used=[...new Set(carnet.map(keyOf))]; const lg=$('legendSaved'); lg.innerHTML=used.map(k=>`<span><i class="round" style="background:${stColor(k)}"></i>${STATUS[k]?.[0]||k}</span>`).join(''); lg.classList.toggle('show',used.length>0);
   // Compléter les anciens enregistrements sans polygone (une fois)
   const missing=carnet.filter(r=>!r.geom && !r._tried); if(missing.length){ missing.slice(0,10).forEach(async r=>{ r._tried=true; try{ const j=await lotAt(r.lat,r.lng); const f=j.features?.[0]; if(f){ r.geom=f.geometry; persist(); renderSaved(); } }catch{} }); } }
 map.on('zoomend',()=>renderSaved());
 renderSaved();
-$('saveLot').onclick=()=>{ if(!selected)return; const rec={...selected,owner:$('lotOwner').value.trim(),email:$('lotEmail').value.trim(),phone:$('lotPhone').value.trim(),note:$('lotNote').value.trim(),status:$('lotStatus').value,date:new Date().toISOString().slice(0,10)};
-  const i=carnet.findIndex(x=>x.lot===rec.lot); if(i>=0)carnet[i]=rec; else carnet.unshift(rec); persist(); restyleScan(); renderSaved(); log('save',{status:rec.status,note:!!rec.note,owner:!!rec.owner}); toast('Enregistré dans le carnet'); $('saveLot').textContent='Mettre à jour'; };
+$('saveLot').onclick=()=>{ if(!selected)return; const rec={...selected,owner:$('lotOwner').value.trim(),email:$('lotEmail').value.trim(),phone:$('lotPhone').value.trim(),note:$('lotNote').value.trim(),tags:getTags(),visited:$('lotVisited').checked,date:new Date().toISOString().slice(0,10)};
+  const i=carnet.findIndex(x=>x.lot===rec.lot); if(i>=0)carnet[i]=rec; else carnet.unshift(rec); persist(); restyleScan(); renderSaved(); log('save',{tags:rec.tags.join(''),visited:rec.visited,note:!!rec.note,owner:!!rec.owner}); toast('Enregistré dans le carnet'); $('saveLot').textContent='Mettre à jour'; };
 
 $('btnCarnet').onclick=()=>{log('btn',{id:'btnCarnet'});renderCarnet();renderLogCount();hide(sheetLot);show(sheetCarnet);};
 function esc(s){return s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
 function renderCarnet(){ const ul=$('carnetList'); ul.innerHTML=''; if(!carnet.length){ul.innerHTML='<li class="empty">Rien encore. Scanne, touche un lot, écris une note, ajoute-le ici.</li>';return;}
   carnet.forEach(r=>{ const li=document.createElement('li');
-    li.innerHTML=`<div class="t"><b>Lot ${r.lot}</b><span>${r.muni||'—'} · ${fmt(r.ha,1)} ha · ${r.date}</span>${r.owner?`<span>${esc(r.owner)}</span>`:''}${r.note?`<span>${esc(r.note)}</span>`:''}</div><span class="st" style="background:${stColor(r.status)}22;color:${stColor(r.status)}">${STATUS[r.status]?.[0]||r.status}</span><button class="close" aria-label="Retirer">×</button>`;
+    li.innerHTML=`<div class="t"><b>Lot ${r.lot}</b><span>${r.muni||'—'} · ${fmt(r.ha,1)} ha · ${r.date}</span>${r.owner?`<span>${esc(r.owner)}</span>`:''}${r.note?`<span>${esc(r.note)}</span>`:''}</div><span class="st" style="background:${stColor(keyOf(r))}22;color:${stColor(keyOf(r))}">${labelOf(r)}</span><button class="close" aria-label="Retirer">×</button>`;
     li.querySelector('.t').onclick=()=>{hide(sheetCarnet);map.setView([r.lat,r.lng],16);identify(r.lat,r.lng);};
     li.querySelector('button').onclick=()=>{carnet=carnet.filter(x=>x.lot!==r.lot);persist();restyleScan();renderSaved();renderCarnet();};
     ul.appendChild(li); }); }
 function csv(){ const head=['lot','municipalite','mrc','hectares','proprietaire','courriel','telephone','statut','note','date','lat','lng'];
-  const rows=carnet.map(r=>[r.lot,r.muni,r.mrc,r.ha.toFixed(3),r.owner||'',r.email||'',r.phone||'',(STATUS[r.status]?.[0]||r.status),r.note,r.date,r.lat.toFixed(6),r.lng.toFixed(6)].map(v=>`"${String(v??'').replace(/"/g,'""')}"`).join(','));
+  const rows=carnet.map(r=>[r.lot,r.muni,r.mrc,r.ha.toFixed(3),r.owner||'',r.email||'',r.phone||'',labelOf(r),r.note,r.date,r.lat.toFixed(6),r.lng.toFixed(6)].map(v=>`"${String(v??'').replace(/"/g,'""')}"`).join(','));
   return '\ufeff'+[head.join(','),...rows].join('\n'); }
 $('exportCsv').onclick=()=>{ log('btn',{id:'exportCsv'}); if(!carnet.length)return toast('Carnet vide'); const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([csv()],{type:'text/csv;charset=utf-8'})); a.download=`terrain-${new Date().toISOString().slice(0,10)}.csv`; a.click(); };
-$('copyRegistre').onclick=()=>{ const l=carnet.filter(r=>r.status==='r'); if(!l.length) return toast('Aucun lot marqué pour le Registre'); copy(l.map(r=>`${r.lot}\t${r.muni}`).join('\n'), `${l.length} lot(s) copié(s) — colle-les dans tes notes pour ce soir`); };
+$('copyRegistre').onclick=()=>{ const l=carnet.filter(r=>(r.tags||[]).includes('i')&&!r.owner); if(!l.length) return toast('Aucun lot « Intéressant » sans propriétaire'); copy(l.map(r=>`${r.lot}\t${r.muni}`).join('\n'), `${l.length} lot(s) copié(s) — à chercher au Registre ce soir`); };
 $('shareCsv').onclick=async()=>{ if(!carnet.length)return toast('Carnet vide'); const file=new File([csv()],'terrain.csv',{type:'text/csv'});
   if(navigator.canShare?.({files:[file]})){try{await navigator.share({files:[file],title:'Carnet Terrain'});}catch{}} else copy(csv(),'CSV copié dans le presse-papier'); };
 
 /* ============================ Lettre ============================ */
-$('copyLetter').onclick=()=>{ if(!selected)return; copy(letter().body,'Lettre copiée — colle-la dans Notes ou Word'); };
+$('copyLetter').onclick=()=>{ if(!selected)return; const L_=letter(), to=[$('lotOwner').value.trim(),$('lotEmail').value.trim(),$('lotPhone').value.trim()].filter(Boolean).join(' · '); copy((to?'À : '+to+'\n\n':'')+L_.body,'Lettre et destinataire copiés'); };
 
 /* ============================ Utilitaires ============================ */
 async function copy(t,msg){try{await navigator.clipboard.writeText(t);if(msg)toast(msg);}catch{if(msg)toast('Copie impossible — note le numéro : '+t);}}
