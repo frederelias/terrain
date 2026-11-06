@@ -58,6 +58,10 @@ button{font:inherit;cursor:pointer;border:0;background:none;color:inherit}
 .compass .deg{position:absolute;bottom:-18px;left:50%;transform:translateX(-50%);font-size:11px;font-weight:700;color:var(--bark);white-space:nowrap}
 .compass.off svg{opacity:.35}
 
+.mode{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(var(--sab) + 90px);z-index:1000;display:flex;background:var(--paper);border-radius:999px;padding:4px;box-shadow:0 4px 14px rgba(23,32,26,.18)}
+.mode button{padding:8px 18px;border-radius:999px;font-weight:700;font-size:14px;color:var(--ink-2);min-height:40px}
+.mode button[aria-pressed="true"]{background:var(--bark);color:#fff}
+.ring.hidden{display:none}
 /* Boutons bas */
 .bottom{position:fixed;left:0;right:0;bottom:calc(var(--sab) + 18px);z-index:1000;display:flex;align-items:center;justify-content:center;gap:12px;padding:0 12px;pointer-events:none}
 .bottom>*{pointer-events:auto}
@@ -137,6 +141,7 @@ button:focus-visible,a:focus-visible{outline:3px solid var(--boot);outline-offse
 <div class="ring" id="ring" aria-hidden="true"><span id="ringLabel">250 m</span></div>
 <div class="legend" id="legend"><span><i style="background:#E0A422"></i>sans adresse civique</span><span><i style="background:#B8BFB5"></i>bâti</span><span><i style="background:#2E7D4F"></i>dans mon carnet</span></div>
 
+<div class="mode" role="group" aria-label="Portée du scan"><button id="modeOne" aria-pressed="false">1 lot</button><button id="modeZone" aria-pressed="true">Zone</button></div>
 <div class="bottom">
   <button class="round" id="btnMe" aria-label="Aller à ma position"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="12" cy="12" r="3" fill="currentColor"/><circle cx="12" cy="12" r="8"/><path d="M12 1v3M12 20v3M1 12h3M20 12h3"/></svg></button>
   <button class="scan" id="btnScan"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="12" cy="12" r="9" stroke-dasharray="3 3"/><circle cx="12" cy="12" r="3"/></svg><span>Scanner</span></button>
@@ -314,10 +319,16 @@ searchForm.onsubmit=async e=>{ e.preventDefault(); const text=q.value.trim(); if
 
 /* ============================ Scan ============================ */
 const btnScan=document.getElementById('btnScan'), legend=document.getElementById('legend');
+let mode=localStorage.getItem('terrain.mode')||'zone';
+function setMode(m){ mode=m; try{localStorage.setItem('terrain.mode',m);}catch{} document.getElementById('modeOne').setAttribute('aria-pressed',m==='one'); document.getElementById('modeZone').setAttribute('aria-pressed',m==='zone'); ring.classList.toggle('hidden',m==='one'); btnScan.lastElementChild.textContent = m==='one' ? 'Ce lot' : 'Scanner'; }
+document.getElementById('modeOne').onclick=()=>{setMode('one');log('mode',{mode:'one'});}; document.getElementById('modeZone').onclick=()=>{setMode('zone');log('mode',{mode:'zone'});};
 let lastMuni=null;
-btnScan.onclick=async()=>{ const c=map.getCenter(), r=ringMeters(), t0=Date.now(); btnScan.disabled=true; btnScan.lastElementChild.textContent='Recherche…';
+btnScan.onclick=async()=>{ const c=map.getCenter(), r=ringMeters(), t0=Date.now();
+  if(mode==='one'){ if(map.getZoom()<13){ toast('Zoome davantage pour viser un lot'); log('map_tap_too_far',{z:+map.getZoom().toFixed(1),via:'btn'}); return; } log('scan_one'); await identify(c.lat,c.lng); return; }
+  btnScan.disabled=true; btnScan.lastElementChild.textContent='Recherche…';
   try{ const res=await scanAt(c.lat,c.lng,r); log('scan',{ms:Date.now()-t0,r:Math.round(r),z:+map.getZoom().toFixed(1),lots:res?.lots??0,vacant:res?.vacant??0,muni:res?.muni||null}); }catch(e){ toast('Service indisponible : '+e.message); log('scan_error',{ms:Date.now()-t0,msg:e.message}); }
   finally{ btnScan.disabled=false; btnScan.lastElementChild.textContent='Scanner'; } };
+setMode(mode);
 
 async function scanAt(lat,lng,radius){
   scanGroup.clearLayers(); legend.classList.remove('show');
