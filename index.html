@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="theme-color" content="#1F3D2B">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Terrain">
+<title>Terrain — repérage de lots</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon.svg">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<style>
+/* ---------- Jetons ---------- */
+:root{
+  --bark:#1F3D2B;      /* vert forêt profond : barre, texte fort */
+  --moss:#4C6B4A;      /* vert mousse : secondaire */
+  --field:#E9EDE4;     /* gris-vert clair : fond des panneaux */
+  --paper:#FFFFFF;
+  --boot:#E0A422;      /* jaune botte : l'action principale */
+  --ink:#17201A;
+  --ink-2:#5A665C;
+  --line:#C9D1C4;
+  --ok:#2E7D4F;
+  --warn:#B4541E;
+  --sheet-radius:18px;
+  --sat:env(safe-area-inset-top,0px);
+  --sab:env(safe-area-inset-bottom,0px);
+  font-family:"Atkinson Hyperlegible",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;margin:0;background:var(--field);color:var(--ink);overflow:hidden}
+button{font:inherit;cursor:pointer;border:0;background:none;color:inherit}
+
+/* ---------- Carte ---------- */
+#map{position:fixed;inset:0;background:#DDE3D6}
+.leaflet-container{font-family:inherit}
+.leaflet-control-attribution{font-size:9px;opacity:.75}
+.leaflet-top{top:calc(var(--sat) + 60px)}
+.leaflet-bar a{width:40px;height:40px;line-height:40px;font-size:20px}
+
+/* ---------- Barre haute ---------- */
+.topbar{
+  position:fixed;top:0;left:0;right:0;z-index:1000;
+  padding:calc(var(--sat) + 8px) 12px 8px;
+  background:var(--bark);color:#fff;
+  display:flex;align-items:center;gap:8px;
+}
+.topbar h1{font-size:18px;font-weight:700;margin:0;letter-spacing:.2px;flex:1}
+.topbar h1 small{font-weight:400;opacity:.7;font-size:13px;margin-left:6px}
+.chip{
+  padding:8px 11px;border-radius:999px;font-size:13px;font-weight:700;
+  background:rgba(255,255,255,.12);color:#fff;border:1px solid rgba(255,255,255,.25);
+  min-height:36px;
+}
+.chip[aria-pressed="true"]{background:var(--boot);color:var(--ink);border-color:var(--boot)}
+
+/* ---------- Bouton principal ---------- */
+.scan{
+  position:fixed;z-index:1000;left:50%;transform:translateX(-50%);
+  bottom:calc(var(--sab) + 24px);
+  min-width:220px;height:60px;padding:0 26px;border-radius:30px;
+  background:var(--boot);color:var(--ink);font-size:19px;font-weight:700;
+  box-shadow:0 8px 24px rgba(23,32,26,.28);
+  display:flex;align-items:center;justify-content:center;gap:10px;
+  transition:transform .15s ease;
+}
+.scan:active{transform:translateX(-50%) scale(.97)}
+.scan[disabled]{opacity:.65}
+.scan svg{width:22px;height:22px}
+
+.tabs{
+  position:fixed;z-index:1000;right:12px;bottom:calc(var(--sab) + 30px);
+  display:flex;flex-direction:column;gap:8px;
+}
+.tabs button{
+  width:48px;height:48px;border-radius:14px;background:var(--paper);color:var(--bark);
+  box-shadow:0 4px 14px rgba(23,32,26,.18);font-weight:700;font-size:12px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;
+  position:relative;
+}
+.tabs button svg{width:20px;height:20px}
+.tabs .count{
+  position:absolute;top:-6px;right:-6px;background:var(--bark);color:#fff;
+  border-radius:999px;min-width:20px;height:20px;font-size:11px;line-height:20px;text-align:center;padding:0 5px;
+}
+
+/* ---------- Feuille basse ---------- */
+.sheet{
+  position:fixed;left:0;right:0;bottom:0;z-index:1100;
+  background:var(--paper);border-radius:var(--sheet-radius) var(--sheet-radius) 0 0;
+  box-shadow:0 -10px 40px rgba(23,32,26,.22);
+  max-height:78vh;display:flex;flex-direction:column;
+  transform:translateY(105%);transition:transform .22s ease;
+  padding-bottom:var(--sab);
+}
+.sheet.open{transform:translateY(0)}
+.sheet .grip{width:44px;height:5px;border-radius:3px;background:var(--line);margin:10px auto 4px}
+.sheet header{display:flex;align-items:flex-start;gap:10px;padding:6px 18px 10px;border-bottom:1px solid var(--line)}
+.sheet header .t{flex:1;min-width:0}
+.sheet header h2{margin:0;font-size:24px;line-height:1.1;font-weight:700;word-break:break-word}
+.sheet header p{margin:4px 0 0;color:var(--ink-2);font-size:14px}
+.close{width:40px;height:40px;border-radius:12px;background:var(--field);font-size:20px;flex:none}
+.sheet .body{overflow:auto;padding:12px 18px 18px;-webkit-overflow-scrolling:touch}
+
+.facts{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:0 0 14px}
+.fact{background:var(--field);border-radius:12px;padding:10px 12px}
+.fact b{display:block;font-size:19px;line-height:1.1}
+.fact span{font-size:12px;color:var(--ink-2)}
+.fact.wide{grid-column:1/-1}
+.fact.tenure-pub{background:#FBE9DE;color:var(--warn)}
+.fact.tenure-priv{background:#E2F1E7;color:var(--ok)}
+
+.actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
+.actions a,.actions button{
+  display:flex;align-items:center;justify-content:center;gap:6px;text-align:center;
+  min-height:50px;padding:8px 10px;border-radius:12px;font-weight:700;font-size:15px;
+  background:var(--bark);color:#fff;text-decoration:none;
+}
+.actions .quiet{background:var(--field);color:var(--bark)}
+.actions .wide{grid-column:1/-1}
+
+.sheet h3{font-size:14px;margin:14px 0 6px;color:var(--ink-2);font-weight:700}
+textarea,select,input{
+  width:100%;font:inherit;font-size:16px;padding:10px 12px;border:1px solid var(--line);
+  border-radius:12px;background:var(--paper);color:var(--ink);
+}
+textarea{min-height:72px;resize:vertical}
+.row{display:flex;gap:8px;align-items:center}
+.row>*{flex:1}
+
+/* ---------- Carnet ---------- */
+.list{list-style:none;margin:0;padding:0}
+.list li{display:flex;gap:10px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line)}
+.list li .t{flex:1;min-width:0}
+.list li b{display:block;font-size:17px}
+.list li span{font-size:13px;color:var(--ink-2);display:block}
+.list li .st{font-size:12px;font-weight:700;padding:4px 8px;border-radius:999px;background:var(--field);color:var(--bark);white-space:nowrap}
+.list li .st.i{background:#FFF1CF;color:#7A5300}
+.list li .st.c{background:#E2F1E7;color:var(--ok)}
+.empty{color:var(--ink-2);padding:16px 0;text-align:center;line-height:1.4}
+
+/* ---------- Toast ---------- */
+.toast{
+  position:fixed;left:50%;transform:translateX(-50%);top:calc(var(--sat) + 68px);z-index:1200;
+  background:var(--ink);color:#fff;padding:10px 16px;border-radius:12px;font-size:14px;
+  opacity:0;transition:opacity .2s;pointer-events:none;max-width:90vw;text-align:center
+}
+.toast.show{opacity:1}
+
+/* ---------- Carte : styles vectoriels ---------- */
+.lot-label{font-weight:700;font-size:11px;color:var(--bark);text-shadow:0 0 3px #fff,0 0 3px #fff;white-space:nowrap}
+.me{width:18px;height:18px;border-radius:50%;background:#1E6FD9;border:3px solid #fff;box-shadow:0 0 0 6px rgba(30,111,217,.25)}
+
+@media (prefers-reduced-motion:reduce){.sheet,.scan{transition:none}}
+button:focus-visible,a:focus-visible{outline:3px solid var(--boot);outline-offset:2px}
+</style>
+</head>
+<body>
+
+<div id="map" role="application" aria-label="Carte"></div>
+
+<div class="topbar">
+  <h1>Terrain <small>repérage de lots</small></h1>
+  <button class="chip" id="btnBase" aria-pressed="false" title="Fond de carte">Satellite</button>
+  <button class="chip" id="btnBaux" aria-pressed="true" title="Baux sur terres publiques">Baux</button>
+</div>
+
+<button class="scan" id="btnScan">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/><circle cx="12" cy="12" r="8"/></svg>
+  Scanner ici
+</button>
+
+<div class="tabs">
+  <button id="btnCarnet" aria-label="Carnet">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 3h11l3 3v15H5z"/><path d="M8 8h8M8 12h8M8 16h5"/></svg>
+    Carnet<span class="count" id="carnetCount" hidden>0</span>
+  </button>
+</div>
+
+<!-- Fiche de lot -->
+<section class="sheet" id="sheetLot" aria-hidden="true">
+  <div class="grip"></div>
+  <header>
+    <div class="t"><h2 id="lotNo">—</h2><p id="lotWhere">—</p></div>
+    <button class="close" id="closeLot" aria-label="Fermer">×</button>
+  </header>
+  <div class="body">
+    <div class="facts">
+      <div class="fact"><b id="lotHa">—</b><span>hectares</span></div>
+      <div class="fact"><b id="lotArp">—</b><span>arpents carrés</span></div>
+      <div class="fact wide" id="lotTenure"><b>—</b><span>tenure (indicatif)</span></div>
+    </div>
+    <div class="actions">
+      <button id="copyLot" class="quiet">Copier le n° de lot</button>
+      <a id="lnkInfolot" target="_blank" rel="noopener" class="quiet">Infolot</a>
+      <a id="lnkRegistre" target="_blank" rel="noopener">Registre foncier</a>
+      <a id="lnkRole" target="_blank" rel="noopener">Rôle d'évaluation</a>
+      <a id="lnkMuni" target="_blank" rel="noopener" class="quiet wide">Site de la municipalité</a>
+    </div>
+    <h3>Note de terrain</h3>
+    <textarea id="lotNote" placeholder="Accès par chemin forestier, ruisseau au nord, aucune construction visible…"></textarea>
+    <div class="row" style="margin-top:8px">
+      <select id="lotStatus">
+        <option value="v">À revoir</option>
+        <option value="i">Intéressant</option>
+        <option value="c">Propriétaire contacté</option>
+      </select>
+      <button id="saveLot" class="chip" style="background:var(--boot);color:var(--ink);border:0;min-height:44px;font-size:15px">Ajouter au carnet</button>
+    </div>
+    <h3>Lettre au propriétaire</h3>
+    <div class="actions"><button id="copyLetter" class="quiet wide">Copier la lettre type</button></div>
+  </div>
+</section>
+
+<!-- Carnet -->
+<section class="sheet" id="sheetCarnet" aria-hidden="true">
+  <div class="grip"></div>
+  <header>
+    <div class="t"><h2>Carnet</h2><p>Lots marqués, stockés dans ce téléphone seulement</p></div>
+    <button class="close" id="closeCarnet" aria-label="Fermer">×</button>
+  </header>
+  <div class="body">
+    <ul class="list" id="carnetList"></ul>
+    <div class="actions" style="margin-top:14px">
+      <button id="exportCsv">Exporter en CSV</button>
+      <button id="shareCsv" class="quiet">Partager</button>
+    </div>
+  </div>
+</section>
+
+<div class="toast" id="toast" role="status"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script>
+/* =====================================================================
+   CONFIG — à ajuster au besoin
+   ===================================================================== */
+const CONFIG = {
+  // Rayon du scan autour de la position (mètres)
+  scanRadius: 250,
+  // Services web gouvernementaux (gratuits, sans clé)
+  cadastre: 'https://geo.environnement.gouv.qc.ca/donnees/rest/services/Reference/Cadastre_allege/MapServer',
+  sda:      'https://servicescarto.mrnf.gouv.qc.ca/pes/rest/services/Territoire/SDA_WMS/MapServer',
+  baux:     'https://servicescarto.mrnf.gouv.qc.ca/pes/rest/services/Territoire/Droits_fonciers_WMS/MapServer',
+  // Portails officiels
+  infolot:  'https://appli.foncier.gouv.qc.ca/infolot/',
+  registre: 'https://www.registrefoncier.gouv.qc.ca',
+  // Visualiseurs de rôle d'évaluation par MRC — colle ici l'URL de la carte
+  // interactive de chaque MRC (laisser vide = recherche web automatique).
+  roles: {
+    'argenteuil': '',
+    'pays-d\'en-haut': '',
+    'matawinie': '',
+    'd\'autray': ''
+  }
+};
+
+/* =====================================================================
+   Carte
+   ===================================================================== */
+const map = L.map('map', { zoomControl:true, attributionControl:true }).setView([46.05, -74.15], 10);
+
+const baseOSM = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  maxZoom:19, attribution:'© OpenStreetMap'
+});
+const baseSat = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+  maxZoom:19, attribution:'Imagerie © Esri, Maxar, Earthstar'
+});
+baseOSM.addTo(map);
+
+// Couche ArcGIS "export" servie en tuiles (fonctionne avec tout MapServer)
+const ArcGISExport = L.TileLayer.extend({
+  initialize(base, layers, opts){ this._base=base; this._layers=layers; L.TileLayer.prototype.initialize.call(this,'',opts); },
+  getTileUrl(c){
+    const n = Math.pow(2,c.z), half=20037508.342789244, res = (2*half)/n;
+    const minx=-half+c.x*res, maxx=minx+res, maxy=half-c.y*res, miny=maxy-res;
+    return `${this._base}/export?bbox=${minx},${miny},${maxx},${maxy}&bboxSR=3857&imageSR=3857&size=256,256&format=png32&transparent=true&dpi=96&layers=show:${this._layers}&f=image`;
+  }
+});
+const lyrCadastre = new ArcGISExport(CONFIG.cadastre, '0', { maxZoom:19, minZoom:13, opacity:.9, attribution:'Cadastre © Gouv. du Québec' }).addTo(map);
+const lyrBaux     = new ArcGISExport(CONFIG.baux, '0,1',   { maxZoom:19, minZoom:10, opacity:.85 }).addTo(map);
+const lyrMuni     = new ArcGISExport(CONFIG.sda, '2',      { maxZoom:19, minZoom:9,  opacity:.6 }).addTo(map);
+
+const scanGroup = L.layerGroup().addTo(map);
+let meMarker = null, meCircle = null, selected = null;
+
+/* =====================================================================
+   Requêtes ArcGIS REST (JSON/GeoJSON, sans clé)
+   ===================================================================== */
+async function query(base, layerId, params){
+  const p = new URLSearchParams({ f:'geojson', inSR:'4326', outSR:'4326', spatialRel:'esriSpatialRelIntersects', returnGeometry:'true', outFields:'*', ...params });
+  const r = await fetch(`${base}/${layerId}/query?${p}`);
+  if(!r.ok) throw new Error(`HTTP ${r.status}`);
+  const j = await r.json();
+  if(j.error) throw new Error(j.error.message||'Erreur service');
+  return j;
+}
+const ptParams = (lat,lng) => ({ geometry:`${lng},${lat}`, geometryType:'esriGeometryPoint' });
+
+async function lotsAround(lat,lng,radius){
+  return query(CONFIG.cadastre, 0, { ...ptParams(lat,lng), distance:String(radius), units:'esriSRUnit_Meter' });
+}
+async function lotAt(lat,lng){ return query(CONFIG.cadastre, 0, ptParams(lat,lng)); }
+async function muniAt(lat,lng){ return query(CONFIG.sda, 2, { ...ptParams(lat,lng), returnGeometry:'false' }); }
+async function bauxAt(lat,lng){ return query(CONFIG.baux, 1, { ...ptParams(lat,lng), returnGeometry:'false' }); }
+
+/* =====================================================================
+   Géométrie : superficie géodésique
+   ===================================================================== */
+const rad = d => d*Math.PI/180;
+function ringArea(c){ const R=6378137; let a=0,n=c.length; if(n<3) return 0;
+  for(let i=0;i<n;i++){ const p1=c[i],p2=c[(i+1)%n]; a+=(rad(p2[0])-rad(p1[0]))*(2+Math.sin(rad(p1[1]))+Math.sin(rad(p2[1]))); }
+  return Math.abs(a*R*R/2); }
+function polyArea(g){ if(!g) return 0;
+  if(g.type==='Polygon') return g.coordinates.reduce((s,r,i)=> i? s-ringArea(r) : ringArea(r), 0);
+  if(g.type==='MultiPolygon') return g.coordinates.reduce((s,p)=> s + p.reduce((t,r,i)=> i? t-ringArea(r) : ringArea(r),0), 0);
+  return 0; }
+const fmt = (n,d=2) => n.toLocaleString('fr-CA',{maximumFractionDigits:d,minimumFractionDigits:d});
+
+/* =====================================================================
+   Position
+   ===================================================================== */
+function locate(){
+  return new Promise((res,rej)=>{
+    if(!navigator.geolocation) return rej(new Error('Pas de GPS dans ce navigateur'));
+    navigator.geolocation.getCurrentPosition(p=>res(p.coords), e=>rej(new Error(e.code===1?'Accès à la position refusé. Autorise-le dans les réglages du navigateur.':'Position introuvable — attends un fix GPS et réessaie.')), { enableHighAccuracy:true, timeout:15000, maximumAge:5000 });
+  });
+}
+
+/* =====================================================================
+   Scan
+   ===================================================================== */
+const btnScan = document.getElementById('btnScan');
+btnScan.addEventListener('click', async ()=>{
+  btnScan.disabled = true; btnScan.lastChild.textContent = ' Recherche…';
+  try{
+    const c = await locate();
+    const lat=c.latitude, lng=c.longitude;
+    if(meMarker){ meMarker.setLatLng([lat,lng]); meCircle.setLatLng([lat,lng]).setRadius(c.accuracy||10); }
+    else{
+      meMarker = L.marker([lat,lng],{icon:L.divIcon({className:'',html:'<div class="me"></div>',iconSize:[18,18],iconAnchor:[9,9]}),zIndexOffset:1000}).addTo(map);
+      meCircle = L.circle([lat,lng],{radius:c.accuracy||10,color:'#1E6FD9',weight:1,fillOpacity:.08}).addTo(map);
+    }
+    map.setView([lat,lng], Math.max(map.getZoom(),16));
+    await scanAt(lat,lng);
+  }catch(e){ toast(e.message); }
+  finally{ btnScan.disabled=false; btnScan.lastChild.textContent=' Scanner ici'; }
+});
+
+// Tap sur la carte = identifier le lot sous le doigt
+map.on('click', async e=>{ if(map.getZoom()<13){ toast('Zoome davantage pour voir les lots'); return; } await identify(e.latlng.lat, e.latlng.lng); });
+
+async function scanAt(lat,lng){
+  scanGroup.clearLayers();
+  const [lots, muni] = await Promise.all([ lotsAround(lat,lng,CONFIG.scanRadius), muniAt(lat,lng).catch(()=>null) ]);
+  const m = muni?.features?.[0]?.properties;
+  if(!lots.features.length){
+    toast(m ? `Aucun lot cadastré dans ${CONFIG.scanRadius} m — ${m.MUS_NM_MUN}. Territoire probablement non cadastré (public).` : `Aucun lot cadastré dans ${CONFIG.scanRadius} m.`);
+    return;
+  }
+  let here = null;
+  lots.features.forEach(f=>{
+    const layer = L.geoJSON(f,{ style:{color:'#1F3D2B',weight:2,fillColor:'#E0A422',fillOpacity:.12} });
+    const ha = polyArea(f.geometry)/10000;
+    layer.bindTooltip(`${f.properties.NO_LOT}<br>${fmt(ha,1)} ha`,{permanent:true,direction:'center',className:'lot-label'});
+    layer.on('click', ev=>{ L.DomEvent.stopPropagation(ev); openLot(f, m); });
+    layer.addTo(scanGroup);
+    if(!here && layer.getBounds().contains([lat,lng])) here = f;
+  });
+  toast(`${lots.features.length} lot${lots.features.length>1?'s':''} dans ${CONFIG.scanRadius} m${m?' — '+m.MUS_NM_MUN:''}`);
+  if(here) openLot(here, m);
+}
+
+async function identify(lat,lng){
+  try{
+    const [lots, muni] = await Promise.all([ lotAt(lat,lng), muniAt(lat,lng).catch(()=>null) ]);
+    const f = lots.features[0], m = muni?.features?.[0]?.properties;
+    if(!f){ toast(m ? `Aucun lot cadastré ici — ${m.MUS_NM_MUN}. Probablement terre publique non cadastrée.` : 'Aucun lot cadastré ici.'); return; }
+    scanGroup.clearLayers();
+    L.geoJSON(f,{style:{color:'#1F3D2B',weight:3,fillColor:'#E0A422',fillOpacity:.18}}).addTo(scanGroup);
+    openLot(f, m);
+  }catch(e){ toast('Service indisponible : '+e.message); }
+}
+
+/* =====================================================================
+   Fiche de lot
+   ===================================================================== */
+const $ = id => document.getElementById(id);
+const sheetLot = $('sheetLot'), sheetCarnet = $('sheetCarnet');
+function show(s){ s.classList.add('open'); s.setAttribute('aria-hidden','false'); }
+function hide(s){ s.classList.remove('open'); s.setAttribute('aria-hidden','true'); }
+$('closeLot').onclick = ()=>hide(sheetLot);
+$('closeCarnet').onclick = ()=>hide(sheetCarnet);
+
+function roleUrl(m){
+  const mrc = (m?.MUS_NM_MRC||'').toLowerCase();
+  for(const k in CONFIG.roles){ if(mrc.includes(k) && CONFIG.roles[k]) return CONFIG.roles[k]; }
+  const q = encodeURIComponent(`rôle d'évaluation carte interactive ${m?.MUS_NM_MUN||''} MRC ${m?.MUS_NM_MRC||''}`);
+  return `https://duckduckgo.com/?q=${q}`;
+}
+
+async function openLot(f, m){
+  const no = f.properties.NO_LOT;
+  const area = polyArea(f.geometry);
+  const b = L.geoJSON(f).getBounds().getCenter();
+  selected = { lot:no, muni:m?.MUS_NM_MUN||'', mrc:m?.MUS_NM_MRC||'', lat:b.lat, lng:b.lng, ha:area/10000 };
+  $('lotNo').textContent = `Lot ${no}`;
+  $('lotWhere').textContent = m ? `${m.MUS_NM_MUN} · MRC ${m.MUS_NM_MRC}` : 'Municipalité inconnue';
+  $('lotHa').textContent = fmt(area/10000);
+  $('lotArp').textContent = fmt(area/3418.89,1);
+  $('lnkInfolot').href = CONFIG.infolot;
+  $('lnkRegistre').href = CONFIG.registre;
+  $('lnkRole').href = roleUrl(m);
+  const site = m?.SITE_WEB ? (m.SITE_WEB.startsWith('http')?m.SITE_WEB:'https://'+m.SITE_WEB) : null;
+  $('lnkMuni').href = site || roleUrl(m);
+  $('lnkMuni').textContent = site ? `Site de ${m.MUS_NM_MUN}${m.TELEPHONE?' · '+m.TELEPHONE:''}` : 'Site de la municipalité';
+  const saved = carnet.find(x=>x.lot===no);
+  $('lotNote').value = saved?.note||''; $('lotStatus').value = saved?.status||'v';
+  $('saveLot').textContent = saved ? 'Mettre à jour' : 'Ajouter au carnet';
+  const t = $('lotTenure'); t.className='fact wide'; t.querySelector('b').textContent='Vérification…';
+  show(sheetLot);
+  try{
+    const bx = await bauxAt(b.lat,b.lng);
+    const n = bx.features?.length||0;
+    if(n){ t.classList.add('tenure-pub'); t.querySelector('b').textContent=`Bail sur terre publique (${n})`; }
+    else { t.classList.add('tenure-priv'); t.querySelector('b').textContent='Aucun bail public — lot probablement privé'; }
+  }catch{ t.querySelector('b').textContent='Tenure non vérifiée (service hors ligne)'; }
+}
+
+$('copyLot').onclick = ()=>copy(selected?.lot||'', 'Numéro de lot copié — colle-le dans Infolot ou le Registre');
+['lnkInfolot','lnkRegistre','lnkRole'].forEach(id=> $(id).addEventListener('click', ()=>{ if(selected) copy(selected.lot, null); }));
+
+/* =====================================================================
+   Carnet (localStorage — reste dans l'appareil)
+   ===================================================================== */
+let carnet = [];
+try{ carnet = JSON.parse(localStorage.getItem('terrain.carnet')||'[]'); }catch{ carnet=[]; }
+function persist(){ try{ localStorage.setItem('terrain.carnet', JSON.stringify(carnet)); }catch{ toast('Stockage local indisponible'); } renderCount(); }
+function renderCount(){ const c=$('carnetCount'); c.textContent=carnet.length; c.hidden=!carnet.length; }
+renderCount();
+
+$('saveLot').onclick = ()=>{
+  if(!selected) return;
+  const rec = { ...selected, note:$('lotNote').value.trim(), status:$('lotStatus').value, date:new Date().toISOString().slice(0,10) };
+  const i = carnet.findIndex(x=>x.lot===rec.lot);
+  if(i>=0) carnet[i]=rec; else carnet.unshift(rec);
+  persist(); toast('Enregistré dans le carnet'); $('saveLot').textContent='Mettre à jour';
+};
+
+const STATUS = { v:['À revoir',''], i:['Intéressant','i'], c:['Contacté','c'] };
+$('btnCarnet').onclick = ()=>{ renderCarnet(); hide(sheetLot); show(sheetCarnet); };
+function renderCarnet(){
+  const ul=$('carnetList'); ul.innerHTML='';
+  if(!carnet.length){ ul.innerHTML='<li class="empty">Rien encore. Scanne un lot, écris une note, ajoute-le ici.</li>'; return; }
+  carnet.forEach(r=>{
+    const li=document.createElement('li');
+    li.innerHTML=`<div class="t"><b>Lot ${r.lot}</b><span>${r.muni||'—'} · ${fmt(r.ha,1)} ha · ${r.date}</span>${r.note?`<span>${esc(r.note)}</span>`:''}</div>
+      <span class="st ${STATUS[r.status][1]}">${STATUS[r.status][0]}</span>
+      <button class="close" aria-label="Retirer" data-lot="${r.lot}">×</button>`;
+    li.querySelector('.t').onclick=()=>{ hide(sheetCarnet); map.setView([r.lat,r.lng],16); identify(r.lat,r.lng); };
+    li.querySelector('button').onclick=()=>{ carnet=carnet.filter(x=>x.lot!==r.lot); persist(); renderCarnet(); };
+    ul.appendChild(li);
+  });
+}
+function esc(s){ return s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+
+function csv(){
+  const head=['lot','municipalite','mrc','hectares','statut','note','date','lat','lng'];
+  const rows=carnet.map(r=>[r.lot,r.muni,r.mrc,r.ha.toFixed(3),STATUS[r.status][0],r.note,r.date,r.lat.toFixed(6),r.lng.toFixed(6)].map(v=>`"${String(v??'').replace(/"/g,'""')}"`).join(','));
+  return '\ufeff'+[head.join(','),...rows].join('\n');
+}
+$('exportCsv').onclick=()=>{
+  if(!carnet.length) return toast('Carnet vide');
+  const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([csv()],{type:'text/csv;charset=utf-8'})); a.download=`terrain-${new Date().toISOString().slice(0,10)}.csv`; a.click();
+};
+$('shareCsv').onclick=async()=>{
+  if(!carnet.length) return toast('Carnet vide');
+  const file=new File([csv()],'terrain.csv',{type:'text/csv'});
+  if(navigator.canShare?.({files:[file]})) { try{ await navigator.share({files:[file],title:'Carnet Terrain'}); }catch{} }
+  else copy(csv(),'CSV copié dans le presse-papier');
+};
+
+/* =====================================================================
+   Lettre type
+   ===================================================================== */
+$('copyLetter').onclick=()=>{
+  if(!selected) return;
+  const d=new Date().toLocaleDateString('fr-CA',{year:'numeric',month:'long',day:'numeric'});
+  const txt=`Montréal, le ${d}
+
+Objet : votre terrain — lot ${selected.lot}, ${selected.muni||'[municipalité]'}
+
+Madame, Monsieur,
+
+Je me permets de vous écrire au sujet du terrain boisé que vous possédez à ${selected.muni||'[municipalité]'} (lot ${selected.lot} du cadastre du Québec, environ ${fmt(selected.ha,1)} hectares). J'ai parcouru le secteur récemment et ce terrain correspond exactement à ce que je cherche pour un projet personnel et familial, à long terme.
+
+Si vous envisagiez un jour de le vendre, en tout ou en partie, j'aimerais beaucoup en discuter avec vous, sans aucune pression. Je suis un acheteur sérieux, en mesure de conclure rapidement et simplement, et je prendrais en charge les frais de notaire.
+
+Vous pouvez me joindre par téléphone au [votre numéro] ou par courriel à [votre courriel]. Même si ce n'est pas le bon moment, je serais heureux d'en reparler plus tard.
+
+Merci de votre attention,
+
+[Votre nom]
+[Votre adresse]`;
+  copy(txt,'Lettre copiée — colle-la dans Notes ou Word');
+};
+
+/* =====================================================================
+   Utilitaires
+   ===================================================================== */
+async function copy(t,msg){ try{ await navigator.clipboard.writeText(t); if(msg) toast(msg); }catch{ if(msg) toast('Copie impossible — note le numéro : '+t); } }
+let toastT; function toast(m){ const t=$('toast'); t.textContent=m; t.classList.add('show'); clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove('show'),3500); }
+
+// Fond de carte & couches
+let sat=false;
+$('btnBase').onclick=e=>{ sat=!sat; e.currentTarget.setAttribute('aria-pressed',sat); if(sat){ map.removeLayer(baseOSM); baseSat.addTo(map); } else { map.removeLayer(baseSat); baseOSM.addTo(map); } lyrMuni.bringToFront(); lyrBaux.bringToFront(); lyrCadastre.bringToFront(); };
+let baux=true;
+$('btnBaux').onclick=e=>{ baux=!baux; e.currentTarget.setAttribute('aria-pressed',baux); baux? lyrBaux.addTo(map) : map.removeLayer(lyrBaux); };
+
+// Service worker (coquille de l'app hors ligne ; les cartes exigent le réseau)
+if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{});
+</script>
+</body>
+</html>
