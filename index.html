@@ -35,6 +35,8 @@ button{font:inherit;cursor:pointer;border:0;background:none;color:inherit}
 .topbar h1{font-size:18px;font-weight:700;margin:0;flex:1;white-space:nowrap}
 .topbar h1 small{font-weight:400;opacity:.7;font-size:13px;margin-left:6px}
 .chip{padding:8px 11px;border-radius:999px;font-size:13px;font-weight:700;background:rgba(255,255,255,.12);color:#fff;border:1px solid rgba(255,255,255,.25);min-height:36px;white-space:nowrap}
+.chip.rec{background:#C62828;color:#fff;border-color:#C62828;animation:pulse 1s infinite}
+@keyframes pulse{50%{opacity:.55}}
 .chip[aria-pressed="true"]{background:var(--boot);color:var(--ink);border-color:var(--boot)}
 .chip svg{width:18px;height:18px;vertical-align:-4px}
 
@@ -117,6 +119,7 @@ button:focus-visible,a:focus-visible{outline:3px solid var(--boot);outline-offse
 <div class="topbar">
   <h1>Terrain <small>repérage</small></h1>
   <button class="chip" id="btnSearch" aria-pressed="false" title="Chercher une adresse ou un code postal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg></button>
+  <button class="chip" id="btnMic" aria-pressed="false" title="Commentaire vocal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></button>
   <button class="chip" id="btnBase" aria-pressed="false">Satellite</button>
   <button class="chip" id="btnBaux" aria-pressed="true">Baux</button>
 </div>
@@ -180,6 +183,8 @@ button:focus-visible,a:focus-visible{outline:3px solid var(--boot);outline-offse
   <div class="body">
     <ul class="list" id="carnetList"></ul>
     <div class="actions" style="margin-top:14px"><button id="exportCsv">Exporter en CSV</button><button id="shareCsv" class="quiet">Partager</button><button id="copyRegistre" class="quiet wide">Copier la liste « Registre à faire »</button></div>
+    <h3>Journal d'usage <span id="logCount" style="font-weight:400"></span></h3>
+    <div class="actions"><button id="shareLog">Partager le rapport</button><button id="copyLog" class="quiet">Copier</button><button id="clearLog" class="quiet wide">Effacer le journal</button></div>
   </div>
 </section>
 
@@ -202,6 +207,18 @@ const CONFIG = {
   // Visualiseurs de rôle par MRC : colle l'URL de la carte interactive ; {lot} sera remplacé par le numéro si l'outil l'accepte.
   roles: { 'argenteuil':'', "pays-d'en-haut":'', 'matawinie':'', "d'autray":'' }
 };
+
+/* ============================ Journal d'usage (local) ============================ */
+let LOG=[]; try{LOG=JSON.parse(localStorage.getItem('terrain.log')||'[]');}catch{LOG=[];}
+const SESSION=Date.now().toString(36).slice(-5);
+let ctx={screen:'carte',lot:null,last:null};
+function log(type,data={}){ const e={t:new Date().toISOString(),s:SESSION,type,screen:ctx.screen,lot:ctx.lot,...data};
+  LOG.push(e); if(LOG.length>3000) LOG=LOG.slice(-3000); ctx.last=type;
+  try{localStorage.setItem('terrain.log',JSON.stringify(LOG));}catch{} }
+log('app_open',{standalone:matchMedia('(display-mode: standalone)').matches,vw:innerWidth,vh:innerHeight,ua:navigator.userAgent.slice(0,80),online:navigator.onLine});
+window.addEventListener('error',e=>log('js_error',{msg:String(e.message).slice(0,160)}));
+window.addEventListener('unhandledrejection',e=>log('js_error',{msg:String(e.reason?.message||e.reason).slice(0,160)}));
+document.addEventListener('visibilitychange',()=>log(document.hidden?'app_hide':'app_show'));
 
 /* ============================ Carte ============================ */
 const map = L.map('map',{zoomControl:false}).setView([46.05,-74.15],10);
@@ -248,7 +265,8 @@ const ring=document.getElementById('ring'), ringLabel=document.getElementById('r
 function ringPx(){ const h=innerHeight-120, w=innerWidth; return Math.min(w,h)*CONFIG.ringFraction/2; }
 function ringMeters(){ const c=map.getCenter(), p=map.latLngToContainerPoint(c); return Math.min(CONFIG.maxRadius, map.distance(c, map.containerPointToLatLng(p.add([ringPx(),0])))); }
 function drawRing(){ const px=ringPx(); ring.style.width=ring.style.height=px*2+'px'; const m=ringMeters(); ringLabel.textContent = m>=1000? fmt(m/1000,1)+' km' : Math.round(m)+' m'; }
-map.on('zoom move resize',drawRing); window.addEventListener('resize',drawRing); drawRing();
+map.on('zoom move resize',drawRing);
+let mvT; map.on('moveend',()=>{clearTimeout(mvT);mvT=setTimeout(()=>log('map_move',{z:+map.getZoom().toFixed(1),r:Math.round(ringMeters())}),800);}); window.addEventListener('resize',drawRing); drawRing();
 
 /* ============================ Position ============================ */
 let me=null, meMarker=null, meCircle=null;
@@ -258,7 +276,7 @@ function showMe(c){ me=[c.latitude,c.longitude];
   if(meMarker){meMarker.setLatLng(me);meCircle.setLatLng(me).setRadius(c.accuracy||10);}
   else{meMarker=L.marker(me,{icon:L.divIcon({className:'',html:'<div class="me"></div>',iconSize:[16,16],iconAnchor:[8,8]}),zIndexOffset:1000}).addTo(map);
        meCircle=L.circle(me,{radius:c.accuracy||10,color:'#1E6FD9',weight:1,fillOpacity:.08}).addTo(map);} }
-document.getElementById('btnMe').onclick=async()=>{ try{ const c=await locate(); showMe(c); map.setView(me,Math.max(map.getZoom(),16)); drawCone(); }catch(e){toast(e.message);} };
+document.getElementById('btnMe').onclick=async()=>{ const t0=Date.now(); try{ const c=await locate(); showMe(c); map.setView(me,Math.max(map.getZoom(),16)); drawCone(); log('locate',{ms:Date.now()-t0,acc:Math.round(c.accuracy||0)}); }catch(e){toast(e.message);log('locate_error',{msg:e.message});} };
 // Suivi en continu, discret (met à jour le point bleu et le cône sans bouger la carte)
 if(navigator.geolocation) navigator.geolocation.watchPosition(p=>{showMe(p.coords);drawCone();},()=>{},{enableHighAccuracy:true,maximumAge:3000});
 
@@ -275,10 +293,10 @@ let coneT=0; function drawCone(){ if(heading===null||!me) return; const now=Date
 async function enableCompass(){
   try{ if(typeof DeviceOrientationEvent!=='undefined' && typeof DeviceOrientationEvent.requestPermission==='function'){ const r=await DeviceOrientationEvent.requestPermission(); if(r!=='granted') throw new Error('refusé'); }
     if('ondeviceorientationabsolute' in window) window.addEventListener('deviceorientationabsolute',onOrient); else window.addEventListener('deviceorientation',onOrient);
-    compassOn=true; compassEl.classList.remove('off'); degEl.textContent='…'; toast('Boussole activée — le cône bleu montre où tu pointes');
+    compassOn=true; compassEl.classList.remove('off'); degEl.textContent='…'; log('compass_on'); toast('Boussole activée — le cône bleu montre où tu pointes');
   }catch{ toast('Boussole indisponible sur cet appareil'); }
 }
-compassEl.onclick=()=>{ if(!compassOn) enableCompass(); else { compassOn=false; compassEl.classList.add('off'); degEl.textContent='boussole'; heading=null; coneGroup.clearLayers(); window.removeEventListener('deviceorientationabsolute',onOrient); window.removeEventListener('deviceorientation',onOrient); } };
+compassEl.onclick=()=>{ if(!compassOn) enableCompass(); else { log('compass_off'); compassOn=false; compassEl.classList.add('off'); degEl.textContent='boussole'; heading=null; coneGroup.clearLayers(); window.removeEventListener('deviceorientationabsolute',onOrient); window.removeEventListener('deviceorientation',onOrient); } };
 // Sur Android, la boussole marche souvent sans permission : on tente discrètement au chargement
 if(typeof DeviceOrientationEvent!=='undefined' && typeof DeviceOrientationEvent.requestPermission!=='function') enableCompass();
 
@@ -290,15 +308,15 @@ searchForm.onsubmit=async e=>{ e.preventDefault(); const text=q.value.trim(); if
     let hit=null;
     try{ const r=await fetch(`${CONFIG.geocode}/findAddressCandidates?${new URLSearchParams({SingleLine:text,outSR:'4326',maxLocations:'1',f:'json'})}`); const j=await r.json(); const c=j.candidates?.[0]; if(c) hit=[c.location.y,c.location.x,c.address]; }catch{}
     if(!hit){ const r=await fetch(`https://nominatim.openstreetmap.org/search?${new URLSearchParams({q:text+', Québec, Canada',format:'json',limit:'1'})}`); const j=await r.json(); if(j[0]) hit=[+j[0].lat,+j[0].lon,j[0].display_name.split(',').slice(0,2).join(',')]; }
-    if(!hit) return toast('Lieu introuvable');
+    log('search',{len:text.length,hit:!!hit}); if(!hit) return toast('Lieu introuvable');
     map.setView([hit[0],hit[1]],15); toast(hit[2]); searchForm.classList.remove('open'); document.getElementById('btnSearch').setAttribute('aria-pressed',false);
   }catch{ toast('Recherche indisponible'); } };
 
 /* ============================ Scan ============================ */
 const btnScan=document.getElementById('btnScan'), legend=document.getElementById('legend');
 let lastMuni=null;
-btnScan.onclick=async()=>{ const c=map.getCenter(), r=ringMeters(); btnScan.disabled=true; btnScan.lastElementChild.textContent='Recherche…';
-  try{ await scanAt(c.lat,c.lng,r); }catch(e){ toast('Service indisponible : '+e.message); }
+btnScan.onclick=async()=>{ const c=map.getCenter(), r=ringMeters(), t0=Date.now(); btnScan.disabled=true; btnScan.lastElementChild.textContent='Recherche…';
+  try{ const res=await scanAt(c.lat,c.lng,r); log('scan',{ms:Date.now()-t0,r:Math.round(r),z:+map.getZoom().toFixed(1),lots:res?.lots??0,vacant:res?.vacant??0,muni:res?.muni||null}); }catch(e){ toast('Service indisponible : '+e.message); log('scan_error',{ms:Date.now()-t0,msg:e.message}); }
   finally{ btnScan.disabled=false; btnScan.lastElementChild.textContent='Scanner'; } };
 
 async function scanAt(lat,lng,radius){
@@ -306,7 +324,7 @@ async function scanAt(lat,lng,radius){
   const [lots,addrs,muni]=await Promise.all([ around(CONFIG.cadastre,0,lat,lng,radius), around(CONFIG.adresses,0,lat,lng,radius+60).catch(()=>({features:[]})), muniAt(lat,lng).catch(()=>null) ]);
   lastMuni=muni?.features?.[0]?.properties||null;
   L.circle([lat,lng],{radius,color:'#E0A422',weight:1,dashArray:'4 4',fill:false,interactive:false}).addTo(scanGroup);
-  if(!lots.features.length){ toast(lastMuni?`Aucun lot cadastré dans ${Math.round(radius)} m — ${lastMuni.MUS_NM_MUN}. Territoire probablement public (non cadastré).`:`Aucun lot cadastré dans ${Math.round(radius)} m.`); return; }
+  if(!lots.features.length){ toast(lastMuni?`Aucun lot cadastré dans ${Math.round(radius)} m — ${lastMuni.MUS_NM_MUN}. Territoire probablement public (non cadastré).`:`Aucun lot cadastré dans ${Math.round(radius)} m.`); return {lots:0,vacant:0,muni:lastMuni?.MUS_NM_MUN}; }
   const pts=addrs.features.map(f=>f.geometry.coordinates);
   let vacant=0;
   lots.features.forEach(f=>{
@@ -315,21 +333,22 @@ async function scanAt(lat,lng,radius){
     const layer=L.geoJSON(f,{style:lotStyle(f.properties.NO_LOT,built)});
     layer._lot=f.properties.NO_LOT; layer._built=built;
     layer.bindTooltip(`${f.properties.NO_LOT}<br>${fmt(polyArea(f.geometry)/10000,1)} ha`,{permanent:true,direction:'center',className:'lot-label'});
-    layer.on('click',ev=>{L.DomEvent.stopPropagation(ev);openLot(f,lastMuni);});
+    layer.on('click',ev=>{L.DomEvent.stopPropagation(ev);log('lot_tap',{from:'scan',lot:f.properties.NO_LOT,built});openLot(f,lastMuni);});
     layer.addTo(scanGroup);
   });
   legend.classList.add('show');
   toast(`${lots.features.length} lots dans ${Math.round(radius)} m · ${vacant} sans adresse civique${lastMuni?' · '+lastMuni.MUS_NM_MUN:''}`);
+  return {lots:lots.features.length,vacant,muni:lastMuni?.MUS_NM_MUN};
 }
 function lotStyle(no,built){ const saved=carnet.some(x=>x.lot===no);
   if(saved) return {color:'#1F3D2B',weight:3,fillColor:'#2E7D4F',fillOpacity:.38};
   return {color:'#1F3D2B',weight:2,fillColor:built?'#B8BFB5':'#E0A422',fillOpacity:built?.25:.28}; }
 function restyleScan(){ scanGroup.eachLayer(l=>{ if(l._lot) l.setStyle(lotStyle(l._lot,l._built)); }); }
-map.on('click',async e=>{ if(map.getZoom()<13){toast('Zoome davantage pour voir les lots');return;} await identify(e.latlng.lat,e.latlng.lng); });
+map.on('click',async e=>{ if(map.getZoom()<13){toast('Zoome davantage pour voir les lots');log('map_tap_too_far',{z:+map.getZoom().toFixed(1)});return;} log('map_tap'); await identify(e.latlng.lat,e.latlng.lng); });
 async function identify(lat,lng){ try{
   const [lots,muni]=await Promise.all([lotAt(lat,lng),muniAt(lat,lng).catch(()=>null)]);
   const f=lots.features[0], m=muni?.features?.[0]?.properties;
-  if(!f){toast(m?`Aucun lot cadastré ici — ${m.MUS_NM_MUN}. Probablement terre publique non cadastrée.`:'Aucun lot cadastré ici.');return;}
+  if(!f){toast(m?`Aucun lot cadastré ici — ${m.MUS_NM_MUN}. Probablement terre publique non cadastrée.`:'Aucun lot cadastré ici.');log('identify_empty');return;}
   scanGroup.clearLayers(); legend.classList.remove('show');
   const l=L.geoJSON(f,{style:lotStyle(f.properties.NO_LOT,false)}); l._lot=f.properties.NO_LOT; l._built=false; l.addTo(scanGroup); openLot(f,m);
 }catch(e){toast('Service indisponible : '+e.message);} }
@@ -337,7 +356,7 @@ async function identify(lat,lng){ try{
 /* ============================ Fiche ============================ */
 const $=id=>document.getElementById(id);
 const sheetLot=$('sheetLot'), sheetCarnet=$('sheetCarnet'); let selected=null;
-function show(s){s.classList.add('open');s.setAttribute('aria-hidden','false');} function hide(s){s.classList.remove('open');s.setAttribute('aria-hidden','true');}
+function show(s){s.classList.add('open');s.setAttribute('aria-hidden','false');ctx.screen=s.id==='sheetLot'?'fiche':'carnet';} function hide(s){s.classList.remove('open');s.setAttribute('aria-hidden','true');log('close_'+ctx.screen);ctx.screen='carte';if(s.id==='sheetLot')ctx.lot=null;}
 $('closeLot').onclick=()=>hide(sheetLot); $('closeCarnet').onclick=()=>hide(sheetCarnet);
 function roleUrl(m,lot){ const mrc=(m?.MUS_NM_MRC||'').toLowerCase();
   for(const k in CONFIG.roles){ if(mrc.includes(k)&&CONFIG.roles[k]) return CONFIG.roles[k].replace('{lot}',encodeURIComponent(lot||'')); }
@@ -345,7 +364,7 @@ function roleUrl(m,lot){ const mrc=(m?.MUS_NM_MRC||'').toLowerCase();
 
 async function openLot(f,m){
   const no=f.properties.NO_LOT, area=polyArea(f.geometry), gj=L.geoJSON(f), b=gj.getBounds(), c=b.getCenter();
-  selected={lot:no,muni:m?.MUS_NM_MUN||'',mrc:m?.MUS_NM_MRC||'',lat:c.lat,lng:c.lng,ha:area/10000};
+  selected={lot:no,muni:m?.MUS_NM_MUN||'',mrc:m?.MUS_NM_MRC||'',lat:c.lat,lng:c.lng,ha:area/10000}; ctx.lot=no; log('lot_open',{lot:no,ha:+(area/10000).toFixed(2),muni:selected.muni});
   $('lotNo').textContent=`Lot ${no}`; $('lotWhere').textContent=m?`${m.MUS_NM_MUN} · MRC ${m.MUS_NM_MRC}`:'Municipalité inconnue';
   $('lotHa').textContent=fmt(area/10000); $('lotArp').textContent=fmt(area/3418.89,1);
   $('lnkInfolot').href=CONFIG.infolot; $('lnkRole').href=roleUrl(m,no);
@@ -363,6 +382,7 @@ function ownerLinks(){ const n=$('lotOwner').value.trim(); const where=selected?
   $('lnkC411').href = n ? `https://www.canada411.ca/search/si/1/${encodeURIComponent(n)}/${encodeURIComponent(where)}` : 'https://www.canada411.ca';
   $('lnkNoms').href = CONFIG.registre; }
 $('lotOwner').addEventListener('input',ownerLinks);
+['copyLot','lnkInfolot','lnkRole','lnkMuni','lnkC411','lnkNoms','copyLetter','markRegistre'].forEach(id=>$(id).addEventListener('click',()=>log('btn',{id})));
 $('lnkNoms').addEventListener('click',()=>{ const n=$('lotOwner').value.trim(); if(n) copy(n,'Nom copié — colle-le dans l\'Index des noms'); });
 $('markRegistre').onclick=()=>{ if(!selected) return; $('lotStatus').value='r'; $('saveLot').click(); copy(selected.lot,null); toast('Lot ajouté à la liste « Registre à faire »'); };
 $('copyLot').onclick=()=>copy(selected?.lot||'','Numéro de lot copié — colle-le dans Infolot ou le Registre');
@@ -375,9 +395,9 @@ function renderCount(){const c=$('carnetCount');c.textContent=carnet.length;c.hi
 function renderSaved(){ savedGroup.clearLayers(); carnet.forEach(r=>{ const mk=L.marker([r.lat,r.lng],{icon:L.divIcon({className:'',html:'<div class="saved-pin"></div>',iconSize:[14,14],iconAnchor:[7,7]})}).addTo(savedGroup);
   mk.bindTooltip(`Lot ${r.lot}${r.owner?' · '+esc(r.owner):''}`); mk.on('click',ev=>{L.DomEvent.stopPropagation(ev);identify(r.lat,r.lng);}); }); } renderSaved();
 $('saveLot').onclick=()=>{ if(!selected)return; const rec={...selected,owner:$('lotOwner').value.trim(),note:$('lotNote').value.trim(),status:$('lotStatus').value,date:new Date().toISOString().slice(0,10)};
-  const i=carnet.findIndex(x=>x.lot===rec.lot); if(i>=0)carnet[i]=rec; else carnet.unshift(rec); persist(); restyleScan(); renderSaved(); toast('Enregistré dans le carnet'); $('saveLot').textContent='Mettre à jour'; };
+  const i=carnet.findIndex(x=>x.lot===rec.lot); if(i>=0)carnet[i]=rec; else carnet.unshift(rec); persist(); restyleScan(); renderSaved(); log('save',{status:rec.status,note:!!rec.note,owner:!!rec.owner}); toast('Enregistré dans le carnet'); $('saveLot').textContent='Mettre à jour'; };
 const STATUS={v:['À revoir',''],r:['Registre à faire','r'],i:['Intéressant','i'],c:['Contacté','c']};
-$('btnCarnet').onclick=()=>{renderCarnet();hide(sheetLot);show(sheetCarnet);};
+$('btnCarnet').onclick=()=>{log('btn',{id:'btnCarnet'});renderCarnet();renderLogCount();hide(sheetLot);show(sheetCarnet);};
 function esc(s){return s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
 function renderCarnet(){ const ul=$('carnetList'); ul.innerHTML=''; if(!carnet.length){ul.innerHTML='<li class="empty">Rien encore. Scanne, touche un lot, écris une note, ajoute-le ici.</li>';return;}
   carnet.forEach(r=>{ const li=document.createElement('li');
@@ -388,7 +408,7 @@ function renderCarnet(){ const ul=$('carnetList'); ul.innerHTML=''; if(!carnet.l
 function csv(){ const head=['lot','municipalite','mrc','hectares','proprietaire','statut','note','date','lat','lng'];
   const rows=carnet.map(r=>[r.lot,r.muni,r.mrc,r.ha.toFixed(3),r.owner||'',STATUS[r.status][0],r.note,r.date,r.lat.toFixed(6),r.lng.toFixed(6)].map(v=>`"${String(v??'').replace(/"/g,'""')}"`).join(','));
   return '\ufeff'+[head.join(','),...rows].join('\n'); }
-$('exportCsv').onclick=()=>{ if(!carnet.length)return toast('Carnet vide'); const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([csv()],{type:'text/csv;charset=utf-8'})); a.download=`terrain-${new Date().toISOString().slice(0,10)}.csv`; a.click(); };
+$('exportCsv').onclick=()=>{ log('btn',{id:'exportCsv'}); if(!carnet.length)return toast('Carnet vide'); const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([csv()],{type:'text/csv;charset=utf-8'})); a.download=`terrain-${new Date().toISOString().slice(0,10)}.csv`; a.click(); };
 $('copyRegistre').onclick=()=>{ const l=carnet.filter(r=>r.status==='r'); if(!l.length) return toast('Aucun lot marqué pour le Registre'); copy(l.map(r=>`${r.lot}\t${r.muni}`).join('\n'), `${l.length} lot(s) copié(s) — colle-les dans tes notes pour ce soir`); };
 $('shareCsv').onclick=async()=>{ if(!carnet.length)return toast('Carnet vide'); const file=new File([csv()],'terrain.csv',{type:'text/csv'});
   if(navigator.canShare?.({files:[file]})){try{await navigator.share({files:[file],title:'Carnet Terrain'});}catch{}} else copy(csv(),'CSV copié dans le presse-papier'); };
@@ -415,8 +435,44 @@ Merci de votre attention,
 /* ============================ Utilitaires ============================ */
 async function copy(t,msg){try{await navigator.clipboard.writeText(t);if(msg)toast(msg);}catch{if(msg)toast('Copie impossible — note le numéro : '+t);}}
 let toastT; function toast(m){const t=$('toast');t.textContent=m;t.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('show'),4000);}
-let sat=false; $('btnBase').onclick=e=>{sat=!sat;e.currentTarget.setAttribute('aria-pressed',sat);if(sat){map.removeLayer(baseOSM);baseSat.addTo(map);}else{map.removeLayer(baseSat);baseOSM.addTo(map);}lyrMuni.bringToFront();lyrBaux.bringToFront();lyrCadastre.bringToFront();};
-let baux=true; $('btnBaux').onclick=e=>{baux=!baux;e.currentTarget.setAttribute('aria-pressed',baux);baux?lyrBaux.addTo(map):map.removeLayer(lyrBaux);};
+let sat=false; $('btnBase').onclick=e=>{sat=!sat;log('basemap',{sat});e.currentTarget.setAttribute('aria-pressed',sat);if(sat){map.removeLayer(baseOSM);baseSat.addTo(map);}else{map.removeLayer(baseSat);baseOSM.addTo(map);}lyrMuni.bringToFront();lyrBaux.bringToFront();lyrCadastre.bringToFront();};
+let baux=true; $('btnBaux').onclick=e=>{baux=!baux;log('baux',{baux});e.currentTarget.setAttribute('aria-pressed',baux);baux?lyrBaux.addTo(map):map.removeLayer(lyrBaux);};
+/* ============================ Commentaires vocaux ============================ */
+const SR=window.SpeechRecognition||window.webkitSpeechRecognition; let rec=null, recOn=false;
+const micBtn=$('btnMic');
+micBtn.onclick=()=>{
+  if(!SR){ const t=prompt('Reconnaissance vocale indisponible — écris ton commentaire :'); if(t){log('voice',{text:t,typed:true});toast('Commentaire noté');} return; }
+  if(recOn){ rec.stop(); return; }
+  rec=new SR(); rec.lang='fr-CA'; rec.continuous=true; rec.interimResults=false;
+  rec.onstart=()=>{recOn=true;micBtn.classList.add('rec');toast('Je t\'écoute — retouche le micro pour arrêter');log('voice_start');};
+  rec.onresult=ev=>{ for(let i=ev.resultIndex;i<ev.results.length;i++){ if(ev.results[i].isFinal){ const text=ev.results[i][0].transcript.trim(); if(text){ log('voice',{text}); toast('« '+text.slice(0,70)+(text.length>70?'…':'')+' »'); } } } };
+  rec.onerror=ev=>{ log('voice_error',{msg:ev.error}); if(ev.error==='not-allowed') toast('Micro refusé — autorise-le dans les réglages du site'); };
+  rec.onend=()=>{recOn=false;micBtn.classList.remove('rec');log('voice_stop');};
+  rec.start();
+};
+
+/* ============================ Rapport ============================ */
+function renderLogCount(){ const v=LOG.filter(e=>e.type==='voice').length; $('logCount').textContent=`· ${LOG.length} événements, ${v} commentaires`; }
+function report(){
+  const sessions=[...new Set(LOG.map(e=>e.s))];
+  const lines=['# Rapport d\'usage — Terrain',`Généré le ${new Date().toLocaleString('fr-CA')} · ${LOG.length} événements · ${sessions.length} session(s)`,''];
+  const count=t=>LOG.filter(e=>e.type===t).length, avg=(t,k)=>{const a=LOG.filter(e=>e.type===t&&e[k]!=null);return a.length?Math.round(a.reduce((s,e)=>s+e[k],0)/a.length):null;};
+  lines.push('## Résumé',`- Scans : ${count('scan')} (${count('scan_error')} échecs) · durée moyenne ${avg('scan','ms')||'—'} ms · rayon moyen ${avg('scan','r')||'—'} m · lots/scan ${avg('scan','lots')||'—'}`,
+    `- Lots ouverts : ${count('lot_open')} · sauvegardés : ${count('save')} · taps hors zoom : ${count('map_tap_too_far')}`,
+    `- Localisations : ${count('locate')} (${count('locate_error')} échecs) · précision moyenne ${avg('locate','acc')||'—'} m`,
+    `- Recherches : ${count('search')} · boussole : ${count('compass_on')} activations · erreurs JS : ${count('js_error')}`,
+    `- Commentaires vocaux : ${count('voice')}`,'');
+  const b={}; LOG.filter(e=>e.type==='btn').forEach(e=>b[e.id]=(b[e.id]||0)+1);
+  lines.push('## Boutons', ...Object.entries(b).sort((x,y)=>y[1]-x[1]).map(([k,v])=>`- ${k} : ${v}`), '');
+  lines.push('## Commentaires vocaux (avec contexte)', ...LOG.filter(e=>e.type==='voice').map(e=>`- ${e.t.slice(0,16).replace('T',' ')} · écran ${e.screen}${e.lot?' · lot '+e.lot:''} · juste avant : ${LOG[LOG.indexOf(e)-1]?.type||'—'}\n  > ${e.text}`), '');
+  lines.push('## Chronologie (compacte)', ...LOG.map(e=>{ const {t,s,type,screen,lot,text,ua,...rest}=e; const extra=Object.entries(rest).filter(([k,v])=>v!==null&&v!==undefined).map(([k,v])=>`${k}=${v}`).join(' '); return `${t.slice(11,19)} ${s} ${type}${screen!=='carte'?' @'+screen:''}${lot?' lot'+lot:''}${extra?' '+extra:''}${text?' "'+text+'"':''}`; }));
+  return lines.join('\n');
+}
+$('shareLog').onclick=async()=>{ const txt=report(); const file=new File([txt],`terrain-rapport-${new Date().toISOString().slice(0,10)}.md`,{type:'text/markdown'});
+  if(navigator.canShare?.({files:[file]})){ try{ await navigator.share({files:[file],title:'Rapport Terrain'}); }catch{} } else { const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([txt],{type:'text/markdown'})); a.download=file.name; a.click(); } };
+$('copyLog').onclick=()=>copy(report(),'Rapport copié — colle-le dans la conversation');
+$('clearLog').onclick=()=>{ if(confirm('Effacer tout le journal d\'usage ?')){ LOG=[]; try{localStorage.removeItem('terrain.log');}catch{} renderLogCount(); toast('Journal effacé'); } };
+
 if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{});
 </script>
 </body>
