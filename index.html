@@ -58,8 +58,8 @@ button{font:inherit;cursor:pointer;border:0;background:none;color:inherit}
 .compass .deg{position:absolute;bottom:-18px;left:50%;transform:translateX(-50%);font-size:11px;font-weight:700;color:var(--bark);white-space:nowrap}
 .compass.off svg{opacity:.35}
 
-.mode{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(var(--sab) + 90px);z-index:1000;display:flex;background:var(--paper);border-radius:999px;padding:4px;box-shadow:0 4px 14px rgba(23,32,26,.18)}
-.mode button{padding:8px 18px;border-radius:999px;font-weight:700;font-size:14px;color:var(--ink-2);min-height:40px}
+.mode{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(var(--sab) + 108px);z-index:1000;display:flex;background:var(--paper);border-radius:999px;padding:4px;box-shadow:0 4px 14px rgba(23,32,26,.18)}
+.mode button{width:52px;border-radius:999px;font-weight:700;font-size:20px;line-height:1;color:var(--ink-2);min-height:40px}
 .mode button[aria-pressed="true"]{background:var(--bark);color:#fff}
 .ring.hidden{display:none}
 /* Boutons bas */
@@ -70,10 +70,25 @@ button{font:inherit;cursor:pointer;border:0;background:none;color:inherit}
 .round.carnet{color:var(--bark);position:relative;font-size:11px;font-weight:700;flex-direction:column;gap:1px}
 .round.carnet svg{width:20px;height:20px}
 .count{position:absolute;top:-4px;right:-4px;background:var(--bark);color:#fff;border-radius:999px;min-width:20px;height:20px;font-size:11px;line-height:20px;text-align:center;padding:0 5px}
-.scan{height:60px;padding:0 26px;border-radius:30px;background:var(--boot);color:var(--ink);font-size:19px;font-weight:700;box-shadow:0 8px 24px rgba(23,32,26,.28);display:flex;align-items:center;gap:10px;transition:transform .15s}
-.scan:active{transform:scale(.97)}
-.scan[disabled]{opacity:.65}
-.scan svg{width:22px;height:22px}
+.scan{
+  width:78px;height:78px;border-radius:50%;padding:0;position:relative;
+  background:
+    repeating-conic-gradient(from 0deg, #2A4D39 0deg 4deg, #152B20 4deg 8deg);
+  box-shadow:0 10px 22px rgba(23,32,26,.38), 0 2px 0 #0E1C14, inset 0 1px 0 rgba(255,255,255,.18);
+  transition:transform .08s ease, box-shadow .08s ease;
+}
+.scan .face{
+  position:absolute;inset:7px;border-radius:50%;
+  background:radial-gradient(circle at 35% 30%, #4C6B4A 0%, #1F3D2B 55%, #132A1E 100%);
+  box-shadow:inset 0 2px 3px rgba(255,255,255,.22), inset 0 -3px 6px rgba(0,0,0,.45), 0 1px 0 rgba(255,255,255,.08);
+  display:flex;align-items:center;justify-content:center;color:var(--boot);
+}
+.scan .face svg{width:34px;height:34px;filter:drop-shadow(0 1px 1px rgba(0,0,0,.5))}
+.scan:active, .scan.down{transform:translateY(3px);box-shadow:0 5px 12px rgba(23,32,26,.38), 0 0 0 #0E1C14, inset 0 1px 0 rgba(255,255,255,.1)}
+.scan:active .face, .scan.down .face{box-shadow:inset 0 3px 6px rgba(0,0,0,.55), inset 0 -1px 2px rgba(255,255,255,.1)}
+.scan.busy .face svg{animation:spin .9s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.scan[disabled]{opacity:.9}
 
 /* Feuilles */
 .sheet{position:fixed;left:0;right:0;bottom:0;z-index:1100;background:var(--paper);border-radius:18px 18px 0 0;box-shadow:0 -10px 40px rgba(23,32,26,.22);max-height:78vh;display:flex;flex-direction:column;transform:translateY(105%);transition:transform .22s ease;padding-bottom:var(--sab)}
@@ -124,7 +139,7 @@ button:focus-visible,a:focus-visible{outline:3px solid var(--boot);outline-offse
   <h1>Terrain <small>repérage</small></h1>
   <button class="chip" id="btnSearch" aria-pressed="false" title="Chercher une adresse ou un code postal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg></button>
   <button class="chip" id="btnMic" aria-pressed="false" title="Commentaire vocal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></button>
-  <button class="chip" id="btnBase" aria-pressed="false">Satellite</button>
+  <button class="chip" id="btnBase" aria-pressed="false" title="Basculer carte / photo aérienne"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l9 5-9 5-9-5 9-5z"/><path d="M3 13l9 5 9-5"/></svg> Aérien</button>
   <button class="chip" id="btnBaux" aria-pressed="true">Baux</button>
 </div>
 <form class="search" id="search">
@@ -141,10 +156,13 @@ button:focus-visible,a:focus-visible{outline:3px solid var(--boot);outline-offse
 <div class="ring" id="ring" aria-hidden="true"><span id="ringLabel">250 m</span></div>
 <div class="legend" id="legend"><span><i style="background:#E0A422"></i>sans adresse civique</span><span><i style="background:#B8BFB5"></i>bâti</span><span><i style="background:#2E7D4F"></i>dans mon carnet</span></div>
 
-<div class="mode" role="group" aria-label="Portée du scan"><button id="modeOne" aria-pressed="false">1 lot</button><button id="modeZone" aria-pressed="true">Zone</button></div>
+<div class="mode" role="group" aria-label="Portée du scan"><button id="modeOne" aria-pressed="false" aria-label="Un seul lot">1</button><button id="modeZone" aria-pressed="true" aria-label="Tous les lots dans l'anneau">∞</button></div>
 <div class="bottom">
   <button class="round" id="btnMe" aria-label="Aller à ma position"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="12" cy="12" r="3" fill="currentColor"/><circle cx="12" cy="12" r="8"/><path d="M12 1v3M12 20v3M1 12h3M20 12h3"/></svg></button>
-  <button class="scan" id="btnScan"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="12" cy="12" r="9" stroke-dasharray="3 3"/><circle cx="12" cy="12" r="3"/></svg><span>Scanner</span></button>
+  <button class="scan" id="btnScan" aria-label="Rafraîchir">
+    <span class="face"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 1 1-2.3-5.7"/><path d="M20 4v5h-5"/></svg></span>
+    <span class="lbl" hidden>Scanner</span>
+  </button>
   <button class="round carnet" id="btnCarnet" aria-label="Carnet"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 3h11l3 3v15H5z"/><path d="M8 8h8M8 12h8M8 16h5"/></svg>Carnet<span class="count" id="carnetCount" hidden>0</span></button>
 </div>
 
@@ -320,14 +338,14 @@ searchForm.onsubmit=async e=>{ e.preventDefault(); const text=q.value.trim(); if
 /* ============================ Scan ============================ */
 const btnScan=document.getElementById('btnScan'), legend=document.getElementById('legend');
 let mode=localStorage.getItem('terrain.mode')||'zone';
-function setMode(m){ mode=m; try{localStorage.setItem('terrain.mode',m);}catch{} document.getElementById('modeOne').setAttribute('aria-pressed',m==='one'); document.getElementById('modeZone').setAttribute('aria-pressed',m==='zone'); ring.classList.toggle('hidden',m==='one'); btnScan.lastElementChild.textContent = m==='one' ? 'Ce lot' : 'Scanner'; }
+function setMode(m){ mode=m; try{localStorage.setItem('terrain.mode',m);}catch{} document.getElementById('modeOne').setAttribute('aria-pressed',m==='one'); document.getElementById('modeZone').setAttribute('aria-pressed',m==='zone'); ring.classList.toggle('hidden',m==='one'); btnScan.setAttribute('aria-label', m==='one' ? 'Identifier ce lot' : 'Scanner la zone'); }
 document.getElementById('modeOne').onclick=()=>{setMode('one');log('mode',{mode:'one'});}; document.getElementById('modeZone').onclick=()=>{setMode('zone');log('mode',{mode:'zone'});};
 let lastMuni=null;
 btnScan.onclick=async()=>{ const c=map.getCenter(), r=ringMeters(), t0=Date.now();
-  if(mode==='one'){ if(map.getZoom()<13){ toast('Zoome davantage pour viser un lot'); log('map_tap_too_far',{z:+map.getZoom().toFixed(1),via:'btn'}); return; } log('scan_one'); await identify(c.lat,c.lng); return; }
-  btnScan.disabled=true; btnScan.lastElementChild.textContent='Recherche…';
+  if(mode==='one'){ if(map.getZoom()<13){ toast('Zoome davantage pour viser un lot'); log('map_tap_too_far',{z:+map.getZoom().toFixed(1),via:'btn'}); return; } log('scan_one'); navigator.vibrate?.(12); btnScan.classList.add('busy'); try{ await identify(c.lat,c.lng); } finally{ btnScan.classList.remove('busy'); } return; }
+  btnScan.disabled=true; btnScan.classList.add('busy'); navigator.vibrate?.(12);
   try{ const res=await scanAt(c.lat,c.lng,r); log('scan',{ms:Date.now()-t0,r:Math.round(r),z:+map.getZoom().toFixed(1),lots:res?.lots??0,vacant:res?.vacant??0,muni:res?.muni||null}); }catch(e){ toast('Service indisponible : '+e.message); log('scan_error',{ms:Date.now()-t0,msg:e.message}); }
-  finally{ btnScan.disabled=false; btnScan.lastElementChild.textContent='Scanner'; } };
+  finally{ btnScan.disabled=false; btnScan.classList.remove('busy'); } };
 setMode(mode);
 
 async function scanAt(lat,lng,radius){
