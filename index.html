@@ -131,7 +131,7 @@ button:focus-visible,a:focus-visible{outline:3px solid var(--boot);outline-offse
 
 <div class="pin" aria-hidden="true"><svg viewBox="0 0 34 44"><path d="M17 1C8 1 1 8 1 17c0 11 16 26 16 26s16-15 16-26C33 8 26 1 17 1z" fill="#1E6FD9" stroke="#fff" stroke-width="2"/><circle cx="17" cy="17" r="6" fill="#fff"/></svg></div>
 <div class="ring" id="ring" aria-hidden="true"><span id="ringLabel">250 m</span></div>
-<div class="legend" id="legend"><span><i style="background:#E0A422"></i>sans adresse civique</span><span><i style="background:#B8BFB5"></i>bâti</span></div>
+<div class="legend" id="legend"><span><i style="background:#E0A422"></i>sans adresse civique</span><span><i style="background:#B8BFB5"></i>bâti</span><span><i style="background:#2E7D4F"></i>dans mon carnet</span></div>
 
 <div class="bottom">
   <button class="round" id="btnMe" aria-label="Aller à ma position"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="12" cy="12" r="3" fill="currentColor"/><circle cx="12" cy="12" r="8"/><path d="M12 1v3M12 20v3M1 12h3M20 12h3"/></svg></button>
@@ -305,7 +305,8 @@ async function scanAt(lat,lng,radius){
   lots.features.forEach(f=>{
     const built=pts.some(p=>inPoly(p,f.geometry)); if(!built) vacant++;
     f._built=built;
-    const layer=L.geoJSON(f,{style:{color:'#1F3D2B',weight:2,fillColor:built?'#B8BFB5':'#E0A422',fillOpacity:built?.25:.28}});
+    const layer=L.geoJSON(f,{style:lotStyle(f.properties.NO_LOT,built)});
+    layer._lot=f.properties.NO_LOT; layer._built=built;
     layer.bindTooltip(`${f.properties.NO_LOT}<br>${fmt(polyArea(f.geometry)/10000,1)} ha`,{permanent:true,direction:'center',className:'lot-label'});
     layer.on('click',ev=>{L.DomEvent.stopPropagation(ev);openLot(f,lastMuni);});
     layer.addTo(scanGroup);
@@ -313,13 +314,17 @@ async function scanAt(lat,lng,radius){
   legend.classList.add('show');
   toast(`${lots.features.length} lots dans ${Math.round(radius)} m · ${vacant} sans adresse civique${lastMuni?' · '+lastMuni.MUS_NM_MUN:''}`);
 }
+function lotStyle(no,built){ const saved=carnet.some(x=>x.lot===no);
+  if(saved) return {color:'#1F3D2B',weight:3,fillColor:'#2E7D4F',fillOpacity:.38};
+  return {color:'#1F3D2B',weight:2,fillColor:built?'#B8BFB5':'#E0A422',fillOpacity:built?.25:.28}; }
+function restyleScan(){ scanGroup.eachLayer(l=>{ if(l._lot) l.setStyle(lotStyle(l._lot,l._built)); }); }
 map.on('click',async e=>{ if(map.getZoom()<13){toast('Zoome davantage pour voir les lots');return;} await identify(e.latlng.lat,e.latlng.lng); });
 async function identify(lat,lng){ try{
   const [lots,muni]=await Promise.all([lotAt(lat,lng),muniAt(lat,lng).catch(()=>null)]);
   const f=lots.features[0], m=muni?.features?.[0]?.properties;
   if(!f){toast(m?`Aucun lot cadastré ici — ${m.MUS_NM_MUN}. Probablement terre publique non cadastrée.`:'Aucun lot cadastré ici.');return;}
   scanGroup.clearLayers(); legend.classList.remove('show');
-  L.geoJSON(f,{style:{color:'#1F3D2B',weight:3,fillColor:'#E0A422',fillOpacity:.18}}).addTo(scanGroup); openLot(f,m);
+  const l=L.geoJSON(f,{style:lotStyle(f.properties.NO_LOT,false)}); l._lot=f.properties.NO_LOT; l._built=false; l.addTo(scanGroup); openLot(f,m);
 }catch(e){toast('Service indisponible : '+e.message);} }
 
 /* ============================ Fiche ============================ */
@@ -355,7 +360,7 @@ let carnet=[]; try{carnet=JSON.parse(localStorage.getItem('terrain.carnet')||'[]
 function persist(){try{localStorage.setItem('terrain.carnet',JSON.stringify(carnet));}catch{toast('Stockage local indisponible');}renderCount();}
 function renderCount(){const c=$('carnetCount');c.textContent=carnet.length;c.hidden=!carnet.length;} renderCount();
 $('saveLot').onclick=()=>{ if(!selected)return; const rec={...selected,note:$('lotNote').value.trim(),status:$('lotStatus').value,date:new Date().toISOString().slice(0,10)};
-  const i=carnet.findIndex(x=>x.lot===rec.lot); if(i>=0)carnet[i]=rec; else carnet.unshift(rec); persist(); toast('Enregistré dans le carnet'); $('saveLot').textContent='Mettre à jour'; };
+  const i=carnet.findIndex(x=>x.lot===rec.lot); if(i>=0)carnet[i]=rec; else carnet.unshift(rec); persist(); restyleScan(); toast('Enregistré dans le carnet'); $('saveLot').textContent='Mettre à jour'; };
 const STATUS={v:['À revoir',''],i:['Intéressant','i'],c:['Contacté','c']};
 $('btnCarnet').onclick=()=>{renderCarnet();hide(sheetLot);show(sheetCarnet);};
 function esc(s){return s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
@@ -363,7 +368,7 @@ function renderCarnet(){ const ul=$('carnetList'); ul.innerHTML=''; if(!carnet.l
   carnet.forEach(r=>{ const li=document.createElement('li');
     li.innerHTML=`<div class="t"><b>Lot ${r.lot}</b><span>${r.muni||'—'} · ${fmt(r.ha,1)} ha · ${r.date}</span>${r.note?`<span>${esc(r.note)}</span>`:''}</div><span class="st ${STATUS[r.status][1]}">${STATUS[r.status][0]}</span><button class="close" aria-label="Retirer">×</button>`;
     li.querySelector('.t').onclick=()=>{hide(sheetCarnet);map.setView([r.lat,r.lng],16);identify(r.lat,r.lng);};
-    li.querySelector('button').onclick=()=>{carnet=carnet.filter(x=>x.lot!==r.lot);persist();renderCarnet();};
+    li.querySelector('button').onclick=()=>{carnet=carnet.filter(x=>x.lot!==r.lot);persist();restyleScan();renderCarnet();};
     ul.appendChild(li); }); }
 function csv(){ const head=['lot','municipalite','mrc','hectares','statut','note','date','lat','lng'];
   const rows=carnet.map(r=>[r.lot,r.muni,r.mrc,r.ha.toFixed(3),STATUS[r.status][0],r.note,r.date,r.lat.toFixed(6),r.lng.toFixed(6)].map(v=>`"${String(v??'').replace(/"/g,'""')}"`).join(','));
