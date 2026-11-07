@@ -250,7 +250,7 @@ button:focus-visible,a:focus-visible{outline:3px solid var(--boot);outline-offse
 <div id="map" role="application" aria-label="Carte"></div>
 
 <div class="topbar">
-  <h1>Terrain <small>v24</small></h1>
+  <h1>Terrain <small>v25</small></h1>
   <button class="chip" id="btnSearch" aria-pressed="false" title="Chercher une adresse ou un code postal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg></button>
   <button class="chip" id="btnPov" aria-label="Photo point de vue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg></button>
   <button class="chip" id="btnMic" aria-pressed="false" title="Commentaire vocal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></button>
@@ -383,7 +383,7 @@ button:focus-visible,a:focus-visible{outline:3px solid var(--boot);outline-offse
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script>
 /* ============================ CONFIG ============================ */
-const APP_VERSION='v24';
+const APP_VERSION='v25';
 const CONFIG = {
   ringFraction: 0.70,      // diamètre de l'anneau = 70 % du plus petit côté de l'écran ; pince pour agrandir/réduire
   maxRadius: 1500,         // rayon maximal du scan (m) pour rester sous la limite des services
@@ -422,7 +422,9 @@ const labelOf=r=>[r.fav?'♥':null,r.visited?'Visité':'À voir',...(r.tags||[])
 function migrate(r){ if(!r.tags){ const st=r.status; r.tags=['i','c','e'].includes(st)?[st]:[]; r.visited=st==='s'; delete r.status; } if(r.tags.includes('i')) r.fav=true; r.tags=r.tags.filter(k=>k==='c'); return r; }
 
 /* ============================ Carte ============================ */
-const map = L.map('map',{zoomControl:false}).setView([46.05,-74.15],10);
+let lastView=null; try{ lastView=JSON.parse(localStorage.getItem('terrain.view')||'null'); }catch{}
+const map = L.map('map',{zoomControl:false}).setView(lastView?[lastView.lat,lastView.lng]:[46.05,-74.15], lastView?lastView.z:10);
+map.on('moveend',()=>{ try{ const c=map.getCenter(); localStorage.setItem('terrain.view',JSON.stringify({lat:+c.lat.toFixed(5),lng:+c.lng.toFixed(5),z:map.getZoom()})); }catch{} });
 const baseOSM = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© OpenStreetMap'});
 const baseSat = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{maxZoom:19,attribution:'Imagerie © Esri, Maxar, Earthstar'});
 baseOSM.addTo(map);
@@ -492,7 +494,8 @@ function showMe(c){ me=[c.latitude,c.longitude];
        meCircle=L.circle(me,{radius:c.accuracy||10,color:'#1E6FD9',weight:1,fillOpacity:.08}).addTo(map);} }
 document.getElementById('btnMe').onclick=async()=>{ const t0=Date.now(); try{ const c=await locate(); showMe(c); map.setView(me,Math.max(map.getZoom(),16)); drawCone(); log('locate',{ms:Date.now()-t0,acc:Math.round(c.accuracy||0)}); }catch(e){toast(e.message);log('locate_error',{msg:e.message});} };
 // Suivi en continu, discret (met à jour le point bleu et le cône sans bouger la carte)
-if(navigator.geolocation) navigator.geolocation.watchPosition(p=>{showMe(p.coords);drawCone(); if(typeof walkPoint==='function') walkPoint(p.coords.latitude,p.coords.longitude,p.coords.accuracy||99);},()=>{},{enableHighAccuracy:true,maximumAge:3000});
+let centeredOnce=false;
+if(navigator.geolocation) navigator.geolocation.watchPosition(p=>{showMe(p.coords);drawCone(); if(!centeredOnce){ centeredOnce=true; map.setView(me,Math.max(map.getZoom(),15)); log('auto_center',{acc:Math.round(p.coords.accuracy||0)}); } if(typeof walkPoint==='function') walkPoint(p.coords.latitude,p.coords.longitude,p.coords.accuracy||99);},()=>{},{enableHighAccuracy:true,maximumAge:3000});
 
 /* ============================ Boussole ============================ */
 let heading=null, compassOn=false;
