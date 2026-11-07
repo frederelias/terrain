@@ -250,7 +250,7 @@ button:focus-visible,a:focus-visible{outline:3px solid var(--boot);outline-offse
 <div id="map" role="application" aria-label="Carte"></div>
 
 <div class="topbar">
-  <h1>Terrain <small>v25</small></h1>
+  <h1>Terrain <small>v26</small></h1>
   <button class="chip" id="btnSearch" aria-pressed="false" title="Chercher une adresse ou un code postal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg></button>
   <button class="chip" id="btnPov" aria-label="Photo point de vue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg></button>
   <button class="chip" id="btnMic" aria-pressed="false" title="Commentaire vocal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></button>
@@ -278,7 +278,7 @@ button:focus-visible,a:focus-visible{outline:3px solid var(--boot);outline-offse
   <canvas id="snapCanvas" hidden></canvas>
 </section>
 <form class="search" id="search">
-  <input id="q" type="search" placeholder="Code postal, adresse ou lieu" autocomplete="off" enterkeyhint="search">
+  <input id="q" type="search" placeholder="Adresse, code postal, lieu ou lien Centris" autocomplete="off" enterkeyhint="search">
   <button type="submit">Aller</button>
 </form>
 
@@ -383,7 +383,7 @@ button:focus-visible,a:focus-visible{outline:3px solid var(--boot);outline-offse
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script>
 /* ============================ CONFIG ============================ */
-const APP_VERSION='v25';
+const APP_VERSION='v26';
 const CONFIG = {
   ringFraction: 0.70,      // diamètre de l'anneau = 70 % du plus petit côté de l'écran ; pince pour agrandir/réduire
   maxRadius: 1500,         // rayon maximal du scan (m) pour rester sous la limite des services
@@ -522,6 +522,7 @@ if(typeof DeviceOrientationEvent!=='undefined' && typeof DeviceOrientationEvent.
 const searchForm=document.getElementById('search'), q=document.getElementById('q');
 document.getElementById('btnSearch').onclick=e=>{ const open=searchForm.classList.toggle('open'); e.currentTarget.setAttribute('aria-pressed',open); if(open) q.focus(); };
 searchForm.onsubmit=async e=>{ e.preventDefault(); const text=q.value.trim(); if(!text) return; q.blur();
+  if(/centris\.ca/i.test(text)){ searchForm.classList.remove('open'); $('btnSearch').setAttribute('aria-pressed',false); const info=parseCentris(text); if(info){ hide(sheetLot); return goToCentris(info); } }
   try{
     let hit=null;
     try{ const r=await fetch(`${CONFIG.geocode}/findAddressCandidates?${new URLSearchParams({SingleLine:text,outSR:'4326',maxLocations:'1',f:'json'})}`); const j=await r.json(); const c=j.candidates?.[0]; if(c) hit=[c.location.y,c.location.x,c.address]; }catch{}
@@ -589,7 +590,8 @@ function roleUrl(m,lot){ const mrc=(m?.MUS_NM_MRC||'').toLowerCase();
 
 async function openLot(f,m){
   const no=f.properties.NO_LOT, area=polyArea(f.geometry), gj=L.geoJSON(f), b=gj.getBounds(), c=b.getCenter();
-  selected={lot:no,muni:m?.MUS_NM_MUN||'',mrc:m?.MUS_NM_MRC||'',lat:c.lat,lng:c.lng,ha:area/10000,geom:f.geometry}; ctx.lot=no; log('lot_open',{lot:no,ha:+(area/10000).toFixed(2),muni:selected.muni});
+  selected={lot:no,muni:m?.MUS_NM_MUN||'',mrc:m?.MUS_NM_MRC||'',lat:c.lat,lng:c.lng,ha:area/10000,geom:f.geometry}; ctx.lot=no;
+  if(pendingCentris){ const pc=pendingCentris; pendingCentris=null; setTimeout(()=>{ syncCentris(pc.url,pc); autosave(); toast(`Annonce ${pc.id||''} attachée au lot ${no}`); },300); } log('lot_open',{lot:no,ha:+(area/10000).toFixed(2),muni:selected.muni});
   $('lotNo').textContent=`Lot ${no}`; $('lotWhere').textContent=m?`${m.MUS_NM_MUN} · MRC ${m.MUS_NM_MRC}`:'Municipalité inconnue';
   $('lotHa').textContent=fmt(area/10000); $('lotAc').textContent=fmt(area/4046.856,2); $('lotM2').textContent=fmt(area,0); $('lotFt2').textContent=fmt(area*10.7639,0);
   $('lnkInfolot').href=CONFIG.infolot; $('lnkRegistre').href=CONFIG.registre; $('lnkRole').href=roleUrl(m,no);
@@ -620,8 +622,16 @@ function syncCentris(url,info){ centrisUrl=url||''; centrisInfo=info||(url?{url}
   if(centrisUrl){ a.href=centrisUrl; const i=centrisInfo||{}; a.textContent=`Annonce ${i.id||''} · En vente`; box.innerHTML=`<span>${esc([i.type,i.address,i.city].filter(Boolean).join(' · ')||centrisUrl.replace(/^https?:\/\//,'').slice(0,60))}</span><button type="button" id="centrisClear">retirer</button>`; $('centrisClear').onclick=()=>{ syncCentris('',null); autosave(); toast('Annonce retirée'); }; d.hidden=false; $('cPrice').value=i.price||''; $('cBroker').value=i.broker||''; }
   else { a.href=centrisCityUrl(selected?.muni); a.textContent='Centris — carte de la municipalité'; box.innerHTML=''; d.hidden=true; } }
 ['cPrice','cBroker'].forEach(id=>$(id).addEventListener('change',()=>{ if(!centrisInfo) return; centrisInfo.price=$('cPrice').value.replace(/[^\d]/g,''); centrisInfo.broker=$('cBroker').value.trim(); autosave(); }));
-async function attachCentris(text){ const info=parseCentris(text); if(!info) return toast('Pas une annonce Centris'); syncCentris(info.url,info); autosave(); log('centris_link',{id:!!info.id,price:!!info.price}); toast(`Annonce ${info.id||''} attachée — lot En vente`); }
-$('btnCentrisPaste').onclick=async()=>{ if(!selected) return; let t=''; try{ t=(await navigator.clipboard.readText()).trim(); }catch{} if(!/centris\.ca/i.test(t)) t=(prompt('Colle le texte partagé ou le lien de l\'annonce Centris :',t&&/^https?:/.test(t)?t:'')||'').trim(); attachCentris(t); };
+async function geocode(text){ try{ const r=await fetch(`${CONFIG.geocode}/findAddressCandidates?${new URLSearchParams({SingleLine:text,outSR:'4326',maxLocations:'1',f:'json'})}`); const j=await r.json(); const c=j.candidates?.[0]; if(c&&c.score>=60) return [c.location.y,c.location.x]; }catch{}
+  try{ const r=await fetch(`https://nominatim.openstreetmap.org/search?${new URLSearchParams({q:text+', Québec, Canada',format:'json',limit:'1'})}`); const j=await r.json(); if(j[0]) return [+j[0].lat,+j[0].lon]; }catch{} return null; }
+// Lien Centris → adresse → carte → lot (sans rien lire chez Centris)
+async function goToCentris(info){ const q=[info.address,info.city].filter(Boolean).join(', '); if(!q) return false; toast('Recherche de l\'adresse…'); const pos=await geocode(q); if(!pos){ toast('Adresse introuvable — place la pin toi-même'); return false; }
+  map.setView(pos,info.address&&/\d/.test(info.address)?17:15); log('centris_geocode',{civic:/\d/.test(info.address||'')}); 
+  if(/\d/.test(info.address||'')){ await identify(pos[0],pos[1]); if(selected){ syncCentris(info.url,info); autosave(); toast(`Annonce ${info.id||''} attachée au lot ${selected.lot}`); return true; } }
+  pendingCentris=info; toast('Touche le lot visé pour y attacher l\'annonce'); return true; }
+let pendingCentris=null;
+async function attachCentris(text){ const info=parseCentris(text); if(!info) return toast('Pas une annonce Centris'); if(!selected){ hide(sheetLot); return goToCentris(info); } syncCentris(info.url,info); autosave(); log('centris_link',{id:!!info.id,price:!!info.price}); toast(`Annonce ${info.id||''} attachée — lot En vente`); }
+$('btnCentrisPaste').onclick=async()=>{ let t=''; try{ t=(await navigator.clipboard.readText()).trim(); }catch{} if(!/centris\.ca/i.test(t)) t=(prompt('Colle le texte partagé ou le lien de l\'annonce Centris :',t&&/^https?:/.test(t)?t:'')||'').trim(); attachCentris(t); };
 function autosave(){ if(!selected) return; const was=carnet.find(x=>x.lot===selected.lot); $('saveLot').click(); if(!was) toast('Ajouté au carnet'); }
 $('btnFav').onclick=()=>{ if(!selected) return; const on=$('btnFav').getAttribute('aria-pressed')!=='true'; $('btnFav').setAttribute('aria-pressed',on); navigator.vibrate?.(10); log('fav',{on}); autosave(); };
 $('lnkCentris').addEventListener('click',()=>{ if(selected&&!centrisUrl) toast('Dans Centris : Partager → Terrain, ou copie le lien et touche le bouton lien'); log('btn',{id:'lnkCentris',has:!!centrisUrl}); });
@@ -850,7 +860,7 @@ $('clearLog').onclick=()=>{ if(confirm('Effacer tout le journal d\'usage ?')){ L
 /* ---- Partage reçu depuis Centris (Web Share Target) ---- */
 (function(){ const q=new URLSearchParams(location.search); const txt=[q.get('title'),q.get('text'),q.get('url')].filter(Boolean).join('\n'); if(!/centris\.ca/i.test(txt)) return; history.replaceState(null,'',location.pathname);
   const info=parseCentris(txt); if(!info) return; log('share_received',{id:!!info.id});
-  const pick=()=>{ if(!carnet.length) return toast('Carnet vide — ouvre d\'abord un lot, puis repartage');
+  const pick=async()=>{ if(info.address||info.city){ const ok=await goToCentris(info); if(ok) return; } if(!carnet.length) return toast('Carnet vide — ouvre d\'abord un lot, puis repartage');
     const sorted=me?[...carnet].sort((a,b)=>map.distance(me,[a.lat,a.lng])-map.distance(me,[b.lat,b.lng])):carnet;
     const list=sorted.slice(0,6).map((r,i)=>`${i+1}. Lot ${r.lot}${r.owner?' · '+r.owner:''}${me?' · '+Math.round(map.distance(me,[r.lat,r.lng]))+' m':''}`).join('\n');
     const ans=prompt(`Annonce ${info.id||''} reçue.\nAttacher à quel lot ?\n\n${list}`,'1'); const r=sorted[(+ans)-1]; if(!r) return toast('Annonce non attachée');
