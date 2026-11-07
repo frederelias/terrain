@@ -7,7 +7,6 @@
   "display": "standalone",
   "background_color": "#E9EDE4",
   "theme_color": "#1F3D2B",
-  "icons": [
-    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
-  ]
+  "icons": [ { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" } ],
+  "share_target": { "action": "./index.html", "method": "GET", "params": { "title": "title", "text": "text", "url": "url" } }
 }
