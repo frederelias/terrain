@@ -233,6 +233,8 @@ textarea{min-height:72px;resize:vertical}
 .saved-label{font-size:12px;line-height:1.25;background:rgba(255,255,255,.88);border-radius:8px;padding:4px 7px;border:1px solid var(--line);text-shadow:none}
 .lot-label{font-weight:700;font-size:11px;color:var(--bark);text-shadow:0 0 3px #fff,0 0 3px #fff;white-space:nowrap}
 .me{width:16px;height:16px;border-radius:50%;background:var(--gps);border:3px solid #fff;box-shadow:0 0 0 5px rgba(30,111,217,.25)}
+.clearbtn{position:fixed;left:12px;bottom:calc(var(--sab) + 248px);z-index:1000;background:var(--paper,#fff);color:var(--ink);border:1.5px solid var(--ink);border-radius:999px;padding:0 12px;min-height:40px;font-weight:700;font-size:13px;box-shadow:0 2px 0 var(--ink)}
+.clearbtn[hidden]{display:none}
 .legend{position:fixed;left:12px;bottom:calc(var(--sab) + 130px);flex-wrap:wrap;z-index:1000;background:rgba(255,255,255,.92);border-radius:10px;padding:6px 10px;font-size:12px;display:none;gap:10px}
 .legend.show{display:flex}
 .legend i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:4px;vertical-align:-1px;border:1.5px solid var(--bark)}
@@ -245,7 +247,7 @@ button:focus-visible,a:focus-visible{outline:3px solid var(--boot);outline-offse
 <div id="map" role="application" aria-label="Carte"></div>
 
 <div class="topbar">
-  <h1>Terrain <small>v21</small></h1>
+  <h1>Terrain <small>v22</small></h1>
   <button class="chip" id="btnSearch" aria-pressed="false" title="Chercher une adresse ou un code postal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg></button>
   <button class="chip" id="btnPov" aria-label="Photo point de vue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg></button>
   <button class="chip" id="btnMic" aria-pressed="false" title="Commentaire vocal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></button>
@@ -285,6 +287,7 @@ button:focus-visible,a:focus-visible{outline:3px solid var(--boot);outline-offse
 
 <div class="pin" aria-hidden="true"><svg viewBox="0 0 34 44"><path d="M17 1C8 1 1 8 1 17c0 11 16 26 16 26s16-15 16-26C33 8 26 1 17 1z" fill="#1E6FD9" stroke="#fff" stroke-width="2"/><circle cx="17" cy="17" r="6" fill="#fff"/></svg></div>
 <div class="ring" id="ring" aria-hidden="true"><span id="ringLabel">250 m</span></div>
+<button class="clearbtn" id="btnClear" hidden>✕ Nettoyer la carte</button>
 <div class="legend" id="legendSaved" style="bottom:calc(var(--sab) + 160px)"></div>
 <div class="legend" id="legend"><span><i style="background:#E0A422"></i>sans adresse civique</span><span><i style="background:#B8BFB5"></i>bâti</span><span><i style="background:#2E7D4F"></i>dans mon carnet</span></div>
 
@@ -307,10 +310,10 @@ button:focus-visible,a:focus-visible{outline:3px solid var(--boot);outline-offse
   <header><div class="t"><h2 id="lotNo">—</h2><p id="lotWhere">—</p></div><button class="close heart" id="btnFav" aria-pressed="false" aria-label="Favori">♥</button><button class="close" id="closeLot" aria-label="Fermer">×</button></header>
   <div class="body">
     <div class="facts">
-      <div class="fact"><b id="lotHa">—</b><span>hectares</span></div>
-      <div class="fact"><b id="lotAc">—</b><span>acres</span></div>
-      <div class="fact"><b id="lotM2">—</b><span>m²</span></div>
       <div class="fact"><b id="lotFt2">—</b><span>pi²</span></div>
+      <div class="fact"><b id="lotM2">—</b><span>m²</span></div>
+      <div class="fact"><b id="lotAc">—</b><span>acres</span></div>
+      <div class="fact"><b id="lotHa">—</b><span>hectares</span></div>
       <div class="fact wide" id="lotAddr"><b>—</b><span>adresses civiques sur le lot</span></div>
       <div class="fact wide" id="lotTenure" hidden><b>—</b><span>tenure (indicatif)</span></div>
     </div>
@@ -380,7 +383,7 @@ button:focus-visible,a:focus-visible{outline:3px solid var(--boot);outline-offse
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script>
 /* ============================ CONFIG ============================ */
-const APP_VERSION='v21';
+const APP_VERSION='v22';
 const CONFIG = {
   ringFraction: 0.70,      // diamètre de l'anneau = 70 % du plus petit côté de l'écran ; pince pour agrandir/réduire
   maxRadius: 1500,         // rayon maximal du scan (m) pour rester sous la limite des services
@@ -456,6 +459,7 @@ function inRing(pt,ring){let ok=false;for(let i=0,j=ring.length-1;i<ring.length;
 function inPoly(pt,g){if(!g)return false;const polys=g.type==='Polygon'?[g.coordinates]:g.type==='MultiPolygon'?g.coordinates:[];return polys.some(p=>inRing(pt,p[0])&&!p.slice(1).some(h=>inRing(pt,h)));}
 function destination(lat,lng,bearing,dist){const R=6371000,b=rad(bearing),la=rad(lat),lo=rad(lng),d=dist/R;const la2=Math.asin(Math.sin(la)*Math.cos(d)+Math.cos(la)*Math.sin(d)*Math.cos(b));const lo2=lo+Math.atan2(Math.sin(b)*Math.sin(d)*Math.cos(la),Math.cos(d)-Math.sin(la)*Math.sin(la2));return [la2*180/Math.PI,lo2*180/Math.PI];}
 const fmt=(n,d=2)=>n.toLocaleString('fr-CA',{maximumFractionDigits:d,minimumFractionDigits:d});
+const ft2=ha=>fmt(ha*107639.1,0)+' pi²';
 function addrLabel(p){const k=Object.keys(p);const civ=k.find(x=>/CIV/i.test(x)),odo=k.find(x=>/ODON|RUE|VOIE/i.test(x));return [civ&&p[civ],odo&&p[odo]].filter(Boolean).join(' ');}
 
 /* ============================ Anneau de scan ============================ */
@@ -537,11 +541,11 @@ async function scanAt(lat,lng,radius){
     f._built=built;
     const layer=L.geoJSON(f,{style:lotStyle(f.properties.NO_LOT,built)});
     layer._lot=f.properties.NO_LOT; layer._built=built;
-    layer.bindTooltip(`${f.properties.NO_LOT}<br>${fmt(polyArea(f.geometry)/10000,1)} ha`,{permanent:true,direction:'center',className:'lot-label'});
+    layer.bindTooltip(`${f.properties.NO_LOT}<br>${ft2(polyArea(f.geometry)/10000)}`,{permanent:true,direction:'center',className:'lot-label'});
     layer.on('click',ev=>{L.DomEvent.stopPropagation(ev);log('lot_tap',{from:'scan',lot:f.properties.NO_LOT,built});openLot(f,lastMuni);});
     layer.addTo(scanGroup);
   });
-  legend.classList.add('show');
+  legend.classList.add('show'); $('btnClear').hidden=false;
   toast(`${lots.features.length} lots dans ${Math.round(radius)} m · ${vacant} sans adresse civique${lastMuni?' · '+lastMuni.MUS_NM_MUN:''}`);
   return {lots:lots.features.length,vacant,muni:lastMuni?.MUS_NM_MUN};
 }
@@ -554,13 +558,14 @@ async function identify(lat,lng){ try{
   const [lots,muni]=await Promise.all([lotAt(lat,lng),muniAt(lat,lng).catch(()=>null)]);
   const f=lots.features[0], m=muni?.features?.[0]?.properties;
   if(!f){toast(m?`Aucun lot cadastré ici — ${m.MUS_NM_MUN}. Probablement terre publique non cadastrée.`:'Aucun lot cadastré ici.');log('identify_empty');return;}
-  scanGroup.clearLayers(); legend.classList.remove('show');
+  scanGroup.clearLayers(); legend.classList.remove('show'); $('btnClear').hidden=false;
   const l=L.geoJSON(f,{style:lotStyle(f.properties.NO_LOT,false)}); l._lot=f.properties.NO_LOT; l._built=false; l.addTo(scanGroup); openLot(f,m);
 }catch(e){toast('Service indisponible : '+e.message);} }
 
 /* ============================ Fiche ============================ */
 const $=id=>document.getElementById(id);
 const sheetLot=$('sheetLot'), sheetCarnet=$('sheetCarnet'); let selected=null;
+$('btnClear').onclick=()=>{ scanGroup.clearLayers(); legend.classList.remove('show'); $('btnClear').hidden=true; log('btn',{id:'btnClear'}); };
 function show(s){s.classList.add('open');s.setAttribute('aria-hidden','false');ctx.screen=s.id==='sheetLot'?'fiche':'carnet';} function hide(s){s.classList.remove('open');s.setAttribute('aria-hidden','true');log('close_'+ctx.screen);ctx.screen='carte';if(s.id==='sheetLot')ctx.lot=null;}
 $('closeLot').onclick=()=>hide(sheetLot); $('closeCarnet').onclick=()=>hide(sheetCarnet);
 function roleUrl(m,lot){ const mrc=(m?.MUS_NM_MRC||'').toLowerCase();
@@ -617,7 +622,7 @@ Objet : votre terrain — lot ${selected.lot}, ${selected.muni||'[municipalité]
 
 ${who?'Bonjour '+who+',':'Madame, Monsieur,'}
 
-Je me permets de vous écrire au sujet du terrain boisé que vous possédez à ${selected.muni||'[municipalité]'} (lot ${selected.lot} du cadastre du Québec, environ ${fmt(selected.ha,1)} hectares). J'ai parcouru le secteur récemment et ce terrain correspond exactement à ce que je cherche pour un projet personnel et familial, à long terme.
+Je me permets de vous écrire au sujet du terrain boisé que vous possédez à ${selected.muni||'[municipalité]'} (lot ${selected.lot} du cadastre du Québec, environ ${ft2(selected.ha)}). J'ai parcouru le secteur récemment et ce terrain correspond exactement à ce que je cherche pour un projet personnel et familial, à long terme.
 
 Si vous envisagiez un jour de le vendre, en tout ou en partie, j'aimerais beaucoup en discuter avec vous, sans aucune pression. Je suis un acheteur sérieux, en mesure de conclure rapidement et simplement, et je prendrais en charge les frais de notaire.
 
@@ -626,7 +631,7 @@ Vous pouvez me joindre par téléphone au [votre numéro] ou par courriel à [vo
 Merci de votre attention,
 
 [Votre nom]`,
-  sms:`Bonjour${who?' '+who:''}, je m'appelle [votre nom]. Je m'intéresse à votre terrain boisé à ${selected.muni||''} (lot ${selected.lot}, env. ${fmt(selected.ha,1)} ha). Si vous pensiez un jour le vendre, j'aimerais en discuter, sans pression. Merci !`}; }
+  sms:`Bonjour${who?' '+who:''}, je m'appelle [votre nom]. Je m'intéresse à votre terrain boisé à ${selected.muni||''} (lot ${selected.lot}, env. ${ft2(selected.ha)}). Si vous pensiez un jour le vendre, j'aimerais en discuter, sans pression. Merci !`}; }
 let chan='mail';
 $('chanMail').onclick=()=>{chan='mail';contactLinks();}; $('chanSms').onclick=()=>{chan='sms';contactLinks();};
 function contactLinks(){ if(!selected) return; const L_=letter(), em=$('lotEmail').value.trim(), ph=$('lotPhone').value.trim().replace(/[^+\d]/g,'');
@@ -646,7 +651,7 @@ $('copyLot').onclick=()=>copy(selected?.lot||'','Numéro de lot copié — colle
 let carnet=[]; try{carnet=JSON.parse(localStorage.getItem('terrain.carnet')||'[]').map(migrate);}catch{carnet=[];}
 function persist(){try{localStorage.setItem('terrain.carnet',JSON.stringify(carnet,(k,v)=>k==='_tried'?undefined:v));}catch{toast('Stockage local indisponible');}renderCount();}
 function renderCount(){const c=$('carnetCount');c.textContent=carnet.length;c.hidden=!carnet.length;} renderCount();
-function savedLabel(r){ return `<b>Lot ${r.lot}</b><br>${labelOf(r)}${r.owner?'<br>'+esc(r.owner):''}${r.ha?'<br>'+fmt(r.ha,1)+' ha':''}`; }
+function savedLabel(r){ return `<b>Lot ${r.lot}</b><br>${labelOf(r)}${r.owner?'<br>'+esc(r.owner):''}${r.ha?'<br>'+ft2(r.ha):''}`; }
 function renderSaved(){ savedGroup.clearLayers(); const zoomed=map.getZoom()>=14;
   carnet.filter(r=>mode!=='fav'||r.fav).forEach(r=>{ const col=stColor(keyOf(r));
     if(zoomed && r.geom){
@@ -673,13 +678,13 @@ $('selMode').onclick=()=>{ selMode=!selMode; selSet.clear(); $('selMode').textCo
 $('selDelete').onclick=()=>{ if(!selSet.size) return toast('Rien de sélectionné'); if(!confirm(`Supprimer ${selSet.size} lot(s) du carnet ? Les photos attachées restent dans le téléphone.`)) return; carnet=carnet.filter(x=>!selSet.has(x.lot)); persist(); restyleScan(); renderSaved(); log('carnet_delete',{n:selSet.size}); selSet.clear(); selMode=false; $('selMode').textContent='Sélectionner'; $('selActions').hidden=true; renderCarnet(); };
 async function renderCarnet(){ const pc=await photoCounts(); const ul=$('carnetList'); ul.innerHTML=''; if(!carnet.length){ul.innerHTML='<li class="empty">Rien encore. Scanne, touche un lot, écris une note, ajoute-le ici.</li>';return;}
   carnet.forEach(r=>{ const li=document.createElement('li');
-    li.innerHTML=`<div class="t"><b>Lot ${r.lot}</b><span>${r.muni||'—'} · ${fmt(r.ha,1)} ha · ${r.date}${pc[r.lot]?' · 📷 '+pc[r.lot]:''}</span>${r.owner?`<span>${esc(r.owner)}</span>`:''}${r.note?`<span>${esc(r.note)}</span>`:''}</div><span class="st" style="background:${stColor(keyOf(r))}22;color:${stColor(keyOf(r))}">${labelOf(r)}</span>${selMode?`<input type="checkbox" class="selbox" ${selSet.has(r.lot)?'checked':''} aria-label="Sélectionner">`:`<button class="close" aria-label="Retirer">×</button>`}`;
+    li.innerHTML=`<div class="t"><b>Lot ${r.lot}</b><span>${r.muni||'—'} · ${ft2(r.ha)} · ${r.date}${pc[r.lot]?' · 📷 '+pc[r.lot]:''}</span>${r.owner?`<span>${esc(r.owner)}</span>`:''}${r.note?`<span>${esc(r.note)}</span>`:''}</div><span class="st" style="background:${stColor(keyOf(r))}22;color:${stColor(keyOf(r))}">${labelOf(r)}</span>${selMode?`<input type="checkbox" class="selbox" ${selSet.has(r.lot)?'checked':''} aria-label="Sélectionner">`:`<button class="close" aria-label="Retirer">×</button>`}`;
     li.querySelector('.t').onclick=()=>{ if(selMode){ const cb=li.querySelector('.selbox'); cb.checked=!cb.checked; cb.checked?selSet.add(r.lot):selSet.delete(r.lot); return; } hide(sheetCarnet);map.setView([r.lat,r.lng],16);identify(r.lat,r.lng);};
     li.querySelector('.selbox')?.addEventListener('change',e=>{ e.target.checked?selSet.add(r.lot):selSet.delete(r.lot); });
     li.querySelector('button.close')?.addEventListener('click',()=>{ if(!confirm(`Retirer le lot ${r.lot} du carnet ?`)) return; carnet=carnet.filter(x=>x.lot!==r.lot);persist();restyleScan();renderSaved();renderCarnet();});
     ul.appendChild(li); }); }
-function csv(){ const head=['lot','municipalite','mrc','hectares','proprietaire','courriel','telephone','favori','statut','centris','centris_no','prix','courtier','note','date','lat','lng'];
-  const rows=carnet.map(r=>[r.lot,r.muni,r.mrc,r.ha.toFixed(3),r.owner||'',r.email||'',r.phone||'',r.fav?'oui':'',labelOf(r),r.centris||'',r.centrisInfo?.id||'',r.centrisInfo?.price||'',r.centrisInfo?.broker||'',r.note,r.date,r.lat.toFixed(6),r.lng.toFixed(6)].map(v=>`"${String(v??'').replace(/"/g,'""')}"`).join(','));
+function csv(){ const head=['lot','municipalite','mrc','pi2','hectares','proprietaire','courriel','telephone','favori','statut','centris','centris_no','prix','courtier','note','date','lat','lng'];
+  const rows=carnet.map(r=>[r.lot,r.muni,r.mrc,Math.round(r.ha*107639.1),r.ha.toFixed(3),r.owner||'',r.email||'',r.phone||'',r.fav?'oui':'',labelOf(r),r.centris||'',r.centrisInfo?.id||'',r.centrisInfo?.price||'',r.centrisInfo?.broker||'',r.note,r.date,r.lat.toFixed(6),r.lng.toFixed(6)].map(v=>`"${String(v??'').replace(/"/g,'""')}"`).join(','));
   return '\ufeff'+[head.join(','),...rows].join('\n'); }
 $('exportCsv').onclick=()=>{ log('btn',{id:'exportCsv'}); if(!carnet.length)return toast('Carnet vide'); const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([csv()],{type:'text/csv;charset=utf-8'})); a.download=`terrain-${new Date().toISOString().slice(0,10)}.csv`; a.click(); };
 $('copyRegistre').onclick=()=>{ const l=carnet.filter(r=>r.fav&&!r.owner); if(!l.length) return toast('Aucun favori sans propriétaire'); copy(l.map(r=>`${r.lot}\t${r.muni}`).join('\n'), `${l.length} lot(s) copié(s) — à chercher au Registre ce soir`); };
