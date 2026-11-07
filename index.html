@@ -134,16 +134,18 @@ button{font:inherit;cursor:pointer;border:0;background:none;color:inherit}
 .aim .dial{width:140px;height:140px} .aim .dial b{font-size:24px;padding-top:28px}
 @media (prefers-reduced-motion:reduce){.aim .aimArt .ph,.aim .aimArt .arrow{animation:none}.aim .aimArt .arrow{opacity:1}.aim .aimArt .ph{transform:perspective(300px) rotateX(70deg)}}
 .bottom{gap:10px;max-width:100vw;box-sizing:border-box}
-@media (max-width:380px){.bottom{gap:6px;padding:0 8px}.round{width:50px;height:50px}.bottom .col{width:50px}.scan{width:72px;height:72px}}
-.bottom .col{display:flex;flex-direction:column;align-items:center;gap:3px;width:56px}
-.wstat{font-family:"JetBrains Mono",ui-monospace,monospace;font-size:10.5px;color:#fff;white-space:nowrap;line-height:1}
-.wstat[hidden]{display:none}
-.round.walk{position:relative} .round.walk .pz{display:none;position:absolute;inset:0;align-items:center;justify-content:center;font-size:16px;font-weight:700;background:rgba(0,0,0,.35);border-radius:50%}
+@media (max-width:380px){.bottom{gap:6px;padding:0 8px}.round{width:50px;height:50px}.scan{width:72px;height:72px}}
+.round.walk{position:relative;color:var(--bark)}
+.round.walk .pz{display:none;position:absolute;inset:0;align-items:center;justify-content:center;font-size:15px;font-weight:700;color:#fff;background:rgba(0,0,0,.35);border-radius:50%}
 .round.walk[aria-pressed="true"]{background:#2E7D4F;color:#fff}
-.round.walk[aria-pressed="true"] .go .l{animation:stepL 1s steps(1) infinite} .round.walk[aria-pressed="true"] .go .r{animation:stepR 1s steps(1) infinite}
+.round.walk.moving .go .l{animation:stepL .5s steps(1) 3} .round.walk.moving .go .r{animation:stepR .5s steps(1) 3}
 @keyframes stepL{0%,49%{opacity:1}50%,100%{opacity:.35}} @keyframes stepR{0%,49%{opacity:.35}50%,100%{opacity:1}}
-.round.walk.paused .go .l,.round.walk.paused .go .r{animation:none;opacity:.5} .round.walk.paused .pz{display:flex}
-.round.stopw{background:#B3261E;color:#fff} .round.stopw[hidden]{display:none}
+.round.walk.paused .pz{display:flex}
+.walkpill{position:fixed;left:12px;top:calc(var(--sat) + 64px);z-index:1000;display:flex;align-items:center;gap:10px;background:#B3261E;color:#fff;border-radius:999px;padding:0 16px 0 12px;min-height:44px;box-shadow:0 2px 0 #5A120C}
+.walkpill[hidden]{display:none}
+.walkpill .sq{width:14px;height:14px;border-radius:3px;background:#fff}
+.walkpill b{font-family:"JetBrains Mono",ui-monospace,monospace;font-size:15px}
+.walkpill.paused{background:#5C6B62;box-shadow:0 2px 0 #2E3733}
 .round.carnet svg{width:26px;height:26px}
 /* Feuilles */
 .sheet{position:fixed;left:0;right:0;bottom:0;z-index:1100;background:var(--paper);border-radius:18px 18px 0 0;box-shadow:0 -10px 40px rgba(23,32,26,.22);max-height:78vh;display:flex;flex-direction:column;transform:translateY(105%);transition:transform .22s ease;padding-bottom:var(--sab)}
@@ -248,7 +250,7 @@ button:focus-visible,a:focus-visible{outline:3px solid var(--boot);outline-offse
 <div id="map" role="application" aria-label="Carte"></div>
 
 <div class="topbar">
-  <h1>Terrain <small>v23</small></h1>
+  <h1>Terrain <small>v24</small></h1>
   <button class="chip" id="btnSearch" aria-pressed="false" title="Chercher une adresse ou un code postal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg></button>
   <button class="chip" id="btnPov" aria-label="Photo point de vue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg></button>
   <button class="chip" id="btnMic" aria-pressed="false" title="Commentaire vocal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></button>
@@ -280,6 +282,7 @@ button:focus-visible,a:focus-visible{outline:3px solid var(--boot);outline-offse
   <button type="submit">Aller</button>
 </form>
 
+<button class="walkpill" id="btnWalkStop" hidden aria-label="Terminer la marche"><span class="sq"></span><b id="walkStat">0 m</b></button>
 <button class="mapbtn" id="btnCentrisMap" aria-label="Ouvrir cette région dans Centris">C</button>
 <button class="compass off" id="compass" aria-label="Boussole">
   <svg viewBox="0 0 44 44"><circle cx="22" cy="22" r="20" fill="none" stroke="#C9D1C4" stroke-width="2"/><path d="M22 5 L27 22 L22 20 L17 22 Z" fill="#B4541E"/><path d="M22 39 L27 22 L22 24 L17 22 Z" fill="#C9D1C4"/><text x="22" y="14" text-anchor="middle" font-size="9" font-weight="700" fill="#1F3D2B">N</text></svg>
@@ -294,11 +297,7 @@ button:focus-visible,a:focus-visible{outline:3px solid var(--boot);outline-offse
 
 <div class="mode" role="group" aria-label="Portée du scan"><button id="modeOne" aria-pressed="false" aria-label="Le lot sous la pin"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-4px"><path d="M12 22s7-7.2 7-12a7 7 0 0 0-14 0c0 4.8 7 12 7 12z"/><circle cx="12" cy="10" r="2.6"/></svg></button><button id="modeZone" aria-pressed="true" aria-label="Tous les lots dans l'anneau">Tous</button><button id="modeFav" aria-pressed="false" aria-label="Mes favoris">♥</button></div>
 <div class="bottom">
-  <div class="col">
-    <button class="round walk" id="btnWalk" aria-pressed="false" aria-label="Marcher le terrain"><svg class="go" viewBox="0 0 24 24" fill="currentColor"><g class="l"><path d="M7 3.5c1.9 0 3 1.6 3 3.6 0 2.1-.7 4.4-2 5.3-.6.4-1.5.4-2.1 0-1.2-.9-1.9-3.2-1.9-5.3 0-2 1.1-3.6 3-3.6z"/><rect x="5.2" y="14" width="3.8" height="2.6" rx="1.3"/></g><g class="r"><path d="M17 8.5c1.9 0 3 1.6 3 3.6 0 2.1-.7 4.4-2 5.3-.6.4-1.5.4-2.1 0-1.2-.9-1.9-3.2-1.9-5.3 0-2 1.1-3.6 3-3.6z"/><rect x="15.2" y="19" width="3.8" height="2.6" rx="1.3"/></g></svg><span class="pz" aria-hidden="true">❚❚</span></button>
-    <span class="wstat" id="walkStat" hidden>0 m · 00:00</span>
-  </div>
-  <button class="round stopw" id="btnWalkStop" hidden aria-label="Terminer la marche"><svg viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="6" width="12" height="12" rx="2"/></svg></button>
+  <button class="round walk" id="btnWalk" aria-pressed="false" aria-label="Marcher le terrain"><svg class="go" viewBox="0 0 24 24" fill="currentColor"><g class="l"><path d="M7 3.5c1.9 0 3 1.6 3 3.6 0 2.1-.7 4.4-2 5.3-.6.4-1.5.4-2.1 0-1.2-.9-1.9-3.2-1.9-5.3 0-2 1.1-3.6 3-3.6z"/><rect x="5.2" y="14" width="3.8" height="2.6" rx="1.3"/></g><g class="r"><path d="M17 8.5c1.9 0 3 1.6 3 3.6 0 2.1-.7 4.4-2 5.3-.6.4-1.5.4-2.1 0-1.2-.9-1.9-3.2-1.9-5.3 0-2 1.1-3.6 3-3.6z"/><rect x="15.2" y="19" width="3.8" height="2.6" rx="1.3"/></g></svg><span class="pz" aria-hidden="true">❚❚</span></button>
   <button class="scan" id="btnScan" aria-label="Rafraîchir">
     <span class="face"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 1 1-2.3-5.7"/><path d="M20 4v5h-5"/></svg></span>
     <span class="lbl" hidden>Scanner</span>
@@ -384,7 +383,7 @@ button:focus-visible,a:focus-visible{outline:3px solid var(--boot);outline-offse
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script>
 /* ============================ CONFIG ============================ */
-const APP_VERSION='v23';
+const APP_VERSION='v24';
 const CONFIG = {
   ringFraction: 0.70,      // diamètre de l'anneau = 70 % du plus petit côté de l'écran ; pince pour agrandir/réduire
   maxRadius: 1500,         // rayon maximal du scan (m) pour rester sous la limite des services
@@ -753,19 +752,19 @@ let walks=[]; try{walks=JSON.parse(localStorage.getItem('terrain.walks')||'[]');
 const bearing=(a,b)=>{ const y=Math.sin(rad(b[1]-a[1]))*Math.cos(rad(b[0])), x=Math.cos(rad(a[0]))*Math.sin(rad(b[0]))-Math.sin(rad(a[0]))*Math.cos(rad(b[0]))*Math.cos(rad(b[1]-a[1])); return (Math.atan2(y,x)*180/Math.PI+360)%360; };
 const fmtDist=m=>m>=1000?fmt(m/1000,2)+' km':Math.round(m)+' m';
 const fmtTime=s=>`${String(Math.floor(s/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`;
-function startWalk(){ walk={id:Date.now().toString(36),start:Date.now(),pts:[],dist:0,photos:[],side:1,lastStep:null,paused:false,pausedMs:0,pausedAt:null}; $('btnWalk').setAttribute('aria-pressed','true'); $('walkStat').hidden=false; $('btnWalkStop').hidden=false; $('btnWalk').classList.remove('paused'); walkLayer.clearLayers(); stepsLayer.clearLayers();
+function startWalk(){ walk={id:Date.now().toString(36),start:Date.now(),pts:[],dist:0,photos:[],side:1,lastStep:null,paused:false,pausedMs:0,pausedAt:null}; $('btnWalk').setAttribute('aria-pressed','true'); $('btnWalkStop').hidden=false; $('btnWalkStop').classList.remove('paused'); $('btnWalk').classList.remove('paused'); $('walkStat').textContent='0 m'; walkLayer.clearLayers(); stepsLayer.clearLayers();
   walk.line=L.polyline([],{color:'#2E7D4F',weight:3,opacity:.5,dashArray:'2 8',interactive:false}).addTo(walkLayer);
-  walkTimer=setInterval(()=>{ if(!walk) return; const el=walkElapsed(); $('walkStat').textContent=(walk.paused?'pause · ':'')+fmtDist(walk.dist)+' · '+fmtTime(el); },1000);
+  walkTimer=null;
   if(!compassOn) enableCompass(); log('walk_start'); toast('En marche — tes pas se dessinent sur la carte'); if(me) walkPoint(me[0],me[1],5); }
 function walkElapsed(){ return Math.round((Date.now()-walk.start-walk.pausedMs-(walk.pausedAt?Date.now()-walk.pausedAt:0))/1000); }
 function walkPoint(lat,lng,acc){ if(!walk||walk.paused||acc>35) return; const p=[lat,lng]; const last=walk.pts.at(-1); if(last){ const d=map.distance(last,p); if(d<4) return; walk.dist+=d; const brg=bearing(last,p);
     if(!walk.lastStep||map.distance(walk.lastStep,p)>=6){ walk.side*=-1; const off=destination(lat,lng,brg+90*walk.side,1.1); L.marker(off,{icon:L.divIcon({className:'',html:`<div class="step" style="transform:rotate(${brg}deg)"></div>`,iconSize:[10,16],iconAnchor:[5,8]}),interactive:false}).addTo(stepsLayer); walk.lastStep=p; } }
-  walk.pts.push({lat,lng,t:Date.now()}); walk.line.addLatLng(p); }
-function stopWalk(){ if(!walk) return; clearInterval(walkTimer); const rec={id:walk.id,start:walk.start,end:Date.now(),secs:walkElapsed(),dist:Math.round(walk.dist),pts:walk.pts.map(q=>[+q.lat.toFixed(6),+q.lng.toFixed(6)]),photos:walk.photos}; walks.unshift(rec); try{localStorage.setItem('terrain.walks',JSON.stringify(walks));}catch{}
-  log('walk_stop',{dist:rec.dist,pts:rec.pts.length,photos:rec.photos.length}); toast(`Marche enregistrée · ${fmtDist(rec.dist)} · ${rec.photos.length} photo(s)`); walk=null; $('btnWalk').setAttribute('aria-pressed','false'); $('walkStat').hidden=true; $('btnWalkStop').hidden=true; $('btnWalk').classList.remove('paused'); }
+  walk.pts.push({lat,lng,t:Date.now()}); walk.line.addLatLng(p); $('walkStat').textContent=fmtDist(walk.dist); const bw=$('btnWalk'); bw.classList.remove('moving'); void bw.offsetWidth; bw.classList.add('moving'); clearTimeout(window._mvT); window._mvT=setTimeout(()=>bw.classList.remove('moving'),1600); }
+function stopWalk(){ if(!walk) return; const rec={id:walk.id,start:walk.start,end:Date.now(),secs:walkElapsed(),dist:Math.round(walk.dist),pts:walk.pts.map(q=>[+q.lat.toFixed(6),+q.lng.toFixed(6)]),photos:walk.photos}; walks.unshift(rec); try{localStorage.setItem('terrain.walks',JSON.stringify(walks));}catch{}
+  log('walk_stop',{dist:rec.dist,pts:rec.pts.length,photos:rec.photos.length}); toast(`Marche enregistrée · ${fmtDist(rec.dist)} · ${rec.photos.length} photo(s)`); walk=null; $('btnWalk').setAttribute('aria-pressed','false'); $('btnWalkStop').hidden=true; $('btnWalk').classList.remove('paused','moving'); }
 $('btnWalk').onclick=()=>{ navigator.vibrate?.(12); if(!walk) return startWalk();
   walk.paused=!walk.paused; if(walk.paused){ walk.pausedAt=Date.now(); walk.lastStep=null; } else { walk.pausedMs+=Date.now()-walk.pausedAt; walk.pausedAt=null; }
-  $('btnWalk').classList.toggle('paused',walk.paused); log('walk_pause',{p:walk.paused}); toast(walk.paused?'Marche en pause — la position n\'est plus enregistrée':'Marche reprise'); };
+  $('btnWalk').classList.toggle('paused',walk.paused); $('btnWalkStop').classList.toggle('paused',walk.paused); log('walk_pause',{p:walk.paused}); toast(walk.paused?'Marche en pause — la position n\'est plus enregistrée':'Marche reprise'); };
 $('btnWalkStop').onclick=()=>{ if(walk&&confirm('Terminer la marche ?')) stopWalk(); };
 
 // Photo en marche : viser, fixer, photographier
