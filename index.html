@@ -250,7 +250,7 @@ button:focus-visible,a:focus-visible{outline:3px solid var(--boot);outline-offse
 <div id="map" role="application" aria-label="Carte"></div>
 
 <div class="topbar">
-  <h1>Terrain <small>v26</small></h1>
+  <h1>Terrain <small>v27</small></h1>
   <button class="chip" id="btnSearch" aria-pressed="false" title="Chercher une adresse ou un code postal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg></button>
   <button class="chip" id="btnPov" aria-label="Photo point de vue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg></button>
   <button class="chip" id="btnMic" aria-pressed="false" title="Commentaire vocal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></button>
@@ -383,7 +383,7 @@ button:focus-visible,a:focus-visible{outline:3px solid var(--boot);outline-offse
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script>
 /* ============================ CONFIG ============================ */
-const APP_VERSION='v26';
+const APP_VERSION='v27';
 const CONFIG = {
   ringFraction: 0.70,      // diamètre de l'anneau = 70 % du plus petit côté de l'écran ; pince pour agrandir/réduire
   maxRadius: 1500,         // rayon maximal du scan (m) pour rester sous la limite des services
@@ -634,7 +634,7 @@ async function attachCentris(text){ const info=parseCentris(text); if(!info) ret
 $('btnCentrisPaste').onclick=async()=>{ let t=''; try{ t=(await navigator.clipboard.readText()).trim(); }catch{} if(!/centris\.ca/i.test(t)) t=(prompt('Colle le texte partagé ou le lien de l\'annonce Centris :',t&&/^https?:/.test(t)?t:'')||'').trim(); attachCentris(t); };
 function autosave(){ if(!selected) return; const was=carnet.find(x=>x.lot===selected.lot); $('saveLot').click(); if(!was) toast('Ajouté au carnet'); }
 $('btnFav').onclick=()=>{ if(!selected) return; const on=$('btnFav').getAttribute('aria-pressed')!=='true'; $('btnFav').setAttribute('aria-pressed',on); navigator.vibrate?.(10); log('fav',{on}); autosave(); };
-$('lnkCentris').addEventListener('click',()=>{ if(selected&&!centrisUrl) toast('Dans Centris : Partager → Terrain, ou copie le lien et touche le bouton lien'); log('btn',{id:'lnkCentris',has:!!centrisUrl}); });
+$('lnkCentris').addEventListener('click',()=>{ if(selected&&!centrisUrl) toast('Pour revenir : X en haut à gauche. Trouvé ? Partager → Terrain'); log('btn',{id:'lnkCentris',has:!!centrisUrl}); });
 $('lnkCall').addEventListener('click',()=>log('btn',{id:'lnkCall'}));
 function setVisited(v){ $('lotVisited').checked=!!v; $('lotVisited').parentElement.querySelector('.lbl').textContent=v?'Visité':'À voir'; }
 $('lotVisited').addEventListener('change',e=>{ setVisited(e.target.checked); log('visited',{v:e.target.checked}); });
@@ -781,7 +781,7 @@ $('btnWalk').onclick=()=>{ navigator.vibrate?.(12); if(!walk) return startWalk()
 $('btnWalkStop').onclick=()=>{ if(walk&&confirm('Terminer la marche ?')) stopWalk(); };
 
 // Photo en marche : viser, fixer, photographier
-$('btnCentrisMap').onclick=async()=>{ const c=map.getCenter(); let m=null; try{ const j=await muniAt(c.lat,c.lng); m=j.features?.[0]?.properties?.MUS_NM_MUN||null; }catch{} const u=centrisCityUrl(m); log('centris_map',{muni:!!m}); if(!m) toast('Municipalité inconnue — Centris s\'ouvre sans zoom'); window.open(u,'_blank','noopener'); };
+$('btnCentrisMap').onclick=async()=>{ const c=map.getCenter(); let m=null; try{ const j=await muniAt(c.lat,c.lng); m=j.features?.[0]?.properties?.MUS_NM_MUN||null; }catch{} const u=centrisCityUrl(m); log('centris_map',{muni:!!m}); toast(m?'Pour revenir à Terrain : le X en haut à gauche de Centris':'Municipalité inconnue — Centris s\'ouvre sans zoom'); window.open(u,'_blank','noopener'); };
 $('btnPov').onclick=()=>{ if(!me) return toast('Attends un fix GPS — touche d\'abord le bouton position'); if(!compassOn) enableCompass(); aimHeading=null; $('aim').hidden=false; log('aim_open',{walking:!!walk}); };
 $('aimCancel').onclick=()=>{ $('aim').hidden=true; };
 $('aimFix').onclick=()=>{ aimHeading=heading; $('aim').hidden=true; navigator.vibrate?.(15); log('aim_fix',{h:heading!=null?Math.round(heading):null,flat:tiltFlat}); openSnap(); };
