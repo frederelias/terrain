@@ -22,7 +22,7 @@
   font-family:"Atkinson Hyperlegible",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{height:100%;margin:0;background:var(--field);color:var(--ink);overflow:hidden}
+html,body{height:100%;width:100%;margin:0;background:var(--field);color:var(--ink);overflow:hidden;overflow-x:hidden;position:relative}
 button{font:inherit;cursor:pointer;border:0;background:none;color:inherit}
 
 #map{position:fixed;inset:0;background:#DDE3D6}
@@ -31,10 +31,10 @@ button{font:inherit;cursor:pointer;border:0;background:none;color:inherit}
 .leaflet-control-zoom{display:none}
 
 /* Barre haute */
-.topbar{position:fixed;top:0;left:0;right:0;z-index:1000;padding:calc(var(--sat) + 8px) 12px 8px;background:var(--bark);color:#fff;display:flex;align-items:center;gap:8px}
-.topbar h1{font-size:18px;font-weight:700;margin:0;flex:1;white-space:nowrap}
+.topbar{position:fixed;top:0;left:0;right:0;z-index:1000;padding:calc(var(--sat) + 8px) 10px 8px;background:var(--bark);color:#fff;display:flex;align-items:center;gap:6px;flex-wrap:nowrap;overflow:hidden;max-width:100vw;box-sizing:border-box}
+.topbar h1{font-size:18px;font-weight:700;margin:0;flex:1 1 auto;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .topbar h1 small{font-weight:400;opacity:.7;font-size:13px;margin-left:6px}
-.chip{padding:8px 11px;border-radius:999px;font-size:13px;font-weight:700;background:rgba(255,255,255,.12);color:#fff;border:1px solid rgba(255,255,255,.25);min-height:36px;white-space:nowrap}
+.chip{flex:none;padding:0 10px;border-radius:999px;font-size:13px;font-weight:700;background:rgba(255,255,255,.12);color:#fff;border:1px solid rgba(255,255,255,.25);min-height:40px;min-width:40px;display:inline-flex;align-items:center;justify-content:center;white-space:nowrap}
 .chip.rec{background:#C62828;color:#fff;border-color:#C62828;animation:pulse 1s infinite}
 @keyframes pulse{50%{opacity:.55}}
 .chip[aria-pressed="true"]{background:var(--boot);color:var(--ink);border-color:var(--boot)}
@@ -132,35 +132,14 @@ button{font:inherit;cursor:pointer;border:0;background:none;color:inherit}
 .aim h2{font-size:24px}
 .aim .dial{width:140px;height:140px} .aim .dial b{font-size:24px;padding-top:28px}
 @media (prefers-reduced-motion:reduce){.aim .aimArt .ph,.aim .aimArt .arrow{animation:none}.aim .aimArt .arrow{opacity:1}.aim .aimArt .ph{transform:perspective(300px) rotateX(70deg)}}
-.bottom{gap:10px}
+.bottom{gap:10px;max-width:100vw;box-sizing:border-box}
+@media (max-width:380px){.bottom{gap:6px;padding:0 8px}.round{width:50px;height:50px}.bottom .col{width:50px}.scan{width:72px;height:72px}}
 .bottom .col{display:flex;flex-direction:column;align-items:center;gap:3px;width:56px}
 .wstat{font-family:"JetBrains Mono",ui-monospace,monospace;font-size:10.5px;color:#fff;white-space:nowrap;line-height:1}
 .wstat[hidden]{display:none}
 .round.walk .stop{display:none} .round.walk[aria-pressed="true"]{background:#2E7D4F;color:#fff} .round.walk[aria-pressed="true"] .go{display:none} .round.walk[aria-pressed="true"] .stop{display:block}
 .round.carnet svg{width:26px;height:26px}
 #walkPhoto[hidden]{display:none} #walkPhoto{background:#2E7D4F;color:#fff}
-.wiz{position:fixed;inset:0;z-index:1350;background:var(--paper,#F7F6F2);color:var(--ink,#141A16);display:flex;flex-direction:column}
-.wiz[hidden]{display:none}
-.wizTop{display:flex;align-items:center;gap:10px;padding:calc(var(--sat) + 10px) 14px 10px;background:var(--panel,#1C2420);color:#fff}
-.wizTop b{font-family:"JetBrains Mono",ui-monospace,monospace;background:rgba(255,255,255,.15);padding:4px 8px;border-radius:999px;font-size:13px}
-.wizTop span{flex:1;font-weight:700;font-size:16px}
-.wizTop button{width:40px;height:40px;border-radius:12px;background:rgba(255,255,255,.15);color:#fff;font-size:22px}
-.planMap{flex:1;background:#DDE3D6;position:relative}
-.wiz.onmap .planMap{display:none}
-.wiz.onmap{background:transparent;pointer-events:none}
-.wiz.onmap .wizTop,.wiz.onmap .wizBottom{pointer-events:auto}
-.planPin{position:absolute;left:50%;top:50%;transform:translate(-50%,-100%);z-index:5;pointer-events:none}
-.wiz.onmap .planPin{display:none}
-.wizBottom{padding:12px 14px calc(var(--sab) + 12px);background:var(--paper,#F7F6F2);border-top:1.5px solid var(--line,#D6D9D2);display:flex;flex-direction:column;gap:10px}
-.wizBottom p{margin:0;font-size:14px;line-height:1.4;color:var(--ink-2,#5C6B62)}
-.wizRow{display:flex;align-items:center;gap:10px;font-size:14px} .wizRow input{flex:1;accent-color:#FF5A1F} .wizRow b{font-family:"JetBrains Mono",ui-monospace,monospace;min-width:48px;text-align:right}
-.wizRow[hidden]{display:none}
-.wizBtns{display:flex;gap:8px} .wizBtns button{flex:1;min-height:52px;border-radius:12px;font-weight:700;font-size:16px}
-.wizBtns .main{background:#FF5A1F;color:#141A16;box-shadow:0 3px 0 #0B110D} .wizBtns .quiet{background:var(--field,#ECEDE8);color:var(--ink,#141A16)}
-.wizBtns button[hidden]{display:none}
-.list li .eye{width:40px;height:40px;border-radius:12px;background:var(--field);font-size:18px;flex:none}
-.list li .eye[aria-pressed="false"]{opacity:.4}
-.list li input[type=range]{width:90px;accent-color:#FF5A1F}
 /* Feuilles */
 .sheet{position:fixed;left:0;right:0;bottom:0;z-index:1100;background:var(--paper);border-radius:18px 18px 0 0;box-shadow:0 -10px 40px rgba(23,32,26,.22);max-height:78vh;display:flex;flex-direction:column;transform:translateY(105%);transition:transform .22s ease;padding-bottom:var(--sab)}
 .sheet.open{transform:translateY(0)}
@@ -259,12 +238,11 @@ button:focus-visible,a:focus-visible{outline:3px solid var(--boot);outline-offse
 <div id="map" role="application" aria-label="Carte"></div>
 
 <div class="topbar">
-  <h1>Terrain <small>repérage</small></h1>
+  <h1>Terrain</h1>
   <button class="chip" id="btnSearch" aria-pressed="false" title="Chercher une adresse ou un code postal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg></button>
   <button class="chip" id="btnMic" aria-pressed="false" title="Commentaire vocal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></button>
-  <button class="chip" id="btnBase" aria-pressed="false" title="Basculer carte / photo aérienne"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l9 5-9 5-9-5 9-5z"/><path d="M3 13l9 5 9-5"/></svg> Aérien</button>
-  <button class="chip" id="btnBaux" aria-pressed="true">Baux</button>
-  <button class="chip" id="btnLayers" aria-pressed="false" title="Calques"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="14" rx="2"/><path d="M3 9h18M8 4v14"/></svg> Calques</button>
+  <button class="chip" id="btnBase" aria-pressed="false" aria-label="Photo aérienne"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l9 5-9 5-9-5 9-5z"/><path d="M3 13l9 5 9-5"/></svg></button>
+  <button class="chip" id="btnBaux" aria-pressed="true" aria-label="Baux sur terres publiques">Baux</button>
 </div>
 
 <section class="aim" id="aim" hidden>
@@ -285,26 +263,6 @@ button:focus-visible,a:focus-visible{outline:3px solid var(--boot);outline-offse
   <div class="snapZoom"><button data-z="1">1×</button><button data-z="2">2×</button><button data-z="4">4×</button><input type="range" id="snapRange" min="1" max="4" step="0.1" value="1" aria-label="Zoom"></div>
   <button class="scan shutter" id="snapShutter" aria-label="Prendre la photo"><span class="face"></span></button>
   <canvas id="snapCanvas" hidden></canvas>
-</section>
-<section class="sheet" id="sheetLayers" aria-hidden="true">
-  <div class="grip"></div>
-  <header><div class="t"><h2>Calques</h2><p>Plans d'arpenteur, cartes, croquis — calés sur le cadastre</p></div><button class="close" id="closeLayers" aria-label="Fermer">×</button></header>
-  <div class="body">
-    <div class="actions"><button id="addLayer" class="wide" style="background:var(--boot);color:var(--ink)">+ Ajouter une carte (image ou PDF)</button></div>
-    <input type="file" id="layerInput" accept="image/*,application/pdf" hidden>
-    <ul class="list" id="layerList"></ul>
-  </div>
-</section>
-<section class="wiz" id="wiz" hidden>
-  <div class="wizTop"><b id="wizStep">1 / 4</b><span id="wizTitle">Point 1 sur le plan</span><button id="wizCancel" aria-label="Annuler">×</button></div>
-  <div id="planMap" class="planMap"></div>
-  <div class="pin planPin" id="planPin" aria-hidden="true"><svg viewBox="0 0 34 44"><path d="M17 1C8 1 1 8 1 17c0 11 16 26 16 26s16-15 16-26C33 8 26 1 17 1z" fill="#FF5A1F" stroke="#fff" stroke-width="2"/><circle cx="17" cy="17" r="6" fill="#fff"/></svg></div>
-  <div class="wizBottom">
-    <p id="wizHint">Déplace le plan pour mettre un repère net sous la pin : coin de lot, intersection, borne.</p>
-    <div class="wizRow" id="wizOpacityRow" hidden><span>Opacité</span><input type="range" id="wizOpacity" min="0.15" max="1" step="0.05" value="0.6"><b id="wizOpacityVal">60 %</b></div>
-    <div class="wizRow" id="wizResidual" hidden></div>
-    <div class="wizBtns"><button id="wizSkip" class="quiet" hidden>Terminer avec 2 points</button><button id="wizNext" class="main">Placer ici</button></div>
-  </div>
 </section>
 <form class="search" id="search">
   <input id="q" type="search" placeholder="Code postal, adresse ou lieu" autocomplete="off" enterkeyhint="search">
@@ -592,7 +550,7 @@ async function identify(lat,lng){ try{
 /* ============================ Fiche ============================ */
 const $=id=>document.getElementById(id);
 const sheetLot=$('sheetLot'), sheetCarnet=$('sheetCarnet'); let selected=null;
-function show(s){s.classList.add('open');s.setAttribute('aria-hidden','false');ctx.screen=s.id==='sheetLot'?'fiche':s.id==='sheetLayers'?'calques':'carnet';} function hide(s){s.classList.remove('open');s.setAttribute('aria-hidden','true');log('close_'+ctx.screen);ctx.screen='carte';if(s.id==='sheetLot')ctx.lot=null;}
+function show(s){s.classList.add('open');s.setAttribute('aria-hidden','false');ctx.screen=s.id==='sheetLot'?'fiche':'carnet';} function hide(s){s.classList.remove('open');s.setAttribute('aria-hidden','true');log('close_'+ctx.screen);ctx.screen='carte';if(s.id==='sheetLot')ctx.lot=null;}
 $('closeLot').onclick=()=>hide(sheetLot); $('closeCarnet').onclick=()=>hide(sheetCarnet);
 function roleUrl(m,lot){ const mrc=(m?.MUS_NM_MRC||'').toLowerCase();
   for(const k in CONFIG.roles){ if(mrc.includes(k)&&CONFIG.roles[k]) return CONFIG.roles[k].replace('{lot}',encodeURIComponent(lot||'')); }
@@ -802,77 +760,6 @@ async function renderWalkList(){ const ul=$('walkList'); ul.innerHTML=''; if(!wa
   walks.forEach(w=>{ const li=document.createElement('li'); const d=new Date(w.start); li.innerHTML=`<div class="t"><b>${d.toLocaleDateString('fr-CA',{day:'numeric',month:'short'})} · ${fmtDist(w.dist)}</b><span>${fmtTime(Math.round((w.end-w.start)/1000))} · ${w.photos.length} photo(s)</span></div><button class="close" aria-label="Retirer">×</button>`;
     li.querySelector('.t').onclick=()=>{ hide(sheetCarnet); if(w.pts.length) map.fitBounds(L.latLngBounds(w.pts).pad(.3)); };
     li.querySelector('button').onclick=()=>{ walks=walks.filter(x=>x.id!==w.id); try{localStorage.setItem('terrain.walks',JSON.stringify(walks));}catch{} renderWalks(); renderWalkList(); }; ul.appendChild(li); }); }
-
-/* ============================ Calques géoréférencés ============================ */
-const R_M=6378137;
-const toM=(lat,lng)=>[R_M*rad(lng), R_M*Math.log(Math.tan(Math.PI/4+rad(lat)/2))];
-const fromM=(x,y)=>[(2*Math.atan(Math.exp(y/R_M))-Math.PI/2)*180/Math.PI, x/R_M*180/Math.PI];
-// Similitude par moindres carrés : (u,v) image (v vers le bas) -> (x,y) mètres.  x = a*u + b*v + tx ; y = -b*u + a*v... on travaille en v' = -v (y vers le haut)
-function fitSimilarity(pairs){ const n=pairs.length; let su=0,sv=0,sx=0,sy=0; pairs.forEach(([u,v,x,y])=>{su+=u;sv+=-v;sx+=x;sy+=y;}); su/=n;sv/=n;sx/=n;sy/=n;
-  let A=0,B=0,D=0; pairs.forEach(([u,v,x,y])=>{ const du=u-su,dv=-v-sv,dx=x-sx,dy=y-sy; A+=du*dx+dv*dy; B+=du*dy-dv*dx; D+=du*du+dv*dv; });
-  const a=A/D,b=B/D; const tx=sx-(a*su-b*sv), ty=sy-(b*su+a*sv); const s=Math.hypot(a,b), th=Math.atan2(b,a);
-  const map=(u,v)=>[a*u-b*(-v)+tx, b*u+a*(-v)+ty];
-  const err=pairs.map(([u,v,x,y])=>{ const [px,py]=map(u,v); return Math.hypot(px-x,py-y); });
-  return {a,b,tx,ty,s,th,map,err}; }
-let LAYERS=[], layerObjs={};
-async function loadLayers(){ LAYERS=await dbAll('layers'); LAYERS.sort((p,q)=>q.created-p.created); LAYERS.forEach(showLayer); }
-function showLayer(ly){ if(layerObjs[ly.id]){ map.removeLayer(layerObjs[ly.id].ov); URL.revokeObjectURL(layerObjs[ly.id].url); delete layerObjs[ly.id]; } if(ly.visible===false) return;
-  const url=URL.createObjectURL(ly.blob); const ov=L.imageOverlay(url,ly.bounds,{opacity:ly.opacity??.6,interactive:false}).addTo(map); layerObjs[ly.id]={ov,url}; lyrMuni.bringToFront(); lyrBaux.bringToFront(); lyrCadastre.bringToFront(); }
-async function saveLayer(ly){ await dbTx('readwrite',st=>st.put(ly),'layers'); }
-function renderLayerList(){ const ul=$('layerList'); ul.innerHTML=''; if(!LAYERS.length){ ul.innerHTML='<li class="empty">Aucun calque. Ajoute un plan d\'arpenteur, une carte de zonage, un croquis.</li>'; return; }
-  LAYERS.forEach(ly=>{ const li=document.createElement('li'); li.innerHTML=`<button class="eye" aria-pressed="${ly.visible!==false}" aria-label="Afficher">👁</button><div class="t"><b>${esc(ly.name)}</b><span>${new Date(ly.created).toLocaleDateString('fr-CA')} · écart ${ly.residual!=null?Math.round(ly.residual)+' m':'—'}</span></div><input type="range" min="0.1" max="1" step="0.05" value="${ly.opacity??.6}" aria-label="Opacité"><button class="close" aria-label="Supprimer">×</button>`;
-    li.querySelector('.eye').onclick=e=>{ ly.visible=!(ly.visible!==false); e.currentTarget.setAttribute('aria-pressed',ly.visible); saveLayer(ly); showLayer(ly); log('layer_toggle',{v:ly.visible}); };
-    li.querySelector('input').oninput=e=>{ ly.opacity=+e.target.value; layerObjs[ly.id]?.ov.setOpacity(ly.opacity); }; li.querySelector('input').onchange=()=>saveLayer(ly);
-    li.querySelector('.t').onclick=()=>{ hide(sheetLayers); map.fitBounds(ly.bounds); };
-    li.querySelector('.close').onclick=async()=>{ if(!confirm(`Supprimer le calque « ${ly.name} » ?`)) return; await dbTx('readwrite',st=>st.delete(ly.id),'layers'); if(layerObjs[ly.id]){ map.removeLayer(layerObjs[ly.id].ov); delete layerObjs[ly.id]; } LAYERS=LAYERS.filter(x=>x.id!==ly.id); renderLayerList(); log('layer_delete'); };
-    ul.appendChild(li); }); }
-const sheetLayers=$('sheetLayers');
-$('btnLayers').onclick=()=>{ renderLayerList(); hide(sheetLot); hide(sheetCarnet); show(sheetLayers); log('btn',{id:'btnLayers'}); };
-$('closeLayers').onclick=()=>hide(sheetLayers);
-$('addLayer').onclick=()=>$('layerInput').click();
-loadLayers();
-
-/* ---- Lecture du fichier : image ou PDF (1re page) ---- */
-function loadScript(src){ return new Promise((res,rej)=>{ const sc=document.createElement('script'); sc.src=src; sc.onload=res; sc.onerror=rej; document.head.appendChild(sc); }); }
-async function fileToImage(file){ const MAX=2600;
-  if(file.type==='application/pdf'||/\.pdf$/i.test(file.name)){ if(!window.pdfjsLib){ await loadScript('https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js'); window.pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js'; }
-    const pdf=await window.pdfjsLib.getDocument({data:await file.arrayBuffer()}).promise; const page=await pdf.getPage(1); const v1=page.getViewport({scale:1}); const k=Math.min(4,MAX/Math.max(v1.width,v1.height)); const vp=page.getViewport({scale:k});
-    const c=document.createElement('canvas'); c.width=Math.round(vp.width); c.height=Math.round(vp.height); await page.render({canvasContext:c.getContext('2d'),viewport:vp}).promise; return c; }
-  const img=await new Promise((res,rej)=>{ const im=new Image(); im.onload=()=>res(im); im.onerror=rej; im.src=URL.createObjectURL(file); });
-  const k=Math.min(1,MAX/Math.max(img.width,img.height)); const c=document.createElement('canvas'); c.width=Math.round(img.width*k); c.height=Math.round(img.height*k); c.getContext('2d').drawImage(img,0,0,c.width,c.height); URL.revokeObjectURL(img.src); return c; }
-
-/* ---- Assistant de calage ---- */
-let wz=null, planMap=null;
-$('layerInput').addEventListener('change',async e=>{ const f=e.target.files[0]; e.target.value=''; if(!f) return; hide(sheetLayers); toast('Lecture du fichier…');
-  try{ const canvas=await fileToImage(f); startWizard(canvas,f.name.replace(/\.[^.]+$/,'')); }catch(err){ toast('Impossible de lire ce fichier'); log('layer_read_error',{msg:String(err.message).slice(0,80)}); } });
-function startWizard(canvas,name){ wz={canvas,name,pts:[],phase:'plan',opacity:.6}; const wizEl=$('wiz'); wizEl.hidden=false; wizEl.classList.remove('onmap');
-  if(planMap){ planMap.remove(); planMap=null; } planMap=L.map('planMap',{crs:L.CRS.Simple,zoomControl:false,attributionControl:false,minZoom:-4});
-  const b=[[0,0],[canvas.height,canvas.width]]; L.imageOverlay(canvas.toDataURL('image/jpeg',.85),b).addTo(planMap); planMap.fitBounds(b); wz.b=b; wz.planMarkers=L.layerGroup().addTo(planMap); wz.mapMarkers=L.layerGroup().addTo(map);
-  setTimeout(()=>planMap.invalidateSize(),50); wizRender(); log('wizard_start',{w:canvas.width,h:canvas.height}); }
-function wizRender(){ const n=wz.pts.length, onPlan=wz.phase==='plan', step=Math.min(n+1,3); $('wiz').classList.toggle('onmap',!onPlan);
-  $('wizOpacityRow').hidden=wz.phase!=='opacity'; $('wizResidual').hidden=true; $('wizSkip').hidden=!(wz.phase==='plan'&&n===2);
-  if(wz.phase==='opacity'){ $('wizStep').textContent='4 / 4'; $('wizTitle').textContent='Opacité du calque'; $('wizHint').textContent='Règle la transparence pour voir le cadastre à travers, puis ajoute le calque.'; $('wizNext').textContent='Ajouter le calque'; $('wizOpacityRow').hidden=false;
-    if(wz.residual!=null){ const r=$('wizResidual'); r.hidden=false; r.innerHTML=wz.residual<=8?`<b style="color:#2E7D4F">✓ écart ${Math.round(wz.residual)} m</b> — calage fiable`:`<b style="color:#B3261E">écart ${Math.round(wz.residual)} m</b> — un point est probablement mal placé ; annule et reprends-le`; } return; }
-  $('wizStep').textContent=`${step} / 4`;
-  if(onPlan){ $('wizTitle').textContent=`Point ${n+1} sur le plan`; $('wizHint').textContent=n===0?'Déplace le plan pour mettre un repère net sous la pin : coin de lot, intersection, borne.':n===1?'Un deuxième repère, le plus loin possible du premier.':'Troisième repère, optionnel : il sert à vérifier le calage.'; $('wizNext').textContent='Placer ici'; setTimeout(()=>planMap.invalidateSize(),50); }
-  else { $('wizTitle').textContent=`Point ${n+1} sur la carte`; $('wizHint').textContent='Déplace la carte pour mettre le même repère sous la pin bleue — ou va à ta position si tu es dessus.'; $('wizNext').textContent='Placer ici'; } }
-$('wizNext').onclick=()=>{ if(!wz) return;
-  if(wz.phase==='plan'){ const c=planMap.getCenter(); wz.cur={u:c.lng,v:wz.canvas.height-c.lat}; L.circleMarker(c,{radius:8,color:'#FF5A1F',weight:3,fillColor:'#fff',fillOpacity:1}).addTo(wz.planMarkers); wz.phase='map'; wizRender(); return; }
-  if(wz.phase==='map'){ const c=map.getCenter(); const [x,y]=toM(c.lat,c.lng); wz.pts.push([wz.cur.u,wz.cur.v,x,y]); L.circleMarker(c,{radius:8,color:'#FF5A1F',weight:3,fillColor:'#fff',fillOpacity:1}).addTo(wz.mapMarkers);
-    if(wz.pts.length>=3) return finishPoints(); wz.phase='plan'; wizRender(); return; }
-  if(wz.phase==='opacity') return commitLayer(); };
-$('wizSkip').onclick=()=>finishPoints();
-$('wizOpacity').oninput=e=>{ wz.opacity=+e.target.value; $('wizOpacityVal').textContent=Math.round(wz.opacity*100)+' %'; wz.preview?.setOpacity(wz.opacity); };
-$('wizCancel').onclick=()=>cancelWizard();
-function cancelWizard(){ if(!wz) return; wz.mapMarkers.clearLayers(); map.removeLayer(wz.mapMarkers); if(wz.preview) map.removeLayer(wz.preview); if(planMap){ planMap.remove(); planMap=null; } $('wiz').hidden=true; wz=null; log('wizard_cancel'); }
-function finishPoints(){ const fit=fitSimilarity(wz.pts); wz.fit=fit; wz.residual=wz.pts.length>=3?Math.max(...fit.err):null;
-  const {canvas}=wz, w=canvas.width,h=canvas.height; const corners=[[0,0],[w,0],[w,h],[0,h]].map(([u,v])=>fit.map(u,v)); const xs=corners.map(c=>c[0]), ys=corners.map(c=>c[1]); const minx=Math.min(...xs),maxx=Math.max(...xs),miny=Math.min(...ys),maxy=Math.max(...ys);
-  const k=Math.min(1,3000/Math.max((maxx-minx)/fit.s,(maxy-miny)/fit.s)); const out=document.createElement('canvas'); out.width=Math.round((maxx-minx)/fit.s*k); out.height=Math.round((maxy-miny)/fit.s*k);
-  const ctx=out.getContext('2d'); ctx.translate(out.width/2,out.height/2); ctx.rotate(-fit.th); ctx.scale(k,k); ctx.drawImage(canvas,-w/2,-h/2);
-  const sw=fromM(minx,miny), ne=fromM(maxx,maxy); wz.bounds=[[sw[0],sw[1]],[ne[0],ne[1]]];
-  out.toBlob(blob=>{ wz.blob=blob; wz.preview=L.imageOverlay(URL.createObjectURL(blob),wz.bounds,{opacity:wz.opacity,interactive:false}).addTo(map); wz.phase='opacity'; map.fitBounds(wz.bounds); wizRender(); },'image/png'); }
-async function commitLayer(){ const ly={id:Date.now().toString(36),name:wz.name,blob:wz.blob,bounds:wz.bounds,opacity:wz.opacity,visible:true,created:Date.now(),residual:wz.residual,pts:wz.pts.length};
-  await saveLayer(ly); LAYERS.unshift(ly); map.removeLayer(wz.preview); wz.preview=null; showLayer(ly); log('layer_add',{pts:ly.pts,res:ly.residual!=null?Math.round(ly.residual):null}); const nm=wz.name; cancelWizard(); toast(`Calque « ${nm} » ajouté`); }
 
 /* ============================ Commentaires vocaux ============================ */
 const SR=window.SpeechRecognition||window.webkitSpeechRecognition; let rec=null, recOn=false;
