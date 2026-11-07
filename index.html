@@ -231,6 +231,7 @@ textarea{min-height:72px;resize:vertical}
 .legend i.round{border-radius:50%;border:2px solid #fff;box-shadow:0 0 0 1px var(--line)}
 .actions a.disabled{opacity:.4;pointer-events:none}
 .saved-label{font-size:12px;line-height:1.25;background:rgba(255,255,255,.88);border-radius:8px;padding:4px 7px;border:1px solid var(--line);text-shadow:none}
+.leaflet-popup-content-wrapper{border-radius:12px;font-family:inherit} .leaflet-popup-content{margin:12px 14px}
 .lot-label{font-weight:700;font-size:11px;color:var(--bark);text-shadow:0 0 3px #fff,0 0 3px #fff;white-space:nowrap}
 .me{width:16px;height:16px;border-radius:50%;background:var(--gps);border:3px solid #fff;box-shadow:0 0 0 5px rgba(30,111,217,.25)}
 .clearbtn{position:fixed;left:12px;bottom:calc(var(--sab) + 248px);z-index:1000;background:var(--paper,#fff);color:var(--ink);border:1.5px solid var(--ink);border-radius:999px;padding:0 12px;min-height:40px;font-weight:700;font-size:13px;box-shadow:0 2px 0 var(--ink)}
@@ -247,7 +248,7 @@ button:focus-visible,a:focus-visible{outline:3px solid var(--boot);outline-offse
 <div id="map" role="application" aria-label="Carte"></div>
 
 <div class="topbar">
-  <h1>Terrain <small>v22</small></h1>
+  <h1>Terrain <small>v23</small></h1>
   <button class="chip" id="btnSearch" aria-pressed="false" title="Chercher une adresse ou un code postal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg></button>
   <button class="chip" id="btnPov" aria-label="Photo point de vue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg></button>
   <button class="chip" id="btnMic" aria-pressed="false" title="Commentaire vocal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></button>
@@ -383,7 +384,7 @@ button:focus-visible,a:focus-visible{outline:3px solid var(--boot);outline-offse
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script>
 /* ============================ CONFIG ============================ */
-const APP_VERSION='v22';
+const APP_VERSION='v23';
 const CONFIG = {
   ringFraction: 0.70,      // diamètre de l'anneau = 70 % du plus petit côté de l'écran ; pince pour agrandir/réduire
   maxRadius: 1500,         // rayon maximal du scan (m) pour rester sous la limite des services
@@ -434,7 +435,8 @@ const ArcGISExport = L.TileLayer.extend({
     return `${this._base}/export?bbox=${minx},${miny},${maxx},${maxy}&bboxSR=3857&imageSR=3857&size=256,256&format=png32&transparent=true&dpi=96&layers=show:${this._layers}&f=image`; }
 });
 const lyrCadastre = new ArcGISExport(CONFIG.cadastre,'0',{maxZoom:19,minZoom:13,opacity:.9,attribution:'Cadastre © Gouv. du Québec'}).addTo(map);
-const lyrBaux     = new ArcGISExport(CONFIG.baux,'0,1',{maxZoom:19,minZoom:10,opacity:.85}).addTo(map);
+const bauxGroup = L.layerGroup().addTo(map); let bauxOn=true; const lyrBaux={addTo(){bauxOn=true;loadBaux();return this;},remove(){bauxOn=false;bauxGroup.clearLayers();},bringToFront(){}};
+map.on('moveend zoomend',()=>{ clearTimeout(window._bauxT); window._bauxT=setTimeout(loadBaux,300); });
 const lyrMuni     = new ArcGISExport(CONFIG.sda,'2',{maxZoom:19,minZoom:9,opacity:.6}).addTo(map);
 const scanGroup = L.layerGroup().addTo(map), coneGroup = L.layerGroup().addTo(map), savedGroup = L.layerGroup().addTo(map);
 
@@ -448,7 +450,18 @@ const ptParams=(lat,lng)=>({geometry:`${lng},${lat}`,geometryType:'esriGeometryP
 const around=(base,layer,lat,lng,r,extra={})=>query(base,layer,{...ptParams(lat,lng),distance:String(r),units:'esriSRUnit_Meter',...extra});
 const lotAt=(lat,lng)=>query(CONFIG.cadastre,0,ptParams(lat,lng));
 const muniAt=(lat,lng)=>query(CONFIG.sda,2,{...ptParams(lat,lng),returnGeometry:'false'});
-const bauxAt=(lat,lng)=>query(CONFIG.baux,1,{...ptParams(lat,lng),returnGeometry:'false'});
+const bauxAt=async(lat,lng)=>{ const [a,b]=await Promise.all([query(CONFIG.baux,0,{...ptParams(lat,lng),distance:'40',units:'esriSRUnit_Meter',returnGeometry:'false'}).catch(()=>({features:[]})), query(CONFIG.baux,1,{...ptParams(lat,lng),returnGeometry:'false'}).catch(()=>({features:[]}))]); return {features:[...a.features,...b.features]}; };
+const bauxColor=t=>/villégiature/i.test(t)?'#2E6BE6':/abri/i.test(t)?'#2E7D4F':'#6A6A5A';
+const bauxDate=v=>v?new Date(v).toLocaleDateString('fr-CA',{year:'numeric',month:'short'}):'';
+function bauxPopup(p){ return `<div style="font:14px/1.35 inherit;min-width:180px"><b>${esc(p.DE_PRECS_N||'Bail sur terre publique')}</b><br><span style="color:#5C6B62">${esc(p.NM_ORGAN_A||'')}${p.DA_PRISE_E?' · depuis '+bauxDate(p.DA_PRISE_E):''}</span><br><small style="color:#5C6B62">Terre publique — le titulaire n'est pas dans les données ouvertes.</small></div>`; }
+let bauxBusy=false;
+async function loadBaux(){ if(!bauxOn||map.getZoom()<12){ bauxGroup.clearLayers(); return; } if(bauxBusy) return; bauxBusy=true;
+  try{ const b=map.getBounds(); const env={geometry:`${b.getWest()},${b.getSouth()},${b.getEast()},${b.getNorth()}`,geometryType:'esriGeometryEnvelope'};
+    const [pts,polys]=await Promise.all([query(CONFIG.baux,0,env), map.getZoom()>=13?query(CONFIG.baux,1,env).catch(()=>({features:[]})):Promise.resolve({features:[]})]);
+    bauxGroup.clearLayers();
+    polys.features.forEach(f=>{ const col=bauxColor(f.properties.DE_PRECS_N||''); L.geoJSON(f,{style:{color:col,weight:2,dashArray:'4 3',fillColor:col,fillOpacity:.08}}).bindPopup(bauxPopup(f.properties)).addTo(bauxGroup); });
+    pts.features.forEach(f=>{ const [lng,lat]=f.geometry.coordinates; const col=bauxColor(f.properties.DE_PRECS_N||''); L.circleMarker([lat,lng],{radius:7,color:'#fff',weight:2,fillColor:col,fillOpacity:.95}).bindPopup(bauxPopup(f.properties)).on('click',()=>log('bail_tap')).addTo(bauxGroup); });
+  }catch(e){ log('baux_error',{msg:String(e.message).slice(0,80)}); } finally{ bauxBusy=false; } }
 const addrInEnvelope=b=>query(CONFIG.adresses,0,{geometry:`${b.getWest()},${b.getSouth()},${b.getEast()},${b.getNorth()}`,geometryType:'esriGeometryEnvelope'});
 
 /* ============================ Géométrie ============================ */
@@ -698,7 +711,7 @@ $('copyLetter').onclick=()=>{ if(!selected)return; const L_=letter(), to=[$('lot
 async function copy(t,msg){try{await navigator.clipboard.writeText(t);if(msg)toast(msg);}catch{if(msg)toast('Copie impossible — note le numéro : '+t);}}
 var toastT; function toast(m){const t=document.getElementById('toast'); if(!t) return;t.textContent=m;t.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('show'),4000);}
 let sat=false; $('btnBase').onclick=e=>{sat=!sat;log('basemap',{sat});e.currentTarget.setAttribute('aria-pressed',sat);if(sat){map.removeLayer(baseOSM);baseSat.addTo(map);}else{map.removeLayer(baseSat);baseOSM.addTo(map);}lyrMuni.bringToFront();lyrBaux.bringToFront();lyrCadastre.bringToFront();};
-let baux=true; $('btnBaux').onclick=e=>{baux=!baux;log('baux',{baux});e.currentTarget.setAttribute('aria-pressed',baux);baux?lyrBaux.addTo(map):map.removeLayer(lyrBaux);};
+let baux=true; $('btnBaux').onclick=e=>{baux=!baux;log('baux',{baux});e.currentTarget.setAttribute('aria-pressed',baux);baux?lyrBaux.addTo(map):lyrBaux.remove();};
 /* ============================ Photos (IndexedDB, local) ============================ */
 const DB=new Promise((res,rej)=>{ const r=indexedDB.open('terrain',2); r.onupgradeneeded=ev=>{ const db=r.result; if(!db.objectStoreNames.contains('photos')){ const st=db.createObjectStore('photos',{keyPath:'id'}); st.createIndex('lot','lot'); } if(!db.objectStoreNames.contains('layers')) db.createObjectStore('layers',{keyPath:'id'}); }; r.onsuccess=()=>res(r.result); r.onerror=()=>rej(r.error); });
 async function dbTx(mode,fn,store='photos'){ const db=await DB; return new Promise((res,rej)=>{ const tx=db.transaction(store,mode), st=tx.objectStore(store); const out=fn(st); tx.oncomplete=()=>res(out?.result??out); tx.onerror=()=>rej(tx.error); }); }
@@ -841,7 +854,7 @@ $('clearLog').onclick=()=>{ if(confirm('Effacer tout le journal d\'usage ?')){ L
     const ans=prompt(`Annonce ${info.id||''} reçue.\nAttacher à quel lot ?\n\n${list}`,'1'); const r=sorted[(+ans)-1]; if(!r) return toast('Annonce non attachée');
     r.centris=info.url; r.centrisInfo=info; persist(); restyleScan(); renderSaved(); toast(`Annonce attachée au lot ${r.lot}`); map.setView([r.lat,r.lng],16); identify(r.lat,r.lng); };
   setTimeout(pick,800); })();
-setMode(mode);
+setMode(mode); setTimeout(loadBaux,500);
 if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{});
 </script>
 </body>
