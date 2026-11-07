@@ -502,7 +502,7 @@ searchForm.onsubmit=async e=>{ e.preventDefault(); const text=q.value.trim(); if
 /* ============================ Scan ============================ */
 const btnScan=document.getElementById('btnScan'), legend=document.getElementById('legend');
 let mode=localStorage.getItem('terrain.mode')||'zone';
-function setMode(m){ mode=m; try{localStorage.setItem('terrain.mode',m);}catch{} document.getElementById('modeOne').setAttribute('aria-pressed',m==='one'); document.getElementById('modeZone').setAttribute('aria-pressed',m==='zone'); document.getElementById('modeFav').setAttribute('aria-pressed',m==='fav'); ring.classList.toggle('hidden',m!=='zone'); if(typeof renderSaved==='function') renderSaved(); btnScan.setAttribute('aria-label', m==='one' ? 'Identifier ce lot' : m==='fav' ? 'Cadrer mes favoris' : 'Scanner la zone'); }
+function setMode(m){ mode=m; try{localStorage.setItem('terrain.mode',m);}catch{} document.getElementById('modeOne').setAttribute('aria-pressed',m==='one'); document.getElementById('modeZone').setAttribute('aria-pressed',m==='zone'); document.getElementById('modeFav').setAttribute('aria-pressed',m==='fav'); ring.classList.toggle('hidden',m!=='zone'); try{ renderSaved(); }catch{} btnScan.setAttribute('aria-label', m==='one' ? 'Identifier ce lot' : m==='fav' ? 'Cadrer mes favoris' : 'Scanner la zone'); }
 document.getElementById('modeOne').onclick=()=>{setMode('one');log('mode',{mode:'one'});}; document.getElementById('modeZone').onclick=()=>{setMode('zone');log('mode',{mode:'zone'});}; document.getElementById('modeFav').onclick=()=>{setMode('fav');log('mode',{mode:'fav'});};
 let lastMuni=null;
 btnScan.onclick=async()=>{ const c=map.getCenter(), r=ringMeters(), t0=Date.now();
@@ -511,7 +511,6 @@ btnScan.onclick=async()=>{ const c=map.getCenter(), r=ringMeters(), t0=Date.now(
   btnScan.disabled=true; btnScan.classList.add('busy'); navigator.vibrate?.(12);
   try{ const res=await scanAt(c.lat,c.lng,r); log('scan',{ms:Date.now()-t0,r:Math.round(r),z:+map.getZoom().toFixed(1),lots:res?.lots??0,vacant:res?.vacant??0,muni:res?.muni||null}); }catch(e){ toast('Service indisponible : '+e.message); log('scan_error',{ms:Date.now()-t0,msg:e.message}); }
   finally{ btnScan.disabled=false; btnScan.classList.remove('busy'); } };
-setMode(mode);
 
 async function scanAt(lat,lng,radius){
   scanGroup.clearLayers(); legend.classList.remove('show');
@@ -668,7 +667,7 @@ $('copyLetter').onclick=()=>{ if(!selected)return; const L_=letter(), to=[$('lot
 
 /* ============================ Utilitaires ============================ */
 async function copy(t,msg){try{await navigator.clipboard.writeText(t);if(msg)toast(msg);}catch{if(msg)toast('Copie impossible — note le numéro : '+t);}}
-let toastT; function toast(m){const t=$('toast');t.textContent=m;t.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('show'),4000);}
+var toastT; function toast(m){const t=document.getElementById('toast'); if(!t) return;t.textContent=m;t.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('show'),4000);}
 let sat=false; $('btnBase').onclick=e=>{sat=!sat;log('basemap',{sat});e.currentTarget.setAttribute('aria-pressed',sat);if(sat){map.removeLayer(baseOSM);baseSat.addTo(map);}else{map.removeLayer(baseSat);baseOSM.addTo(map);}lyrMuni.bringToFront();lyrBaux.bringToFront();lyrCadastre.bringToFront();};
 let baux=true; $('btnBaux').onclick=e=>{baux=!baux;log('baux',{baux});e.currentTarget.setAttribute('aria-pressed',baux);baux?lyrBaux.addTo(map):map.removeLayer(lyrBaux);};
 /* ============================ Photos (IndexedDB, local) ============================ */
@@ -797,6 +796,7 @@ $('shareLog').onclick=async()=>{ const txt=report(); const file=new File([txt],`
 $('copyLog').onclick=()=>copy(report(),'Rapport copié — colle-le dans la conversation');
 $('clearLog').onclick=()=>{ if(confirm('Effacer tout le journal d\'usage ?')){ LOG=[]; try{localStorage.removeItem('terrain.log');}catch{} renderLogCount(); toast('Journal effacé'); } };
 
+setMode(mode);
 if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{});
 </script>
 </body>
