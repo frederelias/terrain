@@ -52,6 +52,7 @@ button{font:inherit;cursor:pointer;border:0;background:none;color:inherit}
 .ring{position:fixed;left:50%;top:50%;z-index:890;pointer-events:none;transform:translate(-50%,-50%);border:2px dashed var(--boot);border-radius:50%;box-shadow:0 0 0 2px rgba(255,255,255,.6) inset}
 .ring span{position:absolute;left:50%;transform:translateX(-50%);bottom:-28px;background:var(--bark);color:#fff;font-size:12px;font-weight:700;padding:3px 8px;border-radius:999px;white-space:nowrap}
 
+.mapbtn{position:fixed;right:12px;top:calc(var(--sat) + 136px);z-index:1000;width:56px;height:56px;border-radius:50%;background:#B3261E;color:#fff;font-weight:700;font-size:22px;box-shadow:0 2px 0 #5A120C}
 /* Boussole */
 .compass{position:fixed;right:12px;top:calc(var(--sat) + 64px);z-index:1000;width:56px;height:56px;border-radius:50%;background:var(--paper);box-shadow:0 4px 14px rgba(23,32,26,.18);display:flex;align-items:center;justify-content:center}
 .compass svg{width:44px;height:44px;transition:transform .12s linear}
@@ -137,9 +138,13 @@ button{font:inherit;cursor:pointer;border:0;background:none;color:inherit}
 .bottom .col{display:flex;flex-direction:column;align-items:center;gap:3px;width:56px}
 .wstat{font-family:"JetBrains Mono",ui-monospace,monospace;font-size:10.5px;color:#fff;white-space:nowrap;line-height:1}
 .wstat[hidden]{display:none}
-.round.walk .stop{display:none} .round.walk[aria-pressed="true"]{background:#2E7D4F;color:#fff} .round.walk[aria-pressed="true"] .go{display:none} .round.walk[aria-pressed="true"] .stop{display:block}
+.round.walk{position:relative} .round.walk .pz{display:none;position:absolute;inset:0;align-items:center;justify-content:center;font-size:16px;font-weight:700;background:rgba(0,0,0,.35);border-radius:50%}
+.round.walk[aria-pressed="true"]{background:#2E7D4F;color:#fff}
+.round.walk[aria-pressed="true"] .go .l{animation:stepL 1s steps(1) infinite} .round.walk[aria-pressed="true"] .go .r{animation:stepR 1s steps(1) infinite}
+@keyframes stepL{0%,49%{opacity:1}50%,100%{opacity:.35}} @keyframes stepR{0%,49%{opacity:.35}50%,100%{opacity:1}}
+.round.walk.paused .go .l,.round.walk.paused .go .r{animation:none;opacity:.5} .round.walk.paused .pz{display:flex}
+.round.stopw{background:#B3261E;color:#fff} .round.stopw[hidden]{display:none}
 .round.carnet svg{width:26px;height:26px}
-#walkPhoto[hidden]{display:none} #walkPhoto{background:#2E7D4F;color:#fff}
 /* Feuilles */
 .sheet{position:fixed;left:0;right:0;bottom:0;z-index:1100;background:var(--paper);border-radius:18px 18px 0 0;box-shadow:0 -10px 40px rgba(23,32,26,.22);max-height:78vh;display:flex;flex-direction:column;transform:translateY(105%);transition:transform .22s ease;padding-bottom:var(--sab)}
 .sheet.open{transform:translateY(0)}
@@ -167,6 +172,7 @@ textarea{min-height:72px;resize:vertical}
 .list{list-style:none;margin:0;padding:0}
 .list li{display:flex;gap:10px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line)}
 .list li .t{flex:1;min-width:0} .list li b{display:block;font-size:17px} .list li span{font-size:13px;color:var(--ink-2);display:block}
+.list li .selbox{width:24px;height:24px;flex:none;accent-color:#B3261E}
 .list li .st{font-size:12px;font-weight:700;padding:4px 8px;border-radius:999px;background:var(--field);color:var(--bark);white-space:nowrap}
 .list li .st.r{background:#E3ECF8;color:#1E4F8F} .list li .st.i{background:#FFF1CF;color:#7A5300} .list li .st.c{background:#E2F1E7;color:var(--ok)}
 .empty{color:var(--ink-2);padding:16px 0;text-align:center;line-height:1.4}
@@ -190,6 +196,7 @@ textarea{min-height:72px;resize:vertical}
 .src .centris-url{font-size:12px;color:var(--ink-2);word-break:break-all;display:flex;gap:8px;align-items:center}
 .src .centris-url:empty{display:none}
 .src .centris-url button{color:#C62828;font-weight:700;font-size:12px;flex:none}
+.centrisData{grid-column:1/-1} .centrisData[hidden]{display:none}
 .src .doc{position:relative;width:50px;height:50px;border-radius:12px;background:var(--field);color:var(--bark);display:flex;align-items:center;justify-content:center}
 .src .doc svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
 .src .doc .n{position:absolute;top:-6px;right:-6px;background:var(--boot);color:var(--ink);border-radius:999px;min-width:20px;height:20px;font-size:11px;line-height:20px;text-align:center;padding:0 5px}
@@ -238,8 +245,9 @@ button:focus-visible,a:focus-visible{outline:3px solid var(--boot);outline-offse
 <div id="map" role="application" aria-label="Carte"></div>
 
 <div class="topbar">
-  <h1>Terrain</h1>
+  <h1>Terrain <small>v21</small></h1>
   <button class="chip" id="btnSearch" aria-pressed="false" title="Chercher une adresse ou un code postal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg></button>
+  <button class="chip" id="btnPov" aria-label="Photo point de vue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg></button>
   <button class="chip" id="btnMic" aria-pressed="false" title="Commentaire vocal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></button>
   <button class="chip" id="btnBase" aria-pressed="false" aria-label="Photo aérienne"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l9 5-9 5-9-5 9-5z"/><path d="M3 13l9 5 9-5"/></svg></button>
   <button class="chip" id="btnBaux" aria-pressed="true" aria-label="Baux sur terres publiques">Baux</button>
@@ -269,6 +277,7 @@ button:focus-visible,a:focus-visible{outline:3px solid var(--boot);outline-offse
   <button type="submit">Aller</button>
 </form>
 
+<button class="mapbtn" id="btnCentrisMap" aria-label="Ouvrir cette région dans Centris">C</button>
 <button class="compass off" id="compass" aria-label="Boussole">
   <svg viewBox="0 0 44 44"><circle cx="22" cy="22" r="20" fill="none" stroke="#C9D1C4" stroke-width="2"/><path d="M22 5 L27 22 L22 20 L17 22 Z" fill="#B4541E"/><path d="M22 39 L27 22 L22 24 L17 22 Z" fill="#C9D1C4"/><text x="22" y="14" text-anchor="middle" font-size="9" font-weight="700" fill="#1F3D2B">N</text></svg>
   <span class="deg" id="deg">boussole</span>
@@ -282,10 +291,10 @@ button:focus-visible,a:focus-visible{outline:3px solid var(--boot);outline-offse
 <div class="mode" role="group" aria-label="Portée du scan"><button id="modeOne" aria-pressed="false" aria-label="Le lot sous la pin"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-4px"><path d="M12 22s7-7.2 7-12a7 7 0 0 0-14 0c0 4.8 7 12 7 12z"/><circle cx="12" cy="10" r="2.6"/></svg></button><button id="modeZone" aria-pressed="true" aria-label="Tous les lots dans l'anneau">Tous</button><button id="modeFav" aria-pressed="false" aria-label="Mes favoris">♥</button></div>
 <div class="bottom">
   <div class="col">
-    <button class="round walk" id="btnWalk" aria-pressed="false" aria-label="Marcher le terrain"><svg class="go" viewBox="0 0 24 24" fill="currentColor"><path d="M8.5 3c1.7 0 2.8 1.4 2.8 3.4 0 2.6-1 5.6-2.6 5.6S5.6 9.3 5.6 6.6C5.6 4.5 6.8 3 8.5 3zm.6 10.5c1.3 0 2.2.9 2.2 2 0 1.4-1 2.5-2.4 2.5s-2.4-1-2.4-2.3c0-1.2 1.2-2.2 2.6-2.2zM15.5 8c1.7 0 2.9 1.5 2.9 3.6 0 2.7-1.1 5.6-2.7 5.6s-2.7-2.7-2.7-5.4C13 9.5 13.8 8 15.5 8zm.6 10.5c1.3 0 2.2.9 2.2 2 0 1.4-1 2.5-2.4 2.5s-2.4-1-2.4-2.3c0-1.2 1.2-2.2 2.6-2.2z"/></svg><svg class="stop" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="6" width="12" height="12" rx="2"/></svg></button>
+    <button class="round walk" id="btnWalk" aria-pressed="false" aria-label="Marcher le terrain"><svg class="go" viewBox="0 0 24 24" fill="currentColor"><g class="l"><path d="M7 3.5c1.9 0 3 1.6 3 3.6 0 2.1-.7 4.4-2 5.3-.6.4-1.5.4-2.1 0-1.2-.9-1.9-3.2-1.9-5.3 0-2 1.1-3.6 3-3.6z"/><rect x="5.2" y="14" width="3.8" height="2.6" rx="1.3"/></g><g class="r"><path d="M17 8.5c1.9 0 3 1.6 3 3.6 0 2.1-.7 4.4-2 5.3-.6.4-1.5.4-2.1 0-1.2-.9-1.9-3.2-1.9-5.3 0-2 1.1-3.6 3-3.6z"/><rect x="15.2" y="19" width="3.8" height="2.6" rx="1.3"/></g></svg><span class="pz" aria-hidden="true">❚❚</span></button>
     <span class="wstat" id="walkStat" hidden>0 m · 00:00</span>
   </div>
-  <button class="round" id="walkPhoto" hidden aria-label="Photo en marche"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg></button>
+  <button class="round stopw" id="btnWalkStop" hidden aria-label="Terminer la marche"><svg viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="6" width="12" height="12" rx="2"/></svg></button>
   <button class="scan" id="btnScan" aria-label="Rafraîchir">
     <span class="face"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 1 1-2.3-5.7"/><path d="M20 4v5h-5"/></svg></span>
     <span class="lbl" hidden>Scanner</span>
@@ -312,7 +321,8 @@ button:focus-visible,a:focus-visible{outline:3px solid var(--boot);outline-offse
       <div class="src" data-src="registre"><a id="lnkRegistre" target="_blank" rel="noopener">Registre foncier</a><button class="doc" data-src="registre" aria-label="Capture Registre"><svg viewBox="0 0 24 24"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg><b class="n" hidden></b></button><div class="st" data-thumbs="registre"></div></div>
       <div class="src" data-src="role"><a id="lnkRole" target="_blank" rel="noopener">Rôle d'évaluation</a><button class="doc" data-src="role" aria-label="Capture rôle"><svg viewBox="0 0 24 24"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg><b class="n" hidden></b></button><div class="st" data-thumbs="role"></div></div>
       <div class="src muni" data-src="muni"><a id="lnkCall" href="#">Appeler</a><a id="lnkMuni" target="_blank" rel="noopener">Site web</a><button class="doc" data-src="muni" aria-label="Capture municipalité"><svg viewBox="0 0 24 24"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg><b class="n" hidden></b></button><div class="st" data-thumbs="muni"></div></div>
-      <div class="src centris" id="srcCentris"><a id="lnkCentris" target="_blank" rel="noopener">Centris — ouvrir la carte</a><button class="doc" id="btnCentrisPaste" aria-label="Coller le lien de l'annonce"><svg viewBox="0 0 24 24"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1.5 1.5"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1.5-1.5"/></svg></button><div class="st centris-url" id="centrisUrl"></div></div>
+      <div class="src centris" id="srcCentris"><a id="lnkCentris" target="_blank" rel="noopener">Centris — carte de la municipalité</a><button class="doc link" id="btnCentrisPaste" aria-label="Coller une annonce Centris"><svg viewBox="0 0 24 24"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1.5 1.5"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1.5-1.5"/></svg></button><div class="st centris-url" id="centrisUrl"></div>
+        <div class="centrisData" id="centrisData" hidden><div class="row"><input class="f" id="cPrice" inputmode="numeric" placeholder="Prix ($)"><input class="f" id="cBroker" placeholder="Courtier"></div></div></div>
     </div>
     <h3>Photos de terrain</h3>
     <div class="photos">
@@ -354,8 +364,9 @@ button:focus-visible,a:focus-visible{outline:3px solid var(--boot);outline-offse
   <div class="body">
     <h3>Marches</h3>
     <ul class="list" id="walkList"></ul>
-    <h3>Lots</h3>
+    <h3>Lots <button id="selMode" class="chip" style="float:right;background:var(--field);color:var(--ink);border:0;min-height:34px;font-size:13px">Sélectionner</button></h3>
     <ul class="list" id="carnetList"></ul>
+    <div class="actions" id="selActions" hidden><button id="selDelete" class="wide" style="background:#B3261E">Supprimer la sélection</button></div>
     <div class="actions" style="margin-top:14px"><button id="exportCsv">Exporter en CSV</button><button id="shareCsv" class="quiet">Partager</button><button id="copyRegistre" class="quiet wide">Copier les favoris sans propriétaire</button></div>
     <h3>Journal d'usage <span id="logCount" style="font-weight:400"></span></h3>
     <div class="actions"><button id="shareLog">Partager le rapport</button><button id="copyLog" class="quiet">Copier</button><button id="clearLog" class="quiet wide">Effacer le journal</button></div>
@@ -369,6 +380,7 @@ button:focus-visible,a:focus-visible{outline:3px solid var(--boot);outline-offse
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script>
 /* ============================ CONFIG ============================ */
+const APP_VERSION='v21';
 const CONFIG = {
   ringFraction: 0.70,      // diamètre de l'anneau = 70 % du plus petit côté de l'écran ; pince pour agrandir/réduire
   maxRadius: 1500,         // rayon maximal du scan (m) pour rester sous la limite des services
@@ -380,7 +392,7 @@ const CONFIG = {
   geocode:  'https://servicescarto.mrnf.gouv.qc.ca/pes/rest/services/Territoire/Adresse_Geocodage/GeocodeServer',
   infolot:  'https://appli.foncier.gouv.qc.ca/infolot/',
   registre: 'https://www.registrefoncier.gouv.qc.ca',
-  centris:  'https://www.centris.ca/fr/propriete~a-vendre?view=Map',
+  centris:  'https://www.centris.ca/fr/a-vendre',   // + ~slug-municipalite?view=Map
   // Visualiseurs de rôle par MRC : colle l'URL de la carte interactive ; {lot} sera remplacé par le numéro si l'outil l'accepte.
   roles: { 'argenteuil':'https://geoweb-mrcargenteuil.hub.arcgis.com/pages/donnes-ouvertes', "pays-d'en-haut":'', 'matawinie':'', "d'autray":'' }
 };
@@ -392,7 +404,7 @@ let ctx={screen:'carte',lot:null,last:null};
 function log(type,data={}){ const e={t:new Date().toISOString(),s:SESSION,type,screen:ctx.screen,lot:ctx.lot,...data};
   LOG.push(e); if(LOG.length>3000) LOG=LOG.slice(-3000); ctx.last=type;
   try{localStorage.setItem('terrain.log',JSON.stringify(LOG));}catch{} }
-log('app_open',{standalone:matchMedia('(display-mode: standalone)').matches,vw:innerWidth,vh:innerHeight,ua:navigator.userAgent.slice(0,80),online:navigator.onLine});
+log('app_open',{v:APP_VERSION,standalone:matchMedia('(display-mode: standalone)').matches,vw:innerWidth,vh:innerHeight,ua:navigator.userAgent.slice(0,80),online:navigator.onLine});
 window.addEventListener('error',e=>log('js_error',{msg:String(e.message).slice(0,160)}));
 window.addEventListener('unhandledrejection',e=>log('js_error',{msg:String(e.reason?.message||e.reason).slice(0,160)}));
 document.addEventListener('visibilitychange',()=>log(document.hidden?'app_hide':'app_show'));
@@ -564,7 +576,7 @@ async function openLot(f,m){
   const tel=(m?.TELEPHONE||'').replace(/[^+\d]/g,''); $('lnkCall').href=tel?'tel:'+tel:'#'; $('lnkCall').textContent=m?.TELEPHONE?'Appeler · '+m.TELEPHONE:'Appeler'; $('lnkCall').classList.toggle('disabled',!tel);
   const site=m?.SITE_WEB?(m.SITE_WEB.startsWith('http')?m.SITE_WEB:'https://'+m.SITE_WEB):null;
   $('lnkMuni').href=site||CONFIG.infolot; $('lnkMuni').textContent=site?`Site de ${m.MUS_NM_MUN}`:'Site web';
-  const saved=carnet.find(x=>x.lot===no); $('lotOwner').value=saved?.owner||''; $('lotEmail').value=saved?.email||''; $('lotPhone').value=saved?.phone||''; ownerLinks(); contactLinks(); $('lotNote').value=saved?.note||''; setTags(saved?.tags||[]); setVisited(saved?.visited); $('btnFav').setAttribute('aria-pressed',!!saved?.fav); syncCentris(saved?.centris||''); $('saveLot').textContent=saved?'Mettre à jour':'Ajouter au carnet'; renderThumbs(no);
+  const saved=carnet.find(x=>x.lot===no); $('lotOwner').value=saved?.owner||''; $('lotEmail').value=saved?.email||''; $('lotPhone').value=saved?.phone||''; ownerLinks(); contactLinks(); $('lotNote').value=saved?.note||''; setTags(saved?.tags||[]); setVisited(saved?.visited); $('btnFav').setAttribute('aria-pressed',!!saved?.fav); syncCentris(saved?.centris||'',saved?.centrisInfo||null); $('saveLot').textContent=saved?'Mettre à jour':'Ajouter au carnet'; renderThumbs(no);
   const t=$('lotTenure'), a=$('lotAddr'); t.className='fact wide'; t.hidden=true; a.className='fact wide'; a.querySelector('b').textContent='Vérification…';
   show(sheetLot);
   addrInEnvelope(b).then(r=>{ const inside=r.features.filter(x=>inPoly(x.geometry.coordinates,f.geometry)); if(!inside.length){a.classList.add('good');a.querySelector('b').textContent='Aucune — probablement non bâti';} else {a.classList.add('bad');a.querySelector('b').textContent=`${inside.length} : ${inside.slice(0,2).map(x=>addrLabel(x.properties)).filter(Boolean).join(', ')||'adresse présente'}`;} })
@@ -579,12 +591,20 @@ $('lotOwner').addEventListener('input',()=>{ownerLinks();contactLinks();});
 ['lotEmail','lotPhone'].forEach(id=>$(id).addEventListener('input',contactLinks));
 function getTags(){ return [...$('stchips').querySelectorAll('button[aria-pressed="true"]')].map(b=>b.dataset.k); }
 function setTags(tags){ $('stchips').querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',tags.includes(b.dataset.k))); }
-let centrisUrl='';
-function syncCentris(url){ centrisUrl=url||''; const a=$('lnkCentris'), box=$('centrisUrl'); if(centrisUrl){ a.href=centrisUrl; a.textContent='Annonce Centris · En vente'; box.innerHTML=`<span>${esc(centrisUrl.replace(/^https?:\/\//,'').slice(0,60))}</span><button type="button" id="centrisClear">retirer</button>`; $('centrisClear').onclick=()=>{ syncCentris(''); autosave(); toast('Lien retiré'); }; } else { a.href=CONFIG.centris; a.textContent='Centris — ouvrir la carte'; box.innerHTML=''; } }
-$('btnCentrisPaste').onclick=async()=>{ if(!selected) return; let t=''; try{ t=(await navigator.clipboard.readText()).trim(); }catch{} if(!/centris\.ca/i.test(t)) t=(prompt('Colle le lien de l\'annonce Centris :',t&&/^https?:/.test(t)?t:'')||'').trim(); if(!/centris\.ca/i.test(t)) return toast('Pas un lien Centris'); syncCentris(t); autosave(); log('centris_link'); toast('Annonce attachée — lot marqué En vente'); };
+let centrisUrl='', centrisInfo=null;
+function parseCentris(text){ text=(text||'').trim(); const m=text.match(/https?:\/\/(?:www\.)?centris\.ca\/\S+/i); const url=m?m[0].replace(/[\)\]\.,]+$/,''):null; if(!url) return null;
+  const info={url}; const idm=url.match(/\/(\d{7,9})(?:[\/?#]|$)/); if(idm) info.id=idm[1]; const pm=url.match(/centris\.ca\/fr\/([a-z-]+)~a-vendre~([a-z0-9-]+)/i); if(pm){ info.type=pm[1].replace(/-/g,' '); info.city=pm[2].replace(/-/g,' '); }
+  const t=text.match(/(.+?) à vendre à (.+?), (.+?), (.+?), (\d{7,9})/); if(t){ info.type=t[1].trim(); info.city=t[2].trim(); info.address=t[4].trim(); info.id=t[5]; }
+  const pr=text.match(/(\d{1,3}(?:[ \u00a0,]\d{3})+|\d{4,})\s?\$/); if(pr) info.price=pr[1].replace(/[^\d]/g,''); return info; }
+function syncCentris(url,info){ centrisUrl=url||''; centrisInfo=info||(url?{url}:null); const a=$('lnkCentris'), box=$('centrisUrl'), d=$('centrisData');
+  if(centrisUrl){ a.href=centrisUrl; const i=centrisInfo||{}; a.textContent=`Annonce ${i.id||''} · En vente`; box.innerHTML=`<span>${esc([i.type,i.address,i.city].filter(Boolean).join(' · ')||centrisUrl.replace(/^https?:\/\//,'').slice(0,60))}</span><button type="button" id="centrisClear">retirer</button>`; $('centrisClear').onclick=()=>{ syncCentris('',null); autosave(); toast('Annonce retirée'); }; d.hidden=false; $('cPrice').value=i.price||''; $('cBroker').value=i.broker||''; }
+  else { a.href=centrisCityUrl(selected?.muni); a.textContent='Centris — carte de la municipalité'; box.innerHTML=''; d.hidden=true; } }
+['cPrice','cBroker'].forEach(id=>$(id).addEventListener('change',()=>{ if(!centrisInfo) return; centrisInfo.price=$('cPrice').value.replace(/[^\d]/g,''); centrisInfo.broker=$('cBroker').value.trim(); autosave(); }));
+async function attachCentris(text){ const info=parseCentris(text); if(!info) return toast('Pas une annonce Centris'); syncCentris(info.url,info); autosave(); log('centris_link',{id:!!info.id,price:!!info.price}); toast(`Annonce ${info.id||''} attachée — lot En vente`); }
+$('btnCentrisPaste').onclick=async()=>{ if(!selected) return; let t=''; try{ t=(await navigator.clipboard.readText()).trim(); }catch{} if(!/centris\.ca/i.test(t)) t=(prompt('Colle le texte partagé ou le lien de l\'annonce Centris :',t&&/^https?:/.test(t)?t:'')||'').trim(); attachCentris(t); };
 function autosave(){ if(!selected) return; const was=carnet.find(x=>x.lot===selected.lot); $('saveLot').click(); if(!was) toast('Ajouté au carnet'); }
 $('btnFav').onclick=()=>{ if(!selected) return; const on=$('btnFav').getAttribute('aria-pressed')!=='true'; $('btnFav').setAttribute('aria-pressed',on); navigator.vibrate?.(10); log('fav',{on}); autosave(); };
-$('lnkCentris').addEventListener('click',()=>{ if(selected&&!centrisUrl) copy(selected.muni,'Municipalité copiée — colle-la dans la recherche Centris, puis copie le lien de l\'annonce'); log('btn',{id:'lnkCentris',has:!!centrisUrl}); });
+$('lnkCentris').addEventListener('click',()=>{ if(selected&&!centrisUrl) toast('Dans Centris : Partager → Terrain, ou copie le lien et touche le bouton lien'); log('btn',{id:'lnkCentris',has:!!centrisUrl}); });
 $('lnkCall').addEventListener('click',()=>log('btn',{id:'lnkCall'}));
 function setVisited(v){ $('lotVisited').checked=!!v; $('lotVisited').parentElement.querySelector('.lbl').textContent=v?'Visité':'À voir'; }
 $('lotVisited').addEventListener('change',e=>{ setVisited(e.target.checked); log('visited',{v:e.target.checked}); });
@@ -642,20 +662,24 @@ function renderSaved(){ savedGroup.clearLayers(); const zoomed=map.getZoom()>=14
   const missing=carnet.filter(r=>!r.geom && !r._tried); if(missing.length){ missing.slice(0,10).forEach(async r=>{ r._tried=true; try{ const j=await lotAt(r.lat,r.lng); const f=j.features?.[0]; if(f){ r.geom=f.geometry; persist(); renderSaved(); } }catch{} }); } }
 map.on('zoomend',()=>renderSaved());
 renderSaved();
-$('saveLot').onclick=()=>{ if(!selected)return; const rec={...selected,owner:$('lotOwner').value.trim(),email:$('lotEmail').value.trim(),phone:$('lotPhone').value.trim(),note:$('lotNote').value.trim(),tags:getTags(),visited:$('lotVisited').checked,fav:$('btnFav').getAttribute('aria-pressed')==='true',centris:centrisUrl,date:new Date().toISOString().slice(0,10)};
+$('saveLot').onclick=()=>{ if(!selected)return; const rec={...selected,owner:$('lotOwner').value.trim(),email:$('lotEmail').value.trim(),phone:$('lotPhone').value.trim(),note:$('lotNote').value.trim(),tags:getTags(),visited:$('lotVisited').checked,fav:$('btnFav').getAttribute('aria-pressed')==='true',centris:centrisUrl,centrisInfo:centrisInfo,date:new Date().toISOString().slice(0,10)};
   const i=carnet.findIndex(x=>x.lot===rec.lot); if(i>=0)carnet[i]=rec; else carnet.unshift(rec); persist(); restyleScan(); renderSaved(); log('save',{tags:rec.tags.join(''),visited:rec.visited,fav:rec.fav,centris:!!rec.centris,note:!!rec.note,owner:!!rec.owner}); toast('Enregistré dans le carnet'); $('saveLot').textContent='Mettre à jour'; };
 
 $('btnCarnet').onclick=()=>{log('btn',{id:'btnCarnet'});renderWalkList();renderCarnet();renderLogCount();hide(sheetLot);show(sheetCarnet);};
 function esc(s){return s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
 async function photoCounts(){ try{ const db=await DB; return new Promise(res=>{ const q=db.transaction('photos').objectStore('photos').getAll(); q.onsuccess=()=>{ const m={}; q.result.forEach(p=>m[p.lot]=(m[p.lot]||0)+1); res(m); }; q.onerror=()=>res({}); }); }catch{ return {}; } }
+let selMode=false, selSet=new Set();
+$('selMode').onclick=()=>{ selMode=!selMode; selSet.clear(); $('selMode').textContent=selMode?'Annuler':'Sélectionner'; $('selActions').hidden=!selMode; renderCarnet(); };
+$('selDelete').onclick=()=>{ if(!selSet.size) return toast('Rien de sélectionné'); if(!confirm(`Supprimer ${selSet.size} lot(s) du carnet ? Les photos attachées restent dans le téléphone.`)) return; carnet=carnet.filter(x=>!selSet.has(x.lot)); persist(); restyleScan(); renderSaved(); log('carnet_delete',{n:selSet.size}); selSet.clear(); selMode=false; $('selMode').textContent='Sélectionner'; $('selActions').hidden=true; renderCarnet(); };
 async function renderCarnet(){ const pc=await photoCounts(); const ul=$('carnetList'); ul.innerHTML=''; if(!carnet.length){ul.innerHTML='<li class="empty">Rien encore. Scanne, touche un lot, écris une note, ajoute-le ici.</li>';return;}
   carnet.forEach(r=>{ const li=document.createElement('li');
-    li.innerHTML=`<div class="t"><b>Lot ${r.lot}</b><span>${r.muni||'—'} · ${fmt(r.ha,1)} ha · ${r.date}${pc[r.lot]?' · 📷 '+pc[r.lot]:''}</span>${r.owner?`<span>${esc(r.owner)}</span>`:''}${r.note?`<span>${esc(r.note)}</span>`:''}</div><span class="st" style="background:${stColor(keyOf(r))}22;color:${stColor(keyOf(r))}">${labelOf(r)}</span><button class="close" aria-label="Retirer">×</button>`;
-    li.querySelector('.t').onclick=()=>{hide(sheetCarnet);map.setView([r.lat,r.lng],16);identify(r.lat,r.lng);};
-    li.querySelector('button').onclick=()=>{carnet=carnet.filter(x=>x.lot!==r.lot);persist();restyleScan();renderSaved();renderCarnet();};
+    li.innerHTML=`<div class="t"><b>Lot ${r.lot}</b><span>${r.muni||'—'} · ${fmt(r.ha,1)} ha · ${r.date}${pc[r.lot]?' · 📷 '+pc[r.lot]:''}</span>${r.owner?`<span>${esc(r.owner)}</span>`:''}${r.note?`<span>${esc(r.note)}</span>`:''}</div><span class="st" style="background:${stColor(keyOf(r))}22;color:${stColor(keyOf(r))}">${labelOf(r)}</span>${selMode?`<input type="checkbox" class="selbox" ${selSet.has(r.lot)?'checked':''} aria-label="Sélectionner">`:`<button class="close" aria-label="Retirer">×</button>`}`;
+    li.querySelector('.t').onclick=()=>{ if(selMode){ const cb=li.querySelector('.selbox'); cb.checked=!cb.checked; cb.checked?selSet.add(r.lot):selSet.delete(r.lot); return; } hide(sheetCarnet);map.setView([r.lat,r.lng],16);identify(r.lat,r.lng);};
+    li.querySelector('.selbox')?.addEventListener('change',e=>{ e.target.checked?selSet.add(r.lot):selSet.delete(r.lot); });
+    li.querySelector('button.close')?.addEventListener('click',()=>{ if(!confirm(`Retirer le lot ${r.lot} du carnet ?`)) return; carnet=carnet.filter(x=>x.lot!==r.lot);persist();restyleScan();renderSaved();renderCarnet();});
     ul.appendChild(li); }); }
-function csv(){ const head=['lot','municipalite','mrc','hectares','proprietaire','courriel','telephone','favori','statut','centris','note','date','lat','lng'];
-  const rows=carnet.map(r=>[r.lot,r.muni,r.mrc,r.ha.toFixed(3),r.owner||'',r.email||'',r.phone||'',r.fav?'oui':'',labelOf(r),r.centris||'',r.note,r.date,r.lat.toFixed(6),r.lng.toFixed(6)].map(v=>`"${String(v??'').replace(/"/g,'""')}"`).join(','));
+function csv(){ const head=['lot','municipalite','mrc','hectares','proprietaire','courriel','telephone','favori','statut','centris','centris_no','prix','courtier','note','date','lat','lng'];
+  const rows=carnet.map(r=>[r.lot,r.muni,r.mrc,r.ha.toFixed(3),r.owner||'',r.email||'',r.phone||'',r.fav?'oui':'',labelOf(r),r.centris||'',r.centrisInfo?.id||'',r.centrisInfo?.price||'',r.centrisInfo?.broker||'',r.note,r.date,r.lat.toFixed(6),r.lng.toFixed(6)].map(v=>`"${String(v??'').replace(/"/g,'""')}"`).join(','));
   return '\ufeff'+[head.join(','),...rows].join('\n'); }
 $('exportCsv').onclick=()=>{ log('btn',{id:'exportCsv'}); if(!carnet.length)return toast('Carnet vide'); const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([csv()],{type:'text/csv;charset=utf-8'})); a.download=`terrain-${new Date().toISOString().slice(0,10)}.csv`; a.click(); };
 $('copyRegistre').onclick=()=>{ const l=carnet.filter(r=>r.fav&&!r.owner); if(!l.length) return toast('Aucun favori sans propriétaire'); copy(l.map(r=>`${r.lot}\t${r.muni}`).join('\n'), `${l.length} lot(s) copié(s) — à chercher au Registre ce soir`); };
@@ -678,7 +702,9 @@ async function listPhotos(lot){ const db=await DB; return new Promise((res,rej)=
 function shrink(file,max=1280){ return new Promise(res=>{ const img=new Image(); img.onload=()=>{ const k=Math.min(1,max/Math.max(img.width,img.height)); const c=document.createElement('canvas'); c.width=Math.round(img.width*k); c.height=Math.round(img.height*k); c.getContext('2d').drawImage(img,0,0,c.width,c.height); c.toBlob(b=>{URL.revokeObjectURL(img.src);res(b);},'image/jpeg',.82); }; img.onerror=()=>res(file); img.src=URL.createObjectURL(file); }); }
 let pendingSrc='terrain';
 $('btnPhoto').onclick=()=>{ if(!selected) return; pendingSrc='terrain'; navigator.vibrate?.(12); $('photoInput').click(); };
-document.querySelectorAll('.src .doc').forEach(b=>b.onclick=()=>{ if(!selected) return; pendingSrc=b.dataset.src; navigator.vibrate?.(12); log('btn',{id:'doc_'+pendingSrc}); $('photoInput').click(); });
+document.querySelectorAll('.src .doc[data-src]').forEach(b=>b.onclick=()=>{ if(!selected) return; pendingSrc=b.dataset.src; navigator.vibrate?.(12); log('btn',{id:'doc_'+pendingSrc}); $('photoInput').click(); });
+const slug=t=>(t||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+const centrisCityUrl=m=>m?`${CONFIG.centris}~${slug(m)}?view=Map`:`${CONFIG.centris}?view=Map`;
 const SRC_LABEL={infolot:'Infolot',registre:'Registre foncier',role:'Rôle',muni:'Municipalité',centris:'Centris',terrain:'Terrain',marche:'Marche'};
 $('photoInput').addEventListener('change',async e=>{ const files=[...e.target.files]; e.target.value=''; if(!files.length) return;
   if(pendingSrc==='marche'){ if(!me) return; const pos=[me[0],me[1]], h=aimHeading; let lotNo=null; try{ const j=await lotAt(pos[0],pos[1]); lotNo=j.features?.[0]?.properties?.NO_LOT||null; }catch{} let n=0;
@@ -709,19 +735,24 @@ let walks=[]; try{walks=JSON.parse(localStorage.getItem('terrain.walks')||'[]');
 const bearing=(a,b)=>{ const y=Math.sin(rad(b[1]-a[1]))*Math.cos(rad(b[0])), x=Math.cos(rad(a[0]))*Math.sin(rad(b[0]))-Math.sin(rad(a[0]))*Math.cos(rad(b[0]))*Math.cos(rad(b[1]-a[1])); return (Math.atan2(y,x)*180/Math.PI+360)%360; };
 const fmtDist=m=>m>=1000?fmt(m/1000,2)+' km':Math.round(m)+' m';
 const fmtTime=s=>`${String(Math.floor(s/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`;
-function startWalk(){ walk={id:Date.now().toString(36),start:Date.now(),pts:[],dist:0,photos:[],side:1,lastStep:null}; $('btnWalk').setAttribute('aria-pressed','true'); $('walkStat').hidden=false; $('walkPhoto').hidden=false; walkLayer.clearLayers(); stepsLayer.clearLayers();
+function startWalk(){ walk={id:Date.now().toString(36),start:Date.now(),pts:[],dist:0,photos:[],side:1,lastStep:null,paused:false,pausedMs:0,pausedAt:null}; $('btnWalk').setAttribute('aria-pressed','true'); $('walkStat').hidden=false; $('btnWalkStop').hidden=false; $('btnWalk').classList.remove('paused'); walkLayer.clearLayers(); stepsLayer.clearLayers();
   walk.line=L.polyline([],{color:'#2E7D4F',weight:3,opacity:.5,dashArray:'2 8',interactive:false}).addTo(walkLayer);
-  walkTimer=setInterval(()=>{ $('walkStat').textContent=fmtDist(walk.dist)+' · '+fmtTime(Math.round((Date.now()-walk.start)/1000)); },1000);
+  walkTimer=setInterval(()=>{ if(!walk) return; const el=walkElapsed(); $('walkStat').textContent=(walk.paused?'pause · ':'')+fmtDist(walk.dist)+' · '+fmtTime(el); },1000);
   if(!compassOn) enableCompass(); log('walk_start'); toast('En marche — tes pas se dessinent sur la carte'); if(me) walkPoint(me[0],me[1],5); }
-function walkPoint(lat,lng,acc){ if(!walk||acc>35) return; const p=[lat,lng]; const last=walk.pts.at(-1); if(last){ const d=map.distance(last,p); if(d<4) return; walk.dist+=d; const brg=bearing(last,p);
+function walkElapsed(){ return Math.round((Date.now()-walk.start-walk.pausedMs-(walk.pausedAt?Date.now()-walk.pausedAt:0))/1000); }
+function walkPoint(lat,lng,acc){ if(!walk||walk.paused||acc>35) return; const p=[lat,lng]; const last=walk.pts.at(-1); if(last){ const d=map.distance(last,p); if(d<4) return; walk.dist+=d; const brg=bearing(last,p);
     if(!walk.lastStep||map.distance(walk.lastStep,p)>=6){ walk.side*=-1; const off=destination(lat,lng,brg+90*walk.side,1.1); L.marker(off,{icon:L.divIcon({className:'',html:`<div class="step" style="transform:rotate(${brg}deg)"></div>`,iconSize:[10,16],iconAnchor:[5,8]}),interactive:false}).addTo(stepsLayer); walk.lastStep=p; } }
-  walk.pts.push({lat,lng,t:Date.now()}); walk.line.addLatLng(p); $('walkStat').textContent=fmtDist(walk.dist)+' · '+fmtTime(Math.round((Date.now()-walk.start)/1000)); }
-function stopWalk(){ if(!walk) return; clearInterval(walkTimer); const rec={id:walk.id,start:walk.start,end:Date.now(),dist:Math.round(walk.dist),pts:walk.pts.map(q=>[+q.lat.toFixed(6),+q.lng.toFixed(6)]),photos:walk.photos}; walks.unshift(rec); try{localStorage.setItem('terrain.walks',JSON.stringify(walks));}catch{}
-  log('walk_stop',{dist:rec.dist,pts:rec.pts.length,photos:rec.photos.length}); toast(`Marche enregistrée · ${fmtDist(rec.dist)} · ${rec.photos.length} photo(s)`); walk=null; $('btnWalk').setAttribute('aria-pressed','false'); $('walkStat').hidden=true; $('walkPhoto').hidden=true; }
-$('btnWalk').onclick=()=>{ navigator.vibrate?.(12); if(walk){ if(confirm('Terminer la marche ?')) stopWalk(); } else startWalk(); };
+  walk.pts.push({lat,lng,t:Date.now()}); walk.line.addLatLng(p); }
+function stopWalk(){ if(!walk) return; clearInterval(walkTimer); const rec={id:walk.id,start:walk.start,end:Date.now(),secs:walkElapsed(),dist:Math.round(walk.dist),pts:walk.pts.map(q=>[+q.lat.toFixed(6),+q.lng.toFixed(6)]),photos:walk.photos}; walks.unshift(rec); try{localStorage.setItem('terrain.walks',JSON.stringify(walks));}catch{}
+  log('walk_stop',{dist:rec.dist,pts:rec.pts.length,photos:rec.photos.length}); toast(`Marche enregistrée · ${fmtDist(rec.dist)} · ${rec.photos.length} photo(s)`); walk=null; $('btnWalk').setAttribute('aria-pressed','false'); $('walkStat').hidden=true; $('btnWalkStop').hidden=true; $('btnWalk').classList.remove('paused'); }
+$('btnWalk').onclick=()=>{ navigator.vibrate?.(12); if(!walk) return startWalk();
+  walk.paused=!walk.paused; if(walk.paused){ walk.pausedAt=Date.now(); walk.lastStep=null; } else { walk.pausedMs+=Date.now()-walk.pausedAt; walk.pausedAt=null; }
+  $('btnWalk').classList.toggle('paused',walk.paused); log('walk_pause',{p:walk.paused}); toast(walk.paused?'Marche en pause — la position n\'est plus enregistrée':'Marche reprise'); };
+$('btnWalkStop').onclick=()=>{ if(walk&&confirm('Terminer la marche ?')) stopWalk(); };
 
 // Photo en marche : viser, fixer, photographier
-$('walkPhoto').onclick=()=>{ if(!me) return toast('Attends un fix GPS'); if(!compassOn) enableCompass(); aimHeading=null; $('aim').hidden=false; log('aim_open'); };
+$('btnCentrisMap').onclick=async()=>{ const c=map.getCenter(); let m=null; try{ const j=await muniAt(c.lat,c.lng); m=j.features?.[0]?.properties?.MUS_NM_MUN||null; }catch{} const u=centrisCityUrl(m); log('centris_map',{muni:!!m}); if(!m) toast('Municipalité inconnue — Centris s\'ouvre sans zoom'); window.open(u,'_blank','noopener'); };
+$('btnPov').onclick=()=>{ if(!me) return toast('Attends un fix GPS — touche d\'abord le bouton position'); if(!compassOn) enableCompass(); aimHeading=null; $('aim').hidden=false; log('aim_open',{walking:!!walk}); };
 $('aimCancel').onclick=()=>{ $('aim').hidden=true; };
 $('aimFix').onclick=()=>{ aimHeading=heading; $('aim').hidden=true; navigator.vibrate?.(15); log('aim_fix',{h:heading!=null?Math.round(heading):null,flat:tiltFlat}); openSnap(); };
 /* ---- Viseur caméra ---- */
@@ -756,9 +787,9 @@ async function renderPov(){ povLayer.clearLayers(); let ph=[]; try{ const db=awa
 function renderWalks(){ walkLayer.clearLayers(); stepsLayer.clearLayers(); walks.forEach(w=>L.polyline(w.pts,{color:'#2E7D4F',weight:3,opacity:.35,dashArray:'2 8',interactive:false}).addTo(walkLayer)); renderPov(); }
 renderWalks();
 async function renderWalkList(){ const ul=$('walkList'); ul.innerHTML=''; if(!walks.length){ ul.innerHTML='<li class="empty">Aucune marche. Touche 👣 pour tracer tes pas.</li>'; return; }
-  walks.forEach(w=>{ const li=document.createElement('li'); const d=new Date(w.start); li.innerHTML=`<div class="t"><b>${d.toLocaleDateString('fr-CA',{day:'numeric',month:'short'})} · ${fmtDist(w.dist)}</b><span>${fmtTime(Math.round((w.end-w.start)/1000))} · ${w.photos.length} photo(s)</span></div><button class="close" aria-label="Retirer">×</button>`;
+  walks.forEach(w=>{ const li=document.createElement('li'); const d=new Date(w.start); li.innerHTML=`<div class="t"><b>${d.toLocaleDateString('fr-CA',{day:'numeric',month:'short'})} · ${fmtDist(w.dist)}</b><span>${fmtTime(w.secs??Math.round((w.end-w.start)/1000))} · ${w.photos.length} photo(s)</span></div><button class="close" aria-label="Retirer">×</button>`;
     li.querySelector('.t').onclick=()=>{ hide(sheetCarnet); if(w.pts.length) map.fitBounds(L.latLngBounds(w.pts).pad(.3)); };
-    li.querySelector('button').onclick=()=>{ walks=walks.filter(x=>x.id!==w.id); try{localStorage.setItem('terrain.walks',JSON.stringify(walks));}catch{} renderWalks(); renderWalkList(); }; ul.appendChild(li); }); }
+    li.querySelector('button').onclick=()=>{ if(!confirm('Supprimer cette marche ?')) return; walks=walks.filter(x=>x.id!==w.id); try{localStorage.setItem('terrain.walks',JSON.stringify(walks));}catch{} renderWalks(); renderWalkList(); }; ul.appendChild(li); }); }
 
 /* ============================ Commentaires vocaux ============================ */
 const SR=window.SpeechRecognition||window.webkitSpeechRecognition; let rec=null, recOn=false;
@@ -796,6 +827,15 @@ $('shareLog').onclick=async()=>{ const txt=report(); const file=new File([txt],`
 $('copyLog').onclick=()=>copy(report(),'Rapport copié — colle-le dans la conversation');
 $('clearLog').onclick=()=>{ if(confirm('Effacer tout le journal d\'usage ?')){ LOG=[]; try{localStorage.removeItem('terrain.log');}catch{} renderLogCount(); toast('Journal effacé'); } };
 
+/* ---- Partage reçu depuis Centris (Web Share Target) ---- */
+(function(){ const q=new URLSearchParams(location.search); const txt=[q.get('title'),q.get('text'),q.get('url')].filter(Boolean).join('\n'); if(!/centris\.ca/i.test(txt)) return; history.replaceState(null,'',location.pathname);
+  const info=parseCentris(txt); if(!info) return; log('share_received',{id:!!info.id});
+  const pick=()=>{ if(!carnet.length) return toast('Carnet vide — ouvre d\'abord un lot, puis repartage');
+    const sorted=me?[...carnet].sort((a,b)=>map.distance(me,[a.lat,a.lng])-map.distance(me,[b.lat,b.lng])):carnet;
+    const list=sorted.slice(0,6).map((r,i)=>`${i+1}. Lot ${r.lot}${r.owner?' · '+r.owner:''}${me?' · '+Math.round(map.distance(me,[r.lat,r.lng]))+' m':''}`).join('\n');
+    const ans=prompt(`Annonce ${info.id||''} reçue.\nAttacher à quel lot ?\n\n${list}`,'1'); const r=sorted[(+ans)-1]; if(!r) return toast('Annonce non attachée');
+    r.centris=info.url; r.centrisInfo=info; persist(); restyleScan(); renderSaved(); toast(`Annonce attachée au lot ${r.lot}`); map.setView([r.lat,r.lng],16); identify(r.lat,r.lng); };
+  setTimeout(pick,800); })();
 setMode(mode);
 if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{});
 </script>
