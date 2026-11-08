@@ -262,7 +262,7 @@ button:focus-visible,a:focus-visible{outline:3px solid var(--boot);outline-offse
 <div id="map" role="application" aria-label="Carte"></div>
 
 <div class="topbar">
-  <h1>Terrain <small>v28</small></h1>
+  <h1>Terrain <small>v29</small></h1>
   <button class="chip" id="btnSearch" aria-pressed="false" title="Chercher une adresse ou un code postal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg></button>
   <button class="chip" id="btnPov" aria-label="Photo point de vue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg></button>
   <button class="chip" id="btnMic" aria-pressed="false" title="Commentaire vocal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></button>
@@ -316,7 +316,7 @@ button:focus-visible,a:focus-visible{outline:3px solid var(--boot);outline-offse
   <div class="introBar"><button id="introSkip">Passer</button><div class="dots" id="dots"></div><button id="introNext" class="main">Suivant</button></div>
 </section>
 <form class="search" id="search">
-  <input id="q" type="search" placeholder="Adresse, code postal, lieu ou lien Centris" autocomplete="off" enterkeyhint="search">
+  <input id="q" type="search" placeholder="N° de lot, adresse, code postal, lien Centris" autocomplete="off" enterkeyhint="search">
   <button type="submit">Aller</button>
 </form>
 
@@ -421,7 +421,7 @@ button:focus-visible,a:focus-visible{outline:3px solid var(--boot);outline-offse
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script>
 /* ============================ CONFIG ============================ */
-const APP_VERSION='v28';
+const APP_VERSION='v29';
 const CONFIG = {
   ringFraction: 0.70,      // diamètre de l'anneau = 70 % du plus petit côté de l'écran ; pince pour agrandir/réduire
   maxRadius: 1500,         // rayon maximal du scan (m) pour rester sous la limite des services
@@ -559,7 +559,19 @@ if(typeof DeviceOrientationEvent!=='undefined' && typeof DeviceOrientationEvent.
 /* ============================ Recherche ============================ */
 const searchForm=document.getElementById('search'), q=document.getElementById('q');
 document.getElementById('btnSearch').onclick=e=>{ const open=searchForm.classList.toggle('open'); e.currentTarget.setAttribute('aria-pressed',open); if(open) q.focus(); };
+const lotDigits=t=>{ const d=(t||'').replace(/^lot\s*/i,'').replace(/[\s.\-]/g,''); return /^\d{6,8}$/.test(d)?d:null; };
+const lotFmt=d=>d.replace(/\B(?=(\d{3})+(?!\d))/g,' ');
+async function goToLot(d){ const f1=lotFmt(d); toast('Recherche du lot '+f1+'…');
+  try{ const j=await query(CONFIG.cadastre,0,{where:`NO_LOT IN ('${f1}','${d}')`}); const f=j.features?.[0];
+    if(!f){ log('lot_search',{found:false}); return toast('Lot '+f1+' introuvable au cadastre rénové'); }
+    const gj=L.geoJSON(f); const b=gj.getBounds(), c=b.getCenter(); map.fitBounds(b.pad(.4),{maxZoom:17});
+    scanGroup.clearLayers(); legend.classList.remove('show'); $('btnClear').hidden=false;
+    const l=L.geoJSON(f,{style:lotStyle(f.properties.NO_LOT,false)}); l._lot=f.properties.NO_LOT; l._built=false; l.addTo(scanGroup);
+    let m=null; try{ const mj=await muniAt(c.lat,c.lng); m=mj.features?.[0]?.properties||null; }catch{}
+    log('lot_search',{found:true}); openLot(f,m);
+  }catch(e){ toast('Cadastre indisponible : '+e.message); } }
 searchForm.onsubmit=async e=>{ e.preventDefault(); const text=q.value.trim(); if(!text) return; q.blur();
+  const ld=lotDigits(text); if(ld){ searchForm.classList.remove('open'); $('btnSearch').setAttribute('aria-pressed',false); hide(sheetLot); return goToLot(ld); }
   if(/centris\.ca/i.test(text)){ searchForm.classList.remove('open'); $('btnSearch').setAttribute('aria-pressed',false); const info=parseCentris(text); if(info){ hide(sheetLot); return goToCentris(info); } }
   try{
     let hit=null;
