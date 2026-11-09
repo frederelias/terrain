@@ -166,6 +166,11 @@ button{font:inherit;cursor:pointer;border:0;background:none;color:inherit}
 .role dl{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;margin:0 0 10px;font-size:14px} .role dt{color:var(--ink-2)} .role dd{margin:0;text-align:right;font-variant-numeric:tabular-nums}
 .role button{min-height:44px;width:100%;border-radius:10px;font-weight:700;background:var(--bark);color:#fff}
 .role .muted{font-size:13px;color:var(--ink-2)}
+.role .use{font-size:18px;font-weight:700;line-height:1.2}
+.role .tags{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 10px}
+.role .tags span{font-size:12px;font-weight:700;padding:4px 8px;border-radius:999px;background:var(--paper);border:1px solid var(--line)}
+.role .tags span.hot{background:#FFF1CF;border-color:#E0A422;color:#7A5300}
+.role .src{font-size:11px;color:var(--ink-2);margin-top:6px}
 /* Feuilles */
 .sheet{position:fixed;left:0;right:0;bottom:0;z-index:1100;background:var(--paper);border-radius:18px 18px 0 0;box-shadow:0 -10px 40px rgba(23,32,26,.22);max-height:78vh;display:flex;flex-direction:column;transform:translateY(105%);transition:transform .22s ease;padding-bottom:var(--sab)}
 .sheet.open{transform:translateY(0)}
@@ -269,7 +274,7 @@ button:focus-visible,a:focus-visible{outline:3px solid var(--boot);outline-offse
 <div id="map" role="application" aria-label="Carte"></div>
 
 <div class="topbar">
-  <h1>Terrain <small>v30</small></h1>
+  <h1>Terrain <small>v31</small></h1>
   <button class="chip" id="btnSearch" aria-pressed="false" title="Chercher une adresse ou un code postal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg></button>
   <button class="chip" id="btnPov" aria-label="Photo point de vue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg></button>
   <button class="chip" id="btnMic" aria-pressed="false" title="Commentaire vocal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></button>
@@ -363,6 +368,7 @@ button:focus-visible,a:focus-visible{outline:3px solid var(--boot);outline-offse
       <div class="fact wide" id="lotTenure" hidden><b>—</b><span>tenure (indicatif)</span></div>
     </div>
     <div class="role" id="roleBox" hidden></div>
+    <div class="role" id="openBox" hidden></div>
     <div class="actions"><button id="copyLot" class="quiet wide">Copier le n° de lot</button></div>
     <h3>Sources et captures</h3>
     <div class="sources">
@@ -429,7 +435,7 @@ button:focus-visible,a:focus-visible{outline:3px solid var(--boot);outline-offse
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script>
 /* ============================ CONFIG ============================ */
-const APP_VERSION='v30';
+const APP_VERSION='v31';
 const CONFIG = {
   ringFraction: 0.70,      // diamètre de l'anneau = 70 % du plus petit côté de l'écran ; pince pour agrandir/réduire
   maxRadius: 1500,         // rayon maximal du scan (m) pour rester sous la limite des services
@@ -658,7 +664,7 @@ async function openLot(f,m){
   const tel=(m?.TELEPHONE||'').replace(/[^+\d]/g,''); $('lnkCall').href=tel?'tel:'+tel:'#'; $('lnkCall').textContent=m?.TELEPHONE?'Appeler · '+m.TELEPHONE:'Appeler'; $('lnkCall').classList.toggle('disabled',!tel);
   const site=m?.SITE_WEB?(m.SITE_WEB.startsWith('http')?m.SITE_WEB:'https://'+m.SITE_WEB):null;
   $('lnkMuni').href=site||CONFIG.infolot; $('lnkMuni').textContent=site?`Site de ${m.MUS_NM_MUN}`:'Site web';
-  const saved=carnet.find(x=>x.lot===no); $('lotOwner').value=saved?.owner||''; $('lotEmail').value=saved?.email||''; $('lotPhone').value=saved?.phone||''; ownerLinks(); contactLinks(); $('lotNote').value=saved?.note||''; setTags(saved?.tags||[]); setVisited(saved?.visited); $('btnFav').setAttribute('aria-pressed',!!saved?.fav); syncCentris(saved?.centris||'',saved?.centrisInfo||null); $('saveLot').textContent=saved?'Mettre à jour':'Ajouter au carnet'; renderThumbs(no); loadRole(no,f.geometry,m);
+  const saved=carnet.find(x=>x.lot===no); $('lotOwner').value=saved?.owner||''; $('lotEmail').value=saved?.email||''; $('lotPhone').value=saved?.phone||''; ownerLinks(); contactLinks(); $('lotNote').value=saved?.note||''; setTags(saved?.tags||[]); setVisited(saved?.visited); $('btnFav').setAttribute('aria-pressed',!!saved?.fav); syncCentris(saved?.centris||'',saved?.centrisInfo||null); $('saveLot').textContent=saved?'Mettre à jour':'Ajouter au carnet'; renderThumbs(no); loadRole(no,f.geometry,m); loadOpenRole(no,m);
   const t=$('lotTenure'), a=$('lotAddr'); t.className='fact wide'; t.hidden=true; a.className='fact wide'; a.querySelector('b').textContent='Vérification…';
   show(sheetLot);
   addrInEnvelope(b).then(r=>{ const inside=r.features.filter(x=>inPoly(x.geometry.coordinates,f.geometry)); if(!inside.length){a.classList.add('good');a.querySelector('b').textContent='Aucune — probablement non bâti';} else {a.classList.add('bad');a.querySelector('b').textContent=`${inside.length} : ${inside.slice(0,2).map(x=>addrLabel(x.properties)).filter(Boolean).join(', ')||'adresse présente'}`;} })
@@ -757,6 +763,25 @@ async function loadRole(no,geom,m){ const box=$('roleBox'); box.hidden=true; box
   log('role_lookup',{found:true,how,owner:!!owner});
   const btn=$('roleUse'); if(btn){ if($('lotOwner').value.trim()===owner) btn.hidden=true;
     btn.onclick=()=>{ $('lotOwner').value=owner; ownerLinks(); contactLinks(); btn.hidden=true; toast('Propriétaire rempli — Ajouter au carnet pour le garder'); log('role_use'); }; } }
+/* ---- Rôle 2026, données ouvertes MAMH (CC-BY 4.0), tuiles par préfixe de lot sur ce dépôt ---- */
+const roleTiles={}; let roleDomains=null;
+async function roleTile(pre){ if(roleTiles[pre]!==undefined) return roleTiles[pre]; try{ const r=await fetch(`data/role/lots/${pre}.json`); roleTiles[pre]=r.ok?await r.json():null; }catch{ roleTiles[pre]=null; } return roleTiles[pre]; }
+async function domains(){ if(roleDomains) return roleDomains; try{ const r=await fetch('data/role/domains.json'); roleDomains=r.ok?await r.json():{}; }catch{ roleDomains={}; } return roleDomains; }
+function adrLabel(a,D){ if(!a) return ''; const t=a.split(' '); const G=D.CODE_GENERIQUE_ADRESSE||{}, Lk=D.CODE_LIEN_ADRESSE||{}; const out=[];
+  t.forEach((w,i)=>{ if(G[w]&&i<=1) out.push(G[w]); else if(/^[A-Z]$/.test(w)&&i<=2){ if(Lk[w]) out.push(Lk[w].toLowerCase()); } else out.push(w.charAt(0)+w.slice(1).toLowerCase()); }); return out.join(' ').replace(/\s+/g,' '); }
+async function loadOpenRole(no,m){ const box=$('openBox'); box.hidden=true; box.innerHTML=''; const d=String(no).replace(/\D/g,''); if(d.length<6) return;
+  const [tile,D]=await Promise.all([roleTile(d.slice(0,4)),domains()]); if(selected?.lot!==no) return; const r=tile?.[d]; if(!r){ log('open_role',{found:false}); return; }
+  const [mat,cubf,sup,vt,vb,vi,an,agri,foret,adr,since,nb,statut]=r; const use=(D.CODE_UTILISATION_CUBF_3||{})[cubf]||('Usage '+cubf);
+  const isArg=/argenteuil/i.test(m?.MUS_NM_MRC||''); const yrs=since?new Date().getFullYear()-(+since):null;
+  const tags=[]; if(since) tags.push(`<span class="${yrs>=25?'hot':''}">Inscrit depuis ${since}${yrs>=25?' · '+yrs+' ans':''}</span>`);
+  if(nb) tags.push(`<span class="${nb>=3?'hot':''}">${nb} propriétaire${nb>1?'s':''} au rôle</span>`);
+  if(statut) tags.push(`<span>${statut.includes('2')&&statut.includes('1')?'Particulier et entreprise':statut.includes('2')?'Entreprise ou organisme':'Particulier'}</span>`);
+  if(agri&&agri!=='0') tags.push(`<span>Zone agricole ${agri==='2'?'100 %':'partielle'}</span>`);
+  if(foret) tags.push(`<span>Forêt ${fmt(foret*10.7639,0)} pi²</span>`);
+  box.innerHTML=`<h4>Rôle 2026 · données ouvertes</h4><div class="use">${esc(use)}</div>${adr?`<div class="sub">${esc(adrLabel(adr,D))}</div>`:''}<div class="tags">${tags.join('')}</div>
+    ${isArg?'':`<dl>${sup?`<dt>Superficie au rôle</dt><dd>${fmt(sup*10.7639,0)} pi²</dd>`:''}<dt>Terrain</dt><dd>${money(vt)}</dd><dt>Bâtiment</dt><dd>${money(vb)}</dd><dt>Immeuble</dt><dd><b>${money(vi)}</b></dd>${an&&an!=='0000'?`<dt>Construction</dt><dd>${esc(an)}</dd>`:''}<dt>Matricule</dt><dd>${esc(mat||'—')}</dd></dl>`}
+    <div class="src">Source : rôle d'évaluation foncière du Québec 2026, MAMH, Données Québec (CC-BY 4.0). Noms et adresses des propriétaires non diffusés.</div>`;
+  box.hidden=false; log('open_role',{found:true,cubf,since:!!since}); }
 $('copyLot').onclick=()=>copy(selected?.lot||'','Numéro de lot copié — colle-le dans Infolot ou le Registre');
 ['lnkInfolot','lnkRegistre','lnkRole'].forEach(id=>$(id).addEventListener('click',()=>{if(selected)copy(selected.lot,null);}));
 
