@@ -67,7 +67,7 @@ for pre, d in tiles.items():
 
 # 6. Domaines (libellés)
 doms = {}
-for name in ['CODE_UTILISATION_CUBF_3', 'CODE_GENERIQUE_ADRESSE', 'CODE_ZONAGE_AGRICOLE', 'CODE_STATUT']:
+for name in ['CODE_UTILISATION_CUBF_3', 'CODE_GENERIQUE_ADRESSE', 'CODE_LIEN_ADRESSE', 'CODE_ORIENTATION_ADRESSE', 'CODE_ZONAGE_AGRICOLE', 'CODE_STATUT']:
     try: doms[name] = ds.GetFieldDomain(name).GetEnumeration()
     except Exception as e: print('domaine', name, e)
 json.dump(doms, open(f'{OUT}/domains.json', 'w'), ensure_ascii=False, separators=(',', ':'))
