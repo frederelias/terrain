@@ -159,6 +159,13 @@ button{font:inherit;cursor:pointer;border:0;background:none;color:inherit}
 .introBar button{min-height:50px;padding:0 20px;border-radius:12px;font-weight:700;font-size:16px;color:var(--ink-2,#5C6B62)}
 .introBar .main{background:#FF5A1F;color:#141A16;box-shadow:0 3px 0 #0B110D;margin-left:auto;min-width:130px}
 .dots{display:flex;gap:6px} .dots i{width:8px;height:8px;border-radius:50%;background:var(--line,#D6D9D2)} .dots i.on{background:var(--ink,#141A16)}
+.role{background:var(--field);border-radius:12px;padding:12px 14px;margin:0 0 14px}
+.role h4{margin:0 0 8px;font-size:12px;letter-spacing:.3px;text-transform:uppercase;color:var(--ink-2)}
+.role .own{font-size:20px;font-weight:700;line-height:1.2}
+.role .sub{font-size:13px;color:var(--ink-2);margin:2px 0 10px}
+.role dl{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;margin:0 0 10px;font-size:14px} .role dt{color:var(--ink-2)} .role dd{margin:0;text-align:right;font-variant-numeric:tabular-nums}
+.role button{min-height:44px;width:100%;border-radius:10px;font-weight:700;background:var(--bark);color:#fff}
+.role .muted{font-size:13px;color:var(--ink-2)}
 /* Feuilles */
 .sheet{position:fixed;left:0;right:0;bottom:0;z-index:1100;background:var(--paper);border-radius:18px 18px 0 0;box-shadow:0 -10px 40px rgba(23,32,26,.22);max-height:78vh;display:flex;flex-direction:column;transform:translateY(105%);transition:transform .22s ease;padding-bottom:var(--sab)}
 .sheet.open{transform:translateY(0)}
@@ -262,7 +269,7 @@ button:focus-visible,a:focus-visible{outline:3px solid var(--boot);outline-offse
 <div id="map" role="application" aria-label="Carte"></div>
 
 <div class="topbar">
-  <h1>Terrain <small>v29</small></h1>
+  <h1>Terrain <small>v30</small></h1>
   <button class="chip" id="btnSearch" aria-pressed="false" title="Chercher une adresse ou un code postal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg></button>
   <button class="chip" id="btnPov" aria-label="Photo point de vue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg></button>
   <button class="chip" id="btnMic" aria-pressed="false" title="Commentaire vocal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></button>
@@ -355,6 +362,7 @@ button:focus-visible,a:focus-visible{outline:3px solid var(--boot);outline-offse
       <div class="fact wide" id="lotAddr"><b>—</b><span>adresses civiques sur le lot</span></div>
       <div class="fact wide" id="lotTenure" hidden><b>—</b><span>tenure (indicatif)</span></div>
     </div>
+    <div class="role" id="roleBox" hidden></div>
     <div class="actions"><button id="copyLot" class="quiet wide">Copier le n° de lot</button></div>
     <h3>Sources et captures</h3>
     <div class="sources">
@@ -421,7 +429,7 @@ button:focus-visible,a:focus-visible{outline:3px solid var(--boot);outline-offse
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script>
 /* ============================ CONFIG ============================ */
-const APP_VERSION='v29';
+const APP_VERSION='v30';
 const CONFIG = {
   ringFraction: 0.70,      // diamètre de l'anneau = 70 % du plus petit côté de l'écran ; pince pour agrandir/réduire
   maxRadius: 1500,         // rayon maximal du scan (m) pour rester sous la limite des services
@@ -429,13 +437,15 @@ const CONFIG = {
   cadastre: 'https://geo.environnement.gouv.qc.ca/donnees/rest/services/Reference/Cadastre_allege/MapServer',
   sda:      'https://servicescarto.mrnf.gouv.qc.ca/pes/rest/services/Territoire/SDA_WMS/MapServer',
   baux:     'https://servicescarto.mrnf.gouv.qc.ca/pes/rest/services/Territoire/Droits_fonciers_WMS/MapServer',
+  roleArg:  'https://sig.argenteuil.qc.ca/server/rest/services/DB_PROD/Unite_evaluation_MRC_PUBLIC/FeatureServer/129',
+  lotsArg:  'https://sig.argenteuil.qc.ca/server/rest/services/DB_PROD/lots_cadastre/FeatureServer/208',
   adresses: 'https://servicescarto.mern.gouv.qc.ca/pes/rest/services/Territoire/AQ_ADRESSES_WMS/MapServer',
   geocode:  'https://servicescarto.mrnf.gouv.qc.ca/pes/rest/services/Territoire/Adresse_Geocodage/GeocodeServer',
   infolot:  'https://appli.foncier.gouv.qc.ca/infolot/',
   registre: 'https://www.registrefoncier.gouv.qc.ca',
   centris:  'https://www.centris.ca/fr/a-vendre',   // + ~slug-municipalite?view=Map
   // Visualiseurs de rôle par MRC : colle l'URL de la carte interactive ; {lot} sera remplacé par le numéro si l'outil l'accepte.
-  roles: { 'argenteuil':'https://geoweb-mrcargenteuil.hub.arcgis.com/pages/donnes-ouvertes', "pays-d'en-haut":'', 'matawinie':'', "d'autray":'' }
+  roles: { 'argenteuil':'https://experience.arcgis.com/experience/5f786b7891884c1ebb5e929e7d881bf6/', "pays-d'en-haut":'', 'matawinie':'', "d'autray":'' }
 };
 
 /* ============================ Journal d'usage (local) ============================ */
@@ -648,7 +658,7 @@ async function openLot(f,m){
   const tel=(m?.TELEPHONE||'').replace(/[^+\d]/g,''); $('lnkCall').href=tel?'tel:'+tel:'#'; $('lnkCall').textContent=m?.TELEPHONE?'Appeler · '+m.TELEPHONE:'Appeler'; $('lnkCall').classList.toggle('disabled',!tel);
   const site=m?.SITE_WEB?(m.SITE_WEB.startsWith('http')?m.SITE_WEB:'https://'+m.SITE_WEB):null;
   $('lnkMuni').href=site||CONFIG.infolot; $('lnkMuni').textContent=site?`Site de ${m.MUS_NM_MUN}`:'Site web';
-  const saved=carnet.find(x=>x.lot===no); $('lotOwner').value=saved?.owner||''; $('lotEmail').value=saved?.email||''; $('lotPhone').value=saved?.phone||''; ownerLinks(); contactLinks(); $('lotNote').value=saved?.note||''; setTags(saved?.tags||[]); setVisited(saved?.visited); $('btnFav').setAttribute('aria-pressed',!!saved?.fav); syncCentris(saved?.centris||'',saved?.centrisInfo||null); $('saveLot').textContent=saved?'Mettre à jour':'Ajouter au carnet'; renderThumbs(no);
+  const saved=carnet.find(x=>x.lot===no); $('lotOwner').value=saved?.owner||''; $('lotEmail').value=saved?.email||''; $('lotPhone').value=saved?.phone||''; ownerLinks(); contactLinks(); $('lotNote').value=saved?.note||''; setTags(saved?.tags||[]); setVisited(saved?.visited); $('btnFav').setAttribute('aria-pressed',!!saved?.fav); syncCentris(saved?.centris||'',saved?.centrisInfo||null); $('saveLot').textContent=saved?'Mettre à jour':'Ajouter au carnet'; renderThumbs(no); loadRole(no,f.geometry,m);
   const t=$('lotTenure'), a=$('lotAddr'); t.className='fact wide'; t.hidden=true; a.className='fact wide'; a.querySelector('b').textContent='Vérification…';
   show(sheetLot);
   addrInEnvelope(b).then(r=>{ const inside=r.features.filter(x=>inPoly(x.geometry.coordinates,f.geometry)); if(!inside.length){a.classList.add('good');a.querySelector('b').textContent='Aucune — probablement non bâti';} else {a.classList.add('bad');a.querySelector('b').textContent=`${inside.length} : ${inside.slice(0,2).map(x=>addrLabel(x.properties)).filter(Boolean).join(', ')||'adresse présente'}`;} })
@@ -719,6 +729,34 @@ $('btnSend').addEventListener('click',()=>{ if(!selected) return; copy(chan==='m
 ['copyLot','lnkInfolot','lnkRegistre','lnkRole','lnkMuni','lnkC411','lnkNoms','copyLetter','exportCsv','shareCsv'].filter(id=>$(id)).forEach(id=>$(id).addEventListener('click',()=>log('btn',{id})));
 $('lnkNoms').addEventListener('click',()=>{ const n=$('lotOwner').value.trim(); if(n) copy(n,'Nom copié — colle-le dans l\'Index des noms'); });
 
+/* ---- Rôle d'évaluation en direct : MRC d'Argenteuil (couche publique de la MRC, un lot à la fois) ---- */
+const money=v=>v==null||v===''?'—':Number(v).toLocaleString('fr-CA',{maximumFractionDigits:0})+' $';
+async function arcq(url,params){ const r=await fetch(`${url}/query?${new URLSearchParams({f:'json',outFields:'*',returnGeometry:'false',...params})}`); if(!r.ok) throw new Error('HTTP '+r.status); const j=await r.json(); if(j.error) throw new Error(j.error.message||'erreur'); return j.features||[]; }
+function interiorPoint(g){ const b=L.geoJSON({type:'Feature',geometry:g}).getBounds(); const c=b.getCenter(); if(inPoly([c.lng,c.lat],g)) return c;
+  for(let i=1;i<8;i++) for(let j=1;j<8;j++){ const lat=b.getSouth()+(b.getNorth()-b.getSouth())*i/8, lng=b.getWest()+(b.getEast()-b.getWest())*j/8; if(inPoly([lng,lat],g)) return L.latLng(lat,lng); } return c; }
+async function loadRole(no,geom,m){ const box=$('roleBox'); box.hidden=true; box.innerHTML='';
+  if(!/argenteuil/i.test(m?.MUS_NM_MRC||'')) return;
+  box.hidden=false; box.innerHTML='<h4>Rôle d\'évaluation · MRC d\'Argenteuil</h4><div class="muted">Lecture du rôle…</div>';
+  const digits=String(no).replace(/\D/g,''), spaced=digits.replace(/\B(?=(\d{3})+(?!\d))/g,' ');
+  let feat=null, how='';
+  try{ const lk=await arcq(CONFIG.lotsArg,{where:`idlot IN ('${spaced}','${digits}')`,outFields:'nomatricul'}); const mat=lk[0]?.attributes?.nomatricul;
+    if(mat){ const r=await arcq(CONFIG.roleArg,{where:`matricul10='${String(mat).replace(/'/g,"''")}'`}); feat=r[0]?.attributes; how='lot'; } }catch(e){ log('role_lookup_error',{step:'lot',msg:String(e.message).slice(0,60)}); }
+  if(!feat){ try{ const pt=interiorPoint(geom); const r=await arcq(CONFIG.roleArg,{geometry:`${pt.lng},${pt.lat}`,geometryType:'esriGeometryPoint',inSR:'4326',spatialRel:'esriSpatialRelIntersects'}); feat=r[0]?.attributes; how='point'; }catch(e){ log('role_lookup_error',{step:'point',msg:String(e.message).slice(0,60)}); } }
+  if(selected?.lot!==no) return;
+  if(!feat){ box.innerHTML='<h4>Rôle d\'évaluation · MRC d\'Argenteuil</h4><div class="muted">Pas de lecture directe pour ce lot — utilise le bouton « Rôle d\'évaluation » plus bas.</div>'; log('role_lookup',{found:false}); return; }
+  const a=feat; const owner=[a.prenom,a.nom].filter(x=>x&&String(x).trim()).join(' ').trim().replace(/\s+/g,' ').toLowerCase().replace(/(^|[\s'-])\S/g,c=>c.toUpperCase());
+  const civ=[a.nocivinf&&(a.nocivinf+(a.nocivinfa||'')), a.typgeneri, a.typlien, a.voiepubliq, a.orientatio].filter(x=>x&&String(x).trim()).join(' ').replace(/\s+/g,' ');
+  const sup=a.supterrain?Number(a.supterrain):null;
+  box.innerHTML=`<h4>Rôle d'évaluation · MRC d'Argenteuil</h4>
+    <div class="own">${owner?esc(owner):'Propriétaire non publié'}</div>
+    <div class="sub">${owner?'Premier propriétaire inscrit au rôle':''}${civ?(owner?' · ':'')+esc(civ):''}</div>
+    <dl><dt>Matricule</dt><dd>${esc(a.matricul10||'—')}</dd>
+    ${sup?`<dt>Superficie au rôle</dt><dd>${fmt(sup*10.7639,0)} pi²</dd>`:''}
+    <dt>Terrain</dt><dd>${money(a.valterrain)}</dd><dt>Bâtiment</dt><dd>${money(a.valbatim)}</dd><dt>Immeuble</dt><dd><b>${money(a.valimmeu)}</b></dd></dl>
+    ${owner?'<button type="button" id="roleUse">Utiliser ce nom comme propriétaire</button>':''}`;
+  log('role_lookup',{found:true,how,owner:!!owner});
+  const btn=$('roleUse'); if(btn){ if($('lotOwner').value.trim()===owner) btn.hidden=true;
+    btn.onclick=()=>{ $('lotOwner').value=owner; ownerLinks(); contactLinks(); btn.hidden=true; toast('Propriétaire rempli — Ajouter au carnet pour le garder'); log('role_use'); }; } }
 $('copyLot').onclick=()=>copy(selected?.lot||'','Numéro de lot copié — colle-le dans Infolot ou le Registre');
 ['lnkInfolot','lnkRegistre','lnkRole'].forEach(id=>$(id).addEventListener('click',()=>{if(selected)copy(selected.lot,null);}));
 
