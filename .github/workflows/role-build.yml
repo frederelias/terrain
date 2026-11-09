@@ -2,7 +2,7 @@ name: role-build
 on:
   workflow_dispatch:
   push:
-    paths: ['.github/workflows/role-build.yml', 'tools/build_role.py']
+    paths: ['tools/build_role.py']
   schedule:
     - cron: '0 6 5 * *'
 permissions:
@@ -19,8 +19,11 @@ jobs:
         run: curl -sSL -o role.zip https://donneesouvertes.affmunqc.net/role/ROLE2026_FGDB.zip && unzip -q role.zip -d role
       - name: Construire les tuiles par préfixe de lot
         run: python3 tools/build_role.py "$(find role -type d -name '*.gdb' | head -1)"
-      - name: Publier
+      - name: Publier sur la branche role-data (hors du site, pour des déploiements légers)
         run: |
           git config user.name "terrain-bot"; git config user.email "terrain-bot@users.noreply.github.com"
-          git rm -q --ignore-unmatch data/role/sample_*.csv
-          git add data/role && git commit -q -m "role: tuiles 2026" && git push || echo "rien a publier"
+          git checkout --orphan role-data-new
+          git rm -rfq --cached .
+          git add -f data/role
+          git commit -qm "role: tuiles $(date +%Y-%m-%d)"
+          git push -f origin role-data-new:role-data
