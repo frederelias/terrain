@@ -1,0 +1,287 @@
+INFO: Open of `role/Role_2026.gdb'
+      using driver `OpenFileGDB' successful.
+
+Layer name: B05EX1_B05V_ADR_PROPRIO
+Metadata:
+  ALIAS_NAME=Table des adresses proprios
+Geometry: None
+Feature Count: 5384712
+Layer SRS WKT:
+(unknown)
+FID Column = OBJECTID
+anrole: String (4.0) NOT NULL, alternative name="ANNÉE DU RÔLE"
+id_provinc: String (23.0) NOT NULL, alternative name="IDENTIFIANT PROVINCIAL"
+code_mun: String (5.0) NOT NULL, alternative name="CODE DE MUNICIPALITÉ"
+rl0102a: String (5.0), alternative name="CODE ARRONDISSEMENT"
+mat18: String (18.0), alternative name="MATRICULE 18 CARACTÈRES"
+rl0201u: String (1.0), alternative name="CODE TYPE POSSESSION", domain name=CODE_INSCRIPTION
+rl0201gx: DateTime, alternative name="DATE INSCRIPTION"
+rl0201hx: String (1.0), alternative name="STATUT PROPRIO", domain name=CODE_STATUT
+
+Layer name: B05EX1_B05V_REPAR_FISC
+Metadata:
+  ALIAS_NAME=Table des données des répartitions fiscales
+Geometry: None
+Feature Count: 1626132
+Layer SRS WKT:
+(unknown)
+FID Column = OBJECTID
+anrole: String (4.0), alternative name="ANNEE DU ROLE"
+id_provinc: String (23.0), alternative name="IDENTIFIANT PROVINCIAL"
+code_mun: String (5.0), alternative name="CODE DE MUNICIPALITE"
+rl0102a: String (5.0), alternative name="CODE ARRONDISSEMENT"
+mat18: String (18.0), alternative name="MATRICULE 18 CARACTERES"
+rl0504a: String (8.0), alternative name="NUMERO DE LA LOI"
+rl0504b: String (12.0), alternative name="NUMERO DE L ARTICLE"
+rl0504c: String (10.0), alternative name="NUMERO OU LETTRE DE L ALINEA"
+rl0504d: Real (0.0), alternative name="MONTANT DE LA REPARTITION"
+rl0504e: String (1.0), alternative name="PARTIE DE L IMMEUBLE CORRESPONDANTE", domain name=CODE_PARTIE_IMMEUBLE
+rl0504f: String (1.0), alternative name="IMPOSABILITE DES MONTANTS", domain name=CODE_IMPOSABILITÉ
+rl0506a: String (30.0), alternative name="SOUS-CATÉGORIE NON RÉSIDENTIEL"
+rl0506b: Integer (0.0), alternative name="SOUS-CATÉGORIE pourcentage"
+rl0507a: String (8.0), alternative name="NUMERO DE LA LOI FIN SCOLAIRE"
+rl0507b: String (10.0), alternative name="NUMERO DE L’ARTICLE FIN SCOLAIRE"
+rl0507c: String (5.0), alternative name="NUMERO OU LETTRE DE L’ALINEA FIN SCOLAIRE"
+rl0507d: Real (0.0), alternative name="MONTANT DE LA REPARTITION FIN SCOLAIRE"
+rl0507e: String (1.0), alternative name="PARTIE DE L’IMMEUBLE CORRESPONDANTE FIN SCOLAIRE", domain name=CODE_PARTIE_IMMEUBLE
+rl0507f: String (1.0), alternative name="IMPOSABILITE DES MONTANTS FIN SCOLAIRE", domain name=CODE_IMPOSABILITÉ
+rl0508a: String (30.0), alternative name="Code du secteur auquel appartient l’unité d’évaluation"
+rl0509a: String (30.0), alternative name="Code de la sous-catégorie des immeubles résidentiels"
+rl0509b: Integer (0.0), alternative name="Proportion, exprimée en pourcentage, de la valeur de la partie résidentielle attribuable à la sous-catégorie"
+
+Layer name: B05EX1_B05V_ADR_UNITE_EVALN
+Metadata:
+  ALIAS_NAME=Table des données d'adresse
+Geometry: None
+Feature Count: 3819572
+Layer SRS WKT:
+(unknown)
+FID Column = OBJECTID
+anrole: String (4.0), alternative name="ANNÉE DU RÔLE"
+id_provinc: String (23.0), alternative name="IDENTIFIANT PROVINCIAL"
+code_mun: String (5.0), alternative name="CODE DE LA MUNICIPALITÉ"
+rl0102a: String (5.0), alternative name="CODE ARRONDISSMENT"
+mat18: String (18.0), alternative name="MATRICULE 18 CARACTÈRES"
+no_seq_adr: String (2.0), alternative name="NUMÉRO SÉQUENCE ADRESSE"
+rl0101a: String (6.0), alternative name="NUMÉRO INFERIEUR DE L’ADRESSE"
+rl0101b: String (4.0), alternative name="FRACTION OU LETTRE DU NUMÉRO INFERIEUR"
+rl0101c: String (6.0), alternative name="NUMÉRO SUPÉRIEUR DE L’ADRESSE"
+rl0101d: String (4.0), alternative name="FRACTION OU LETTRE DU NUMÉRO SUPÉRIEUR"
+rl0101e: String (2.0), alternative name="CODE GÉNÉRIQUE DE LA VOIE", domain name=CODE_GENERIQUE_ADRESSE
+rl0101f: String (1.0), alternative name="CODE DE LIEN", domain name=CODE_LIEN_ADRESSE
+rl0101g: String (75.0), alternative name="NOM DE LA VOIE"
+rl0101h: String (2.0), alternative name="CODE D'ORIENTATION", domain name=CODE_ORIENTATION_ADRESSE
+rl0101i: String (5.0), alternative name="NUMÉRO APPARTEMENT OU LOCAL"
+rl0101j: String (5.0), alternative name="PARTIE COMPLÈTE DE L’ADRESSE"
+
+Layer name: B05EX1_B05V_LOT_CADST
+Metadata:
+  ALIAS_NAME=Table des données du cadastre
+Geometry: None
+Feature Count: 5595995
+Layer SRS WKT:
+(unknown)
+FID Column = OBJECTID
+anrole: String (4.0), alternative name="ANNÉE DU RÔLE"
+id_provinc: String (23.0), alternative name="IDENTIFIANT PROVINCIAL"
+code_mun: String (5.0), alternative name="CODE DE MUNICIPALITÉ"
+rl0102a: String (5.0), alternative name="CODE ARRONDISSEMENT"
+mat18: String (18.0), alternative name="MATRICULE 18 CARACTÈRES"
+rl0103a: String (7.0), alternative name="NUMÉRO LOT"
+rl0103b: String (3.0), alternative name="SUFFIXE NUMÉRO LOT"
+rl0103c: String (60.0), alternative name="NOM CADASTRE NON RÉNOVÉ"
+rl0103d: String (60.0), alternative name="DESIGNATION SECONDAIRE CADASTRE"
+rl0103e: String (18.0), alternative name="NUMÉRO LOT NON RÉNOVÉ"
+rl0103f: String (1.0), alternative name="PARTIE NON SUBDIVISÉE"
+
+Layer name: B05EX1_B05V_UNITE_EVALN
+Metadata:
+  ALIAS_NAME=Table des caractéristiques de l'immeuble
+Geometry: None
+Feature Count: 3747176
+Layer SRS WKT:
+(unknown)
+FID Column = OBJECTID
+anrole: String (4.0), alternative name="ANNÉE DU RÔLE"
+id_provinc: String (23.0), alternative name="IDENTIFIANT PROVINCIAL"
+code_mun: String (5.0), alternative name="CODE DE LA MUNICIPALITÉ"
+rl0102a: String (5.0), alternative name="CODE ARRONDISSMENT"
+mat18: String (18.0), alternative name="MATRICULE 18 CARACTÈRES"
+rl0105a: String (4.0), alternative name="CODE UTILISATION PRÉDOMINANT DE L’UNITÉ", domain name=CODE_UTILISATION_CUBF_3
+rl0106a: String (15.0), alternative name="NUMÉRO DE DOSSIER"
+rl0107a: String (4.0), alternative name="UNITÉ DE VOISINAGE"
+rl0301a: Real (0.0), alternative name="FRONT EN MÈTRES"
+rl0302a: Real (0.0), alternative name="SUPERFICIE EN MÈTRES"
+rl0303a: String (1.0), alternative name="CODE ZONAGE", domain name=CODE_ZONAGE_AGRICOLE
+rl0304a: Real (0.0), alternative name="SUPERFICIE EAE TOTALE"
+rl0305a: Real (0.0), alternative name="SUPERFICIE EAE ZONÉE"
+rl0306a: Integer (0.0), alternative name="NOMBRE ÉTAGES"
+rl0307a: String (4.0), alternative name="ANNÉE DE CONSTRUCTION"
+rl0307b: String (1.0), alternative name="ANNÉE CONST RÉELLE ESTIMÉE"
+rl0308a: Real (0.0), alternative name="SUPF ÉTAGE BÂTIMENT PRINCIPAL"
+rl0309a: String (1.0), alternative name="TYPE DE BÂTIMENT", domain name=CODE_LIEN_PHYSIQUE
+rl0311a: Integer (0.0), alternative name="NOMBRE DE LOGEMENTS"
+rl0312a: Integer (0.0), alternative name="CHAMBRES LOCATIVES"
+rl0313a: Integer(Int16) (0.0), alternative name="NOMBRE DE LOCAUX NON RÉSIDENTIELS"
+rl0402a: Integer (0.0), alternative name="VALEUR TERRAIN"
+rl0403a: Integer (0.0), alternative name="VALEUR BÂTIMENT"
+rl0404a: Integer64 (0.0), alternative name="VALEUR IMMEUBLE"
+rl0405a: Integer (0.0), alternative name="ÉVALUATION ANTÉRIEURE IMMEUBLE"
+rl0501a: String (1.0), alternative name="TERRAIN VAGUE DESSERVI", domain name=CODE_TERRAIN_VAGUE
+rl0502a: String (2.0), alternative name="CODE MIXITE NON RÉSIDENTIELLE", domain name=CODE_CL_IMM_N_RESD
+rl0503a: String (1.0), alternative name="CODE MIXITE INDUSTRIELLE", domain name=CODE_CL_INDUSTRIELLE
+rl0505a: Integer (0.0), alternative name="VALEUR IMPOSABLE SCOLAIRE AGRICOLE"
+ind_nouv_ctrid: String (3.0), alternative name="NOUVEAU CENTROÏDE"
+dat_cond_mrche: DateTime, alternative name="DATE CONDITION MARCHÉ"
+rl0310a: String (1.0), alternative name="GENRE DE CONSTRUCTION", domain name=CODE_GENRE_CONSTRUCTION
+rl0314a: Real (0.0), alternative name="SUPERFICIE VISÉE PAR UNE IMPOSITION MAXIMALE"
+rl0315a: Real (0.0), alternative name="SUPERFICIE À VOCATION FORESTIÈRE TOTALE"
+rl0316a: Real (0.0), alternative name="SUPERFICIE À VOCATION FORESTIÈRE ZONEE"
+rl0317a: Integer (0.0), alternative name="Nombre total de raccordement au service d’aqueduc"
+rl0318a: Integer (0.0), alternative name="Nombre total de raccordement au service d’égout sanitaire"
+rl0319a: Integer (0.0), alternative name="Nombre total de raccordement au service d’égout pluvial"
+rl0320a: Real (0.0), alternative name="Superficie à vocation agricole exploitable mais non exploitée"
+
+Layer name: rol_unite_p
+Metadata:
+  ALIAS_NAME=Rôle d'évaluation foncière
+Geometry: Point
+Feature Count: 3747008
+Extent: (-79.555314, 44.991946) - (-57.108024, 54.945102)
+Layer SRS WKT:
+GEOGCRS["NAD83",
+    DATUM["North American Datum 1983",
+        ELLIPSOID["GRS 1980",6378137,298.257222101,
+            LENGTHUNIT["metre",1]]],
+    PRIMEM["Greenwich",0,
+        ANGLEUNIT["degree",0.0174532925199433]],
+    CS[ellipsoidal,2],
+        AXIS["geodetic latitude (Lat)",north,
+            ORDER[1],
+            ANGLEUNIT["degree",0.0174532925199433]],
+        AXIS["geodetic longitude (Lon)",east,
+            ORDER[2],
+            ANGLEUNIT["degree",0.0174532925199433]],
+    USAGE[
+        SCOPE["Geodesy."],
+        AREA["North America - onshore and offshore: Canada - Alberta; British Columbia; Manitoba; New Brunswick; Newfoundland and Labrador; Northwest Territories; Nova Scotia; Nunavut; Ontario; Prince Edward Island; Quebec; Saskatchewan; Yukon. Puerto Rico. United States (USA) - Alabama; Alaska; Arizona; Arkansas; California; Colorado; Connecticut; Delaware; Florida; Georgia; Hawaii; Idaho; Illinois; Indiana; Iowa; Kansas; Kentucky; Louisiana; Maine; Maryland; Massachusetts; Michigan; Minnesota; Mississippi; Missouri; Montana; Nebraska; Nevada; New Hampshire; New Jersey; New Mexico; New York; North Carolina; North Dakota; Ohio; Oklahoma; Oregon; Pennsylvania; Rhode Island; South Carolina; South Dakota; Tennessee; Texas; Utah; Vermont; Virginia; Washington; West Virginia; Wisconsin; Wyoming. US Virgin Islands. British Virgin Islands."],
+        BBOX[14.92,167.65,86.45,-40.73]],
+    ID["EPSG",4269]]
+Data axis to CRS axis mapping: 2,1
+FID Column = OBJECTID
+Geometry Column = Shape
+id_provinc: String (23.0), alternative name="IDENTIFIANT PROVINCIAL"
+code_mun: String (5.0), alternative name="CODE DE MUNICIPALITE"
+arrond: String (5.0), alternative name="CODE ARRONDISSMENT"
+rejet: Integer (0.0), domain name=DOM_REJET
+date_entree: String (4.0), alternative name="ANNÉE D ACTIVATION DE L UNITÉ"
+mat18: String (18.0), alternative name="MATRICULE 18 CARACTÈRES"
+
+Relationship: R_ADR_PROPRIO
+  Type: Association
+  Related table type: features
+  Cardinality: OneToMany
+  Left table name: rol_unite_p
+  Right table name: B05EX1_B05V_ADR_PROPRIO
+  Left table fields: id_provinc
+  Right table fields: id_provinc
+  Forward path label: B05EX1_B05V_ADR_PROPRIO
+  Backward path label: rol_unite_p
+
+Relationship: R_ADR_UNITE_EVALN
+  Type: Association
+  Related table type: features
+  Cardinality: OneToMany
+  Left table name: rol_unite_p
+  Right table name: B05EX1_B05V_ADR_UNITE_EVALN
+  Left table fields: id_provinc
+  Right table fields: id_provinc
+  Forward path label: B05EX1_B05V_ADR_UNITE_EVALN
+  Backward path label: rol_unite_p
+
+Relationship: R_LOT_CADST
+  Type: Association
+  Related table type: features
+  Cardinality: OneToMany
+  Left table name: rol_unite_p
+  Right table name: B05EX1_B05V_LOT_CADST
+  Left table fields: id_provinc
+  Right table fields: id_provinc
+  Forward path label: B05EX1_B05V_LOT_CADST
+  Backward path label: rol_unite_p
+
+Relationship: R_REPAR_FISC
+  Type: Association
+  Related table type: features
+  Cardinality: OneToMany
+  Left table name: rol_unite_p
+  Right table name: B05EX1_B05V_REPAR_FISC
+  Left table fields: id_provinc
+  Right table fields: id_provinc
+  Forward path label: B05EX1_B05V_REPAR_FISC
+  Backward path label: rol_unite_p
+
+Relationship: R_UNITE_EVALN
+  Type: Association
+  Related table type: features
+  Cardinality: OneToMany
+  Left table name: rol_unite_p
+  Right table name: B05EX1_B05V_UNITE_EVALN
+  Left table fields: id_provinc
+  Right table fields: id_provinc
+  Forward path label: B05EX1_B05V_UNITE_EVALN
+  Backward path label: rol_unite_p
+ERROR 1: Couldn't fetch requested layer 'Layer:'!
+ERROR 1: Geometry type None is not compatible with GEOMETRY=AS_XY.
+ERROR 1: Terminating translation prematurely after failed
+translation of layer B05EX1_B05V_ADR_PROPRIO (use -skipfailures to skip errors)
+ERROR 1: Couldn't fetch requested layer '(None)'!
+ERROR 1: Couldn't fetch requested layer 'Layer:'!
+ERROR 1: Geometry type None is not compatible with GEOMETRY=AS_XY.
+ERROR 1: Terminating translation prematurely after failed
+translation of layer B05EX1_B05V_REPAR_FISC (use -skipfailures to skip errors)
+ERROR 1: Couldn't fetch requested layer '(None)'!
+ERROR 1: Couldn't fetch requested layer 'Layer:'!
+ERROR 1: Geometry type None is not compatible with GEOMETRY=AS_XY.
+ERROR 1: Terminating translation prematurely after failed
+translation of layer B05EX1_B05V_ADR_UNITE_EVALN (use -skipfailures to skip errors)
+ERROR 1: Couldn't fetch requested layer '(None)'!
+ERROR 1: Couldn't fetch requested layer 'Layer:'!
+ERROR 1: Geometry type None is not compatible with GEOMETRY=AS_XY.
+ERROR 1: Terminating translation prematurely after failed
+translation of layer B05EX1_B05V_LOT_CADST (use -skipfailures to skip errors)
+ERROR 1: Couldn't fetch requested layer '(None)'!
+ERROR 1: Couldn't fetch requested layer 'Layer:'!
+ERROR 1: Geometry type None is not compatible with GEOMETRY=AS_XY.
+ERROR 1: Terminating translation prematurely after failed
+translation of layer B05EX1_B05V_UNITE_EVALN (use -skipfailures to skip errors)
+ERROR 1: Couldn't fetch requested layer '(None)'!
+ERROR 1: Couldn't fetch requested layer 'Group'!
+ERROR 1: Couldn't fetch requested layer 'RoleFoncier:'!
+ERROR 1: Couldn't fetch requested layer 'Layer:'!
+ERROR 1: Couldn't fetch requested layer '(Point)'!
+ERROR 1: Couldn't fetch requested layer 'Relationship:'!
+ERROR 1: Couldn't fetch requested layer 'R_ADR_PROPRIO'!
+ERROR 1: Couldn't fetch requested layer '(Association,'!
+ERROR 1: Couldn't fetch requested layer 'rol_unite_p,'!
+ERROR 1: Couldn't fetch requested layer 'B05EX1_B05V_ADR_PROPRIO)'!
+ERROR 1: Couldn't fetch requested layer 'Relationship:'!
+ERROR 1: Couldn't fetch requested layer 'R_ADR_UNITE_EVALN'!
+ERROR 1: Couldn't fetch requested layer '(Association,'!
+ERROR 1: Couldn't fetch requested layer 'rol_unite_p,'!
+ERROR 1: Couldn't fetch requested layer 'B05EX1_B05V_ADR_UNITE_EVALN)'!
+ERROR 1: Couldn't fetch requested layer 'Relationship:'!
+ERROR 1: Couldn't fetch requested layer 'R_LOT_CADST'!
+ERROR 1: Couldn't fetch requested layer '(Association,'!
+ERROR 1: Couldn't fetch requested layer 'rol_unite_p,'!
+ERROR 1: Couldn't fetch requested layer 'B05EX1_B05V_LOT_CADST)'!
+ERROR 1: Couldn't fetch requested layer 'Relationship:'!
+ERROR 1: Couldn't fetch requested layer 'R_REPAR_FISC'!
+ERROR 1: Couldn't fetch requested layer '(Association,'!
+ERROR 1: Couldn't fetch requested layer 'rol_unite_p,'!
+ERROR 1: Couldn't fetch requested layer 'B05EX1_B05V_REPAR_FISC)'!
+ERROR 1: Couldn't fetch requested layer 'Relationship:'!
+ERROR 1: Couldn't fetch requested layer 'R_UNITE_EVALN'!
+ERROR 1: Couldn't fetch requested layer '(Association,'!
+ERROR 1: Couldn't fetch requested layer 'rol_unite_p,'!
+ERROR 1: Couldn't fetch requested layer 'B05EX1_B05V_UNITE_EVALN)'!
