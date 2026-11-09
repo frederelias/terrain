@@ -590,6 +590,8 @@ body.isoff .mapctl{top:calc(var(--sat) + 164px)}
         <div class="src centris" id="srcCentris"><a id="lnkCentris" target="_blank" rel="noopener">Centris — annonces de la municipalité</a><button class="doc link" id="btnCentrisPaste" aria-label="Coller le lien d'une annonce Centris"><svg viewBox="0 0 24 24"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1.5 1.5"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1.5-1.5"/></svg><span>Coller</span></button><div class="st centris-url" id="centrisUrl"></div>
           <div class="centrisData" id="centrisData" hidden><div class="row"><input class="f" id="cPrice" inputmode="numeric" placeholder="Prix ($)" aria-label="Prix demandé"><input class="f" id="cBroker" placeholder="Courtier" aria-label="Courtier"></div></div></div>
         <p class="fine">Trouvé une annonce ? Dans Centris : Partager → lots. Ou copie son lien, reviens ici et touche « Coller ».</p>
+        <h3>Chercher une annonce autour de ce lot</h3>
+        <div class="links" id="adsLot"></div>
       </div>
     </details>
 
@@ -631,7 +633,9 @@ body.isoff .mapctl{top:calc(var(--sat) + 164px)}
     <div class="trow"><div class="t">Photo aérienne</div><label class="switch"><input type="checkbox" id="lyrSat"><span class="track"></span></label></div>
     <div class="trow"><div class="t">Terres publiques louées<small>Baux de villégiature et abris sommaires (zoom rapproché)</small></div><label class="switch"><input type="checkbox" id="lyrBauxT" checked><span class="track"></span></label></div>
     <div class="trow"><div class="t">Seulement mes favoris<small>Masque les autres lots du carnet</small></div><label class="switch"><input type="checkbox" id="lyrFavOnly"><span class="track"></span></label></div>
-    <div class="links"><button id="btnCentrisMap" class="wide">Voir les annonces Centris de cette zone</button></div>
+    <h3>Annonces à vendre ici</h3>
+    <p class="hint">Chaque site s'ouvre sur la zone que tu regardes, au plus près de ce qu'il accepte.</p>
+    <div class="links" id="adsMap"></div>
     <h3>Légende</h3>
     <div class="lg"><span><i style="background:#E0A422"></i>sans adresse (probablement vacant)</span><span><i style="background:#B8BFB5"></i>bâti</span><span><i style="background:#FF5A1F"></i>passe tes filtres</span></div>
     <div class="lg" id="legendSaved"></div>
@@ -664,7 +668,7 @@ body.isoff .mapctl{top:calc(var(--sat) + 164px)}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script>
 /* ============================ CONFIG ============================ */
-const APP_VERSION='v33';
+const APP_VERSION='v34';
 const CONFIG = {
   ringFraction: 0.70, maxRadius: 1500, coneLength: 150, coneHalfAngle: 25,
   cadastre: 'https://geo.environnement.gouv.qc.ca/donnees/rest/services/Reference/Cadastre_allege/MapServer',
@@ -978,7 +982,7 @@ async function openLot(f,m){
   $('lotOwner').value=saved?.owner||''; $('lotEmail').value=saved?.email||''; $('lotPhone').value=saved?.phone||''; $('lotAddrPost').value=saved?.addrPost||''; $('lotNote').value=saved?.note||'';
   $('lotVisited').checked=!!saved?.visited; $('lotContacted').checked=!!(saved?.tags||[]).includes('c'); setFav(!!saved?.fav);
   syncCentris(saved?.centris||'',saved?.centrisInfo||null); loading=false;
-  renderSummary(); ownerLinks(); contactLinks(); updateFicheState(); renderThumbs(no);
+  renderSummary(); ownerLinks(); contactLinks(); updateFicheState(); renderThumbs(no); renderAdsLot();
   $('secOwner').open=!saved?.owner; $('secContact').open=!!saved?.owner&&!(saved?.tags||[]).includes('c');
   loadRole(no,f.geometry,m); loadOpenRole(no,m);
   show(sheets.lot); tip('fiche','♥ Garder ajoute ce lot au carnet. Tout ce que tu écris ici s\'enregistre tout seul.');
@@ -1090,7 +1094,37 @@ async function goToCentris(info){ const qq=[info.address,info.city].filter(Boole
 async function attachCentris(text){ const info=parseCentris(text); if(!info) return toast('Pas une annonce Centris'); if(!selected){ return goToCentris(info); } syncCentris(info.url,info); saveNow(); log('centris_link',{id:!!info.id,price:!!info.price}); toast(`Annonce ${info.id||''} attachée`); }
 $('btnCentrisPaste').onclick=async()=>{ let t=''; try{ t=(await navigator.clipboard.readText()).trim(); }catch{} if(!/centris\.ca/i.test(t)) t=(prompt('Colle le lien ou le texte partagé de l\'annonce Centris :',t&&/^https?:/.test(t)?t:'')||'').trim(); if(t) attachCentris(t); };
 $('lnkCentris').addEventListener('click',()=>{ if(selected&&!centrisUrl) toast('Pour revenir : le X en haut à gauche. Trouvé ? Partager → lots'); log('btn',{id:'lnkCentris',has:!!centrisUrl}); });
-$('btnCentrisMap').onclick=async()=>{ const c=map.getCenter(); let m=null; try{ const j=await muniAt(c.lat,c.lng); m=j.features?.[0]?.properties?.MUS_NM_MUN||null; }catch{} log('centris_map',{muni:!!m}); toast(m?'Pour revenir : le X en haut à gauche de Centris':'Municipalité inconnue — Centris s\'ouvre sans zoom'); window.open(centrisCityUrl(m),'_blank','noopener'); };
+/* ---- Sources d'annonces : chacune reçoit le maximum qu'elle accepte dans son adresse ---- */
+const MRC_REGION={'argenteuil':'laurentides',"les pays-d'en-haut":'laurentides',"pays-d'en-haut":'laurentides','les laurentides':'laurentides','antoine-labelle':'laurentides','la rivière-du-nord':'laurentides','rivière-du-nord':'laurentides','thérèse-de blainville':'laurentides','deux-montagnes':'laurentides','mirabel':'laurentides',
+  'matawinie':'lanaudiere',"d'autray":'lanaudiere','joliette':'lanaudiere','montcalm':'lanaudiere',"l'assomption":'lanaudiere','les moulins':'lanaudiere',
+  'papineau':'outaouais','pontiac':'outaouais',"les collines-de-l'outaouais":'outaouais','la vallée-de-la-gatineau':'outaouais','maskinongé':'mauricie','mékinac':'mauricie','les chenaux':'mauricie'};
+const regionOf=mrc=>MRC_REGION[(mrc||'').toLowerCase().replace(/^mrc (de |des |du |d')?/,'').trim()]||MRC_REGION[(mrc||'').toLowerCase()]||null;
+function listingSources(o){ // o: {lat,lng,zoom,bounds,muni,mrc}
+  const enc=encodeURIComponent, z=Math.round(o.zoom), b=o.bounds, reg=regionOf(o.mrc);
+  const place=(z>=11&&o.muni)?slug(o.muni):(reg||slug(o.muni||''));
+  const centris=cat=>`${CONFIG.centris.replace('/a-vendre','')}/${cat}~a-vendre${place?'~'+place:''}?view=Map`;
+  const rc=(type)=>`https://www.realtor.ca/map#ZoomLevel=${z}&Center=${o.lat.toFixed(6)}%2C${o.lng.toFixed(6)}&LatitudeMax=${b.getNorth().toFixed(5)}&LongitudeMax=${b.getEast().toFixed(5)}&LatitudeMin=${b.getSouth().toFixed(5)}&LongitudeMin=${b.getWest().toFixed(5)}&Sort=6-D&PropertyTypeGroupID=1&TransactionTypeId=2&PropertySearchTypeId=${type}&Currency=CAD`;
+  const km=Math.max(2,Math.min(100,Math.round(map.distance([b.getSouth(),b.getWest()],[b.getNorth(),b.getEast()])/2000)));
+  const near=o.muni?`${o.muni}, QC`:'Québec';
+  const gsite=(site,extra)=>`https://www.google.com/search?q=${enc(`site:${site} ${extra} "${o.muni||''}"`)}&tbs=qdr:m`;
+  return [
+    {k:'realtor',label:'Realtor.ca · terrains (même vue)',url:rc(6)},
+    {k:'realtor_rec',label:'Realtor.ca · chalets et récréatif',url:rc(2)},
+    {k:'realtor_agri',label:'Realtor.ca · terres agricoles',url:rc(4)},
+    {k:'centris',label:`Centris · terrains${place?' · '+(place===reg?reg:o.muni):''}`,url:centris('terrain')},
+    {k:'centris_terre',label:'Centris · terres',url:centris('terre')},
+    {k:'kijiji',label:`Kijiji · terrains (${km} km)`,url:`https://www.kijiji.ca/b-land-for-sale/quebec/c641l9001?radius=${km}.0&address=${enc(near)}&ll=${o.lat.toFixed(5)},${o.lng.toFixed(5)}`},
+    {k:'lespac',label:'LesPAC · terrains',url:gsite('lespac.com','terrain')},
+    {k:'duproprio',label:'DuProprio · terrains',url:gsite('duproprio.com','terrain')},
+    {k:'appartogo',label:'Appartogo · terrains',url:reg&&o.muni?`https://appartogo.com/fr/terrain-vendre/canada/quebec/${reg}/${slug(o.muni)}`:gsite('appartogo.com','terrain')},
+    {k:'marketplace',label:'Facebook Marketplace',url:`https://www.facebook.com/marketplace/search/?query=${enc('terrain '+(o.muni||''))}`}
+  ]; }
+function renderAds(boxId,o){ const box=$(boxId); if(!box) return; box.innerHTML='';
+  listingSources(o).forEach(sr=>{ const a=document.createElement('a'); a.href=sr.url; a.target='_blank'; a.rel='noopener'; a.textContent=sr.label; a.onclick=()=>{ log('ads',{src:sr.k,where:boxId}); if(sr.k.startsWith('centris')) toast('Pour revenir : le X en haut à gauche. Trouvé ? Partager → lots'); }; box.appendChild(a); }); }
+async function renderAdsMap(){ const c=map.getCenter(); let m=lastMuni; try{ const j=await muniAt(c.lat,c.lng); m=j.features?.[0]?.properties||m; }catch{}
+  renderAds('adsMap',{lat:c.lat,lng:c.lng,zoom:map.getZoom(),bounds:map.getBounds(),muni:m?.MUS_NM_MUN||'',mrc:m?.MUS_NM_MRC||''}); }
+function renderAdsLot(){ if(!selected) return; const g=L.geoJSON({type:'Feature',geometry:selected.geom}).getBounds().pad(2.5);
+  renderAds('adsLot',{lat:selected.lat,lng:selected.lng,zoom:Math.max(13,Math.min(16,map.getBoundsZoom(g))),bounds:g,muni:selected.muni,mrc:selected.mrc}); }
 
 /* ---- Lettre et contact ---- */
 function letter(){ const d=new Date().toLocaleDateString('fr-CA',{year:'numeric',month:'long',day:'numeric'}); const who=$('lotOwner').value.trim();
@@ -1160,7 +1194,7 @@ $('restoreInput').addEventListener('change',async e=>{ const f=e.target.files[0]
 /* ============================ Couches ============================ */
 let sat=store.get('terrain.sat',false);
 function applyBase(){ if(sat){ map.removeLayer(baseOSM); baseSat.addTo(map); } else { map.removeLayer(baseSat); baseOSM.addTo(map); } lyrMuni.bringToFront(); lyrCadastre.bringToFront(); }
-$('btnLayers').onclick=()=>{ $('lyrSat').checked=sat; $('lyrBauxT').checked=bauxOn; $('lyrFavOnly').checked=favOnly; renderSaved(); show(sheets.layers); log('btn',{id:'btnLayers'}); };
+$('btnLayers').onclick=()=>{ renderAdsMap(); $('lyrSat').checked=sat; $('lyrBauxT').checked=bauxOn; $('lyrFavOnly').checked=favOnly; renderSaved(); show(sheets.layers); log('btn',{id:'btnLayers'}); };
 $('lyrSat').onchange=e=>{ sat=e.target.checked; store.set('terrain.sat',sat); applyBase(); log('basemap',{sat}); };
 $('lyrBauxT').onchange=e=>{ bauxOn=e.target.checked; store.set('terrain.baux',bauxOn); if(bauxOn) loadBaux(); else bauxGroup.clearLayers(); log('baux',{on:bauxOn}); };
 $('lyrFavOnly').onchange=e=>{ favOnly=e.target.checked; store.set('terrain.favOnly',favOnly); renderSaved(); log('fav_only',{on:favOnly}); };
