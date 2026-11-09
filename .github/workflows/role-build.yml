@@ -1,0 +1,26 @@
+name: role-build
+on:
+  workflow_dispatch:
+  push:
+    paths: ['.github/workflows/role-build.yml', 'tools/build_role.py']
+  schedule:
+    - cron: '0 6 5 * *'
+permissions:
+  contents: write
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - name: GDAL
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq gdal-bin python3-gdal > /dev/null
+      - name: Télécharger le rôle géoréférencé 2026 (MAMH, CC-BY 4.0)
+        run: curl -sSL -o role.zip https://donneesouvertes.affmunqc.net/role/ROLE2026_FGDB.zip && unzip -q role.zip -d role
+      - name: Construire les tuiles par préfixe de lot
+        run: python3 tools/build_role.py "$(find role -type d -name '*.gdb' | head -1)"
+      - name: Publier
+        run: |
+          git config user.name "terrain-bot"; git config user.email "terrain-bot@users.noreply.github.com"
+          git rm -q --ignore-unmatch data/role/sample_*.csv
+          git add data/role && git commit -q -m "role: tuiles 2026" && git push || echo "rien a publier"
