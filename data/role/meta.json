@@ -1,0 +1,24 @@
+{
+ "source": "Rôle d'évaluation foncière du Québec géoréférencé 2026, MAMH, Données Québec, CC-BY 4.0",
+ "fields": [
+  "mat18",
+  "cubf",
+  "sup_m2",
+  "v_terrain",
+  "v_batiment",
+  "v_immeuble",
+  "annee_constr",
+  "zonage_agri",
+  "sup_foret_m2",
+  "adresse_unite",
+  "inscrit_depuis",
+  "nb_inscrits",
+  "statut",
+  "code_mun",
+  "lat",
+  "lng"
+ ],
+ "lots": 694980,
+ "tiles": 3063,
+ "built": "2026-11-09"
+}
