@@ -158,6 +158,17 @@ button{font:inherit;cursor:pointer;border:0;background:none;color:inherit}
 .introBar{display:flex;align-items:center;gap:12px;padding:12px 16px calc(var(--sab) + 16px)}
 .introBar button{min-height:50px;padding:0 20px;border-radius:12px;font-weight:700;font-size:16px;color:var(--ink-2,#5C6B62)}
 .introBar .main{background:#FF5A1F;color:#141A16;box-shadow:0 3px 0 #0B110D;margin-left:auto;min-width:130px}
+.slides article.setup{justify-content:flex-start;gap:10px;overflow-y:auto}
+.perm{display:flex;flex-direction:column;gap:8px;width:100%;max-width:380px}
+.perm button{display:grid;grid-template-columns:1fr auto;grid-template-rows:auto auto;text-align:left;gap:2px 10px;padding:12px 14px;border-radius:12px;background:var(--field,#ECEDE8);color:var(--ink,#141A16);border:1.5px solid var(--line,#D6D9D2);min-height:60px}
+.perm button b{font-size:15px} .perm button span{grid-column:1;font-size:12.5px;color:var(--ink-2,#5C6B62);line-height:1.35}
+.perm button i{grid-row:1/3;grid-column:2;align-self:center;font-style:normal;font-weight:700;font-size:13px;padding:6px 10px;border-radius:999px;background:#FF5A1F;color:#141A16}
+.perm button i::before{content:"Autoriser"} .perm button[data-p="install"] i::before{content:"Installer"}
+.perm button.ok i{background:#E3EFE6;color:#2E7D4F} .perm button.ok i::before{content:"✓"}
+.perm button.no i{background:#F8E3E0;color:#B3261E} .perm button.no i::before{content:"Refusé"}
+.perm button.na{opacity:.55} .perm button.na i::before{content:"—"} .perm button.na i{background:transparent;color:var(--ink-2)}
+.slides p.fine{font-size:12.5px;max-width:380px}
+.nomore{display:flex;align-items:center;gap:8px;font-size:14px;color:var(--ink-2,#5C6B62);min-height:44px} .nomore input{width:20px;height:20px}
 .dots{display:flex;gap:6px} .dots i{width:8px;height:8px;border-radius:50%;background:var(--line,#D6D9D2)} .dots i.on{background:var(--ink,#141A16)}
 .role{background:var(--field);border-radius:12px;padding:12px 14px;margin:0 0 14px}
 .role h4{margin:0 0 8px;font-size:12px;letter-spacing:.3px;text-transform:uppercase;color:var(--ink-2)}
@@ -274,7 +285,7 @@ button:focus-visible,a:focus-visible{outline:3px solid var(--boot);outline-offse
 <div id="map" role="application" aria-label="Carte"></div>
 
 <div class="topbar">
-  <h1>Terrain <small>v31</small></h1>
+  <h1>Terrain <small>v32</small></h1>
   <button class="chip" id="btnSearch" aria-pressed="false" title="Chercher une adresse ou un code postal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg></button>
   <button class="chip" id="btnPov" aria-label="Photo point de vue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg></button>
   <button class="chip" id="btnMic" aria-pressed="false" title="Commentaire vocal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></button>
@@ -323,6 +334,19 @@ button:focus-visible,a:focus-visible{outline:3px solid var(--boot);outline-offse
       <div class="ill"><svg viewBox="0 0 120 120"><ellipse cx="35" cy="80" rx="6" ry="10" fill="#2E7D4F" transform="rotate(-20 35 80)"/><ellipse cx="52" cy="62" rx="6" ry="10" fill="#2E7D4F" transform="rotate(-20 52 62)"/><ellipse cx="70" cy="46" rx="6" ry="10" fill="#2E7D4F" transform="rotate(-20 70 46)"/><circle cx="88" cy="32" r="7" fill="#FF5A1F" stroke="#fff" stroke-width="2"/><path d="M88 32 L76 8 A26 26 0 0 1 100 8 Z" fill="rgba(255,90,31,.4)"/></svg></div>
       <h2>Marche et photos</h2>
       <p><b>👣</b> trace tes pas sur la carte. <b>📷</b> prend une photo avec la direction du regard : pointe à plat, fixe, cadre. Tout reste dans ton téléphone. Le <b>carnet</b> rassemble lots, marches et export.</p>
+    </article>
+    <article class="setup">
+      <h2>Avant de partir</h2>
+      <p>Terrain fonctionne mieux installé et avec ces accès. Touche chaque ligne :</p>
+      <div class="perm" id="permList">
+        <button type="button" data-p="install"><b>📲 Installer l'application</b><span>Plein écran, icône sur ton téléphone, partage depuis Centris.</span><i></i></button>
+        <button type="button" data-p="geo"><b>📍 Position</b><span>Indispensable : te placer sur la carte, scanner autour de toi, tracer ta marche.</span><i></i></button>
+        <button type="button" data-p="cam"><b>📷 Caméra</b><span>Photos point de vue et captures attachées aux lots.</span><i></i></button>
+        <button type="button" data-p="mic"><b>🎙️ Micro</b><span>Notes et commentaires vocaux.</span><i></i></button>
+        <button type="button" data-p="compass"><b>🧭 Boussole</b><span>Direction du regard et des photos.</span><i></i></button>
+      </div>
+      <p class="fine" id="permHelp">Accès refusé par erreur ? Chrome → ⋮ → Paramètres → Paramètres des sites → frederelias.github.io.</p>
+      <label class="nomore"><input type="checkbox" id="introOff"> Ne plus afficher au démarrage</label>
     </article>
   </div>
   <div class="introBar"><button id="introSkip">Passer</button><div class="dots" id="dots"></div><button id="introNext" class="main">Suivant</button></div>
@@ -435,7 +459,7 @@ button:focus-visible,a:focus-visible{outline:3px solid var(--boot);outline-offse
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script>
 /* ============================ CONFIG ============================ */
-const APP_VERSION='v31';
+const APP_VERSION='v32';
 const CONFIG = {
   ringFraction: 0.70,      // diamètre de l'anneau = 70 % du plus petit côté de l'écran ; pince pour agrandir/réduire
   maxRadius: 1500,         // rayon maximal du scan (m) pour rester sous la limite des services
@@ -979,16 +1003,35 @@ $('clearLog').onclick=()=>{ if(confirm('Effacer tout le journal d\'usage ?')){ L
     const ans=prompt(`Annonce ${info.id||''} reçue.\nAttacher à quel lot ?\n\n${list}`,'1'); const r=sorted[(+ans)-1]; if(!r) return toast('Annonce non attachée');
     r.centris=info.url; r.centrisInfo=info; persist(); restyleScan(); renderSaved(); toast(`Annonce attachée au lot ${r.lot}`); map.setView([r.lat,r.lng],16); identify(r.lat,r.lng); };
   setTimeout(pick,800); })();
-/* ---- Introduction ---- */
+/* ---- Introduction : à chaque ouverture (sauf si désactivée) + préparation du téléphone ---- */
+let deferredInstall=null; window.addEventListener('beforeinstallprompt',e=>{ e.preventDefault(); deferredInstall=e; });
+window.addEventListener('appinstalled',()=>{ markPerm('install','ok'); log('installed'); });
+function markPerm(k,st){ const b=document.querySelector(`#permList button[data-p="${k}"]`); if(!b) return; b.classList.remove('ok','no','na'); if(st) b.classList.add(st); }
+async function refreshPerms(){
+  const standalone=(window.matchMedia&&matchMedia('(display-mode: standalone)').matches)||navigator.standalone===true; if(standalone) markPerm('install','ok');
+  if(navigator.permissions?.query){ for(const [k,n] of [['geo','geolocation'],['cam','camera'],['mic','microphone']]){ try{ const r=await navigator.permissions.query({name:n}); markPerm(k,r.state==='granted'?'ok':r.state==='denied'?'no':null); }catch{} } }
+  if(compassOn) markPerm('compass','ok'); if(!navigator.mediaDevices?.getUserMedia){ markPerm('cam','na'); markPerm('mic','na'); } }
+async function askPerm(k){ log('perm_ask',{k});
+  try{
+    if(k==='install'){ if(deferredInstall){ deferredInstall.prompt(); const c=await deferredInstall.userChoice; deferredInstall=null; if(c.outcome==='accepted') markPerm('install','ok'); }
+      else toast(/iphone|ipad/i.test(navigator.userAgent)?'Safari : Partager → Sur l\'écran d\'accueil':'Chrome : ⋮ → Installer l\'application (ou Ajouter à l\'écran d\'accueil)'); return; }
+    if(k==='geo'){ const c=await locate(); showMe(c); markPerm('geo','ok'); return; }
+    if(k==='cam'||k==='mic'){ const st=await navigator.mediaDevices.getUserMedia(k==='cam'?{video:true}:{audio:true}); st.getTracks().forEach(t=>t.stop()); markPerm(k,'ok'); return; }
+    if(k==='compass'){ await enableCompass(); markPerm('compass',compassOn?'ok':'no'); return; }
+  }catch(e){ markPerm(k,'no'); toast('Accès refusé — voir la note sous la liste pour le réactiver'); } }
+document.querySelectorAll('#permList button').forEach(b=>b.onclick=()=>askPerm(b.dataset.p));
 (function(){ const el=$('intro'), sl=$('slides'), n=sl.children.length, dots=$('dots'); dots.innerHTML=Array.from({length:n},(_,i)=>`<i class="${i?'':'on'}"></i>`).join('');
-  const idx=()=>Math.round(sl.scrollLeft/sl.clientWidth); const upd=()=>{ const i=idx(); [...dots.children].forEach((d,k)=>d.classList.toggle('on',k===i)); $('introNext').textContent=i===n-1?'Commencer':'Suivant'; };
+  const idx=()=>Math.round(sl.scrollLeft/(sl.clientWidth||1)); const go=i=>{ const x=i*sl.clientWidth; if(sl.scrollTo) sl.scrollTo({left:x,behavior:'smooth'}); else sl.scrollLeft=x; };
+  const upd=()=>{ const i=idx(); [...dots.children].forEach((d,k)=>d.classList.toggle('on',k===i)); $('introNext').textContent=i===n-1?'Commencer':'Suivant'; $('introSkip').textContent=i===n-1?'':'Passer'; };
   sl.addEventListener('scroll',()=>{ clearTimeout(window._inT); window._inT=setTimeout(upd,80); });
-  const close=()=>{ el.hidden=true; try{localStorage.setItem('terrain.intro','1');}catch{} log('intro_close',{slide:idx()}); };
-  $('introNext').onclick=()=>{ const i=idx(); if(i>=n-1) return close(); const x=(i+1)*sl.clientWidth; if(sl.scrollTo) sl.scrollTo({left:x,behavior:'smooth'}); else sl.scrollLeft=x; };
-  $('introSkip').onclick=close;
-  window.openIntro=()=>{ el.hidden=false; sl.scrollLeft=0; upd(); log('intro_open'); };
+  let off=false; try{ off=localStorage.getItem('terrain.introOff')==='1'; }catch{} $('introOff').checked=off;
+  $('introOff').onchange=e=>{ try{ localStorage.setItem('terrain.introOff',e.target.checked?'1':'0'); }catch{} log('intro_off',{v:e.target.checked}); };
+  const close=()=>{ el.hidden=true; log('intro_close',{slide:idx()}); };
+  $('introNext').onclick=()=>{ const i=idx(); if(i>=n-1) return close(); go(i+1); };
+  $('introSkip').onclick=()=>{ const i=idx(); if(i>=n-1) return close(); go(n-1); };
+  window.openIntro=()=>{ el.hidden=false; sl.scrollLeft=0; upd(); refreshPerms(); log('intro_open'); };
   $('btnHelp').onclick=()=>openIntro();
-  let seen=false; try{ seen=!!localStorage.getItem('terrain.intro'); }catch{} if(!seen) try{ openIntro(); }catch{} })();
+  if(!off) try{ openIntro(); }catch{} })();
 setMode(mode); setTimeout(loadBaux,500);
 if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{});
 </script>
