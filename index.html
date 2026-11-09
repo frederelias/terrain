@@ -852,9 +852,10 @@ searchForm.onsubmit=async e=>{ e.preventDefault(); const text=q.value.trim(); if
   if(!hit) return toast('Lieu introuvable'); map.setView([hit[0],hit[1]],15); toast(hit[2]||text); };
 
 /* ============================ Rôle 2026 (données ouvertes MAMH, CC-BY 4.0) ============================ */
+const ROLE_BASE='https://raw.githubusercontent.com/frederelias/terrain/role-data/data/role/';
 const roleTiles={}; let roleDomains=null;
-async function roleTile(pre){ if(roleTiles[pre]!==undefined) return roleTiles[pre]; try{ const r=await netFetch(`data/role/lots/${pre}.json`); roleTiles[pre]=r.ok?await r.json():null; }catch{ roleTiles[pre]=null; } return roleTiles[pre]; }
-async function domains(){ if(roleDomains) return roleDomains; try{ const r=await netFetch('data/role/domains.json'); roleDomains=r.ok?await r.json():{}; }catch{ roleDomains={}; } return roleDomains; }
+async function roleTile(pre){ if(roleTiles[pre]!==undefined) return roleTiles[pre]; try{ const r=await netFetch(`${ROLE_BASE}lots/${pre}.json`); roleTiles[pre]=r.ok?await r.json():null; }catch{ roleTiles[pre]=null; } return roleTiles[pre]; }
+async function domains(){ if(roleDomains) return roleDomains; try{ const r=await netFetch(ROLE_BASE+'domains.json'); roleDomains=r.ok?await r.json():{}; }catch{ roleDomains={}; } return roleDomains; }
 async function roleFor(no){ const d=String(no).replace(/\D/g,''); if(d.length<6) return null; const t=await roleTile(d.slice(0,4)); return t?.[d]||null; }
 function adrLabel(a,D){ if(!a) return ''; const t=a.split(' '); const G=D.CODE_GENERIQUE_ADRESSE||{}, Lk=D.CODE_LIEN_ADRESSE||{}; const out=[];
   t.forEach((w,i)=>{ if(G[w]&&i<=1) out.push(G[w]); else if(/^[A-Z]$/.test(w)&&i<=2){ if(Lk[w]) out.push(Lk[w].toLowerCase()); } else out.push(w.charAt(0)+w.slice(1).toLowerCase()); }); return out.join(' ').replace(/\s+/g,' '); }
