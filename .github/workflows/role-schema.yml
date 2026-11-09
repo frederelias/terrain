@@ -1,0 +1,31 @@
+name: role-schema
+on:
+  workflow_dispatch:
+  push:
+    paths: ['.github/workflows/role-schema.yml']
+permissions:
+  contents: write
+jobs:
+  schema:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: GDAL
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq gdal-bin > /dev/null
+      - name: Télécharger le rôle géoréférencé 2026 (données ouvertes MAMH, CC-BY 4.0)
+        run: |
+          curl -sSL -o role.zip https://donneesouvertes.affmunqc.net/role/ROLE2026_FGDB.zip
+          ls -la role.zip && unzip -q role.zip -d role && find role -maxdepth 2 | head -20
+      - name: Schéma et échantillon
+        run: |
+          mkdir -p data/role
+          GDB=$(find role -type d -name '*.gdb' | head -1); echo "GDB=$GDB"
+          ogrinfo -ro -so -al "$GDB" > data/role/schema.txt 2>&1 || true
+          for L in $(ogrinfo -ro -q "$GDB" | sed -E 's/^[0-9]+: ([^ ]+).*/\1/'); do
+            ogr2ogr -f CSV "data/role/sample_${L}.csv" "$GDB" "$L" -limit 5 -t_srs EPSG:4326 -lco GEOMETRY=AS_XY 2>>data/role/schema.txt || true
+          done
+          ls -la data/role
+      - name: Publier
+        run: |
+          git config user.name "terrain-bot"; git config user.email "terrain-bot@users.noreply.github.com"
+          git add data/role && git commit -m "role: schema 2026" && git push || echo "rien a publier"
