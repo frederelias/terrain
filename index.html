@@ -9,7 +9,18 @@
 <meta name="apple-mobile-web-app-title" content="lots">
 <title>lots — à qui appartient cette terre ?</title>
 <link rel="manifest" href="manifest.webmanifest">
-<link rel="apple-touch-icon" href="icon.svg">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="canonical" href="https://lots.quebec/">
+<meta name="description" content="Dans le bois, devant une terre qui dort : touche la carte et vois le lot, sa superficie, son évaluation et comment joindre son propriétaire. Partout au Québec.">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="lots">
+<meta property="og:locale" content="fr_CA">
+<meta property="og:url" content="https://lots.quebec/">
+<meta property="og:title" content="lots — à qui appartient cette terre ?">
+<meta property="og:description" content="Lots du cadastre, rôle d'évaluation, propriétaire, annonces : partout au Québec, dans ton téléphone. Gratuit, rien n'est envoyé.">
+<meta property="og:image" content="https://lots.quebec/og.png">
+<meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="icon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@500;700&display=swap">
@@ -539,7 +550,8 @@ body.walking .mectl{bottom:calc(var(--sab) + 224px)}
         <button type="button" data-p="mic"><b>🎙️ Micro</b><span>Commentaires vocaux pour améliorer l'app.</span><i></i></button>
         <button type="button" data-p="compass"><b>🧭 Boussole</b><span>Direction du regard et des photos.</span><i></i></button>
       </div>
-      <p class="fine" id="permHelp">Accès refusé par erreur ? Chrome → ⋮ → Paramètres → Paramètres des sites → frederelias.github.io.</p>
+      <p class="fine" id="permHelp">Accès refusé par erreur ? Chrome → ⋮ → Paramètres → Paramètres des sites → lots.quebec.</p>
+      <p class="fine">En utilisant lots, tu acceptes les <a href="confidentialite.html" target="_blank" rel="noopener">conditions et la politique de confidentialité</a>. Données à titre indicatif, sans valeur légale. Respecte toujours la propriété privée.</p>
       <label class="nomore"><input type="checkbox" id="introOff"> Ne plus afficher au démarrage</label>
       <p class="fine" id="introVersion"></p>
     </article>
@@ -696,6 +708,7 @@ body.walking .mectl{bottom:calc(var(--sab) + 224px)}
     <h3>Améliorer l'app <span id="logCount" style="font-weight:400"></span></h3>
     <div class="links"><button id="btnMic">Commentaire vocal</button><button id="shareLog">Partager le rapport</button><button id="copyLog">Copier le rapport</button><button id="clearLog">Effacer le journal</button></div>
     <p class="version" id="carnetVersion"></p>
+    <p class="version"><a href="confidentialite.html" target="_blank" rel="noopener">Confidentialité et conditions</a> · <a href="mailto:bonjour@lots.quebec?subject=lots">Nous écrire</a></p>
   </div>
 </section>
 
@@ -706,7 +719,7 @@ body.walking .mectl{bottom:calc(var(--sab) + 224px)}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script>
 /* ============================ CONFIG ============================ */
-const APP_VERSION='v38';
+const APP_VERSION='v39';
 const CONFIG = {
   ringFraction: 0.70, maxRadius: 1500, coneLength: 150, coneHalfAngle: 25,
   cadastre: 'https://geo.environnement.gouv.qc.ca/donnees/rest/services/Reference/Cadastre_allege/MapServer',
@@ -1214,7 +1227,7 @@ function renderSaved(){ savedGroup.clearLayers(); const zoomed=map.getZoom()>=14
   $('lgLeaf').innerHTML=icoSvg('leaf',16); $('lgHouse').innerHTML=icoSvg('house',16);
   const missing=carnet.filter(r=>!r.geom&&!r._tried); missing.slice(0,10).forEach(async r=>{ r._tried=true; try{ const j=await lotAt(r.lat,r.lng); const f=j.features?.[0]; if(f){ r.geom=f.geometry; persist(); renderSaved(); } }catch{} }); }
 map.on('zoomend',()=>renderSaved());
-$('btnCarnet').onclick=()=>{ log('btn',{id:'btnCarnet'}); renderWalkList(); renderCarnet(); renderLogCount(); $('carnetVersion').textContent=`lots ${APP_VERSION} · données locales, rien n'est envoyé`; show(sheets.carnet); };
+$('btnCarnet').onclick=()=>{ log('btn',{id:'btnCarnet'}); renderWalkList(); renderCarnet(); renderLogCount(); $('carnetVersion').textContent=`lots ${APP_VERSION} · tes données restent dans ce téléphone`; show(sheets.carnet); };
 async function photoCounts(){ try{ const all=await dbAll('photos'); const m={}; all.forEach(p=>{ if(p.lot) m[p.lot]=(m[p.lot]||0)+1; }); return m; }catch{ return {}; } }
 let selMode=false, selSet=new Set();
 $('selMode').onclick=()=>{ selMode=!selMode; selSet.clear(); $('selMode').textContent=selMode?'Annuler':'Sélectionner'; $('selActions').hidden=!selMode; renderCarnet(); };
