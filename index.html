@@ -440,6 +440,16 @@ body.walking .mectl{bottom:calc(var(--sab) + 224px)}
 .viewer .vtitle input{min-height:46px}
 .viewer .vtitle button{min-height:46px}
 .viewer .del{position:static;left:auto;bottom:auto;transform:none;align-self:flex-start;background:transparent;color:#FF9C8F;padding:0;min-height:44px;font-weight:700}
+/* v40 : partage */
+.modal{position:fixed;inset:0;z-index:1460;background:rgba(10,14,12,.55);display:flex;align-items:flex-end;justify-content:center}
+.modal[hidden]{display:none}
+.modal .mbox{background:var(--paper,#fff);color:var(--ink);width:100%;max-width:520px;border-radius:18px 18px 0 0;padding:18px 18px calc(var(--sab) + 14px);box-shadow:0 -10px 40px rgba(0,0,0,.3)}
+.modal h2{margin:0 0 6px;font-size:21px}
+.modal .prem{display:flex;align-items:center;gap:10px;margin-top:14px}
+.modal .prem button{flex:1;min-height:50px;border-radius:12px;background:var(--field);color:var(--ink-2);font-weight:700;font-size:15px;opacity:.8}
+.badge-p{flex:none;font-size:12px;font-weight:700;padding:5px 10px;border-radius:999px;background:#FFF1CF;color:#7A5300;border:1px solid #E0A422}
+.modal .cancel{width:100%;min-height:46px;margin-top:6px;font-weight:700;color:var(--ink-2)}
+#btnShare{margin-right:6px}
 /* Éléments retirés de l'ancienne interface */
 .bottom,.mode,.mapbtn,.walkpill,.clearbtn,.legend{display:none !important}
 
@@ -561,7 +571,7 @@ body.walking .mectl{bottom:calc(var(--sab) + 224px)}
 
 <section class="sheet" id="sheetLot" aria-hidden="true" aria-labelledby="lotNo">
   <div class="grip"></div>
-  <header><div class="t"><h2 id="lotNo">—</h2><p id="lotWhere">—</p></div><button class="keep" id="btnFav" aria-pressed="false"><span class="h" aria-hidden="true">♥</span><span id="favLabel">Garder</span></button><button class="close" id="closeLot" aria-label="Fermer">×</button></header>
+  <header><div class="t"><h2 id="lotNo">—</h2><p id="lotWhere">—</p></div><button class="keep" id="btnFav" aria-pressed="false"><span class="h" aria-hidden="true">♥</span><span id="favLabel">Garder</span></button><button class="close" id="btnShare" aria-label="Partager ce lot"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="M7.5 7.5L12 3l4.5 4.5"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></svg></button><button class="close" id="closeLot" aria-label="Fermer">×</button></header>
   <div class="body">
     <div class="sum">
       <div class="own unk" id="sumOwner">Propriétaire inconnu</div>
@@ -714,12 +724,22 @@ body.walking .mectl{bottom:calc(var(--sab) + 224px)}
 
 <div class="viewer" id="viewer" hidden><img id="viewerImg" alt=""><button class="close" id="viewerClose" aria-label="Fermer">×</button><div class="vbar"><label class="vlab" for="viewerTitle">Titre de la photo</label><div class="vtitle"><input id="viewerTitle" placeholder="Ex. : chemin d'accès, côté nord" autocomplete="off" enterkeyhint="done"><button id="viewerRename">Renommer</button></div><button class="del" id="viewerDel">Supprimer la photo</button></div></div>
 
+<div class="modal" id="shareModal" hidden role="dialog" aria-modal="true" aria-labelledby="shareTitle">
+  <div class="mbox">
+    <h2 id="shareTitle">Partager le lot</h2>
+    <button class="primary" id="shareZip">Exporter photos + GPS (.zip)</button>
+    <p class="fine">Photos, position et direction de chaque prise, contour du lot et marches qui le traversent (GeoJSON et KML pour Google Earth), avec une fiche résumé. Fabriqué dans ton téléphone, rien n'est envoyé à un serveur. Le nom du propriétaire, ses coordonnées et tes notes ne sont pas inclus.</p>
+    <div class="prem"><button id="shareLink" disabled>Lien de fiche partageable</button><span class="badge-p">Premium · bientôt</span></div>
+    <p class="fine">Envoie la fiche complète par un simple lien, à jour, à un conjoint, un courtier ou un notaire. <a href="#" id="premiumNotify">Me prévenir au lancement</a></p>
+    <button class="cancel" id="shareClose">Fermer</button>
+  </div>
+</div>
 <div class="toast" id="toast" role="status"></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script>
 /* ============================ CONFIG ============================ */
-const APP_VERSION='v39';
+const APP_VERSION='v40';
 const CONFIG = {
   ringFraction: 0.70, maxRadius: 1500, coneLength: 150, coneHalfAngle: 25,
   cadastre: 'https://geo.environnement.gouv.qc.ca/donnees/rest/services/Reference/Cadastre_allege/MapServer',
@@ -1258,6 +1278,50 @@ $('restoreInput').addEventListener('change',async e=>{ const f=e.target.files[0]
     carnet=[...byLot.values()]; const wids=new Set(walks.map(x=>x.id)); (data.walks||[]).forEach(x=>{ if(!wids.has(x.id)) walks.push(x); }); store.set('terrain.walks',walks);
     persist(); renderSaved(); renderWalks(); renderCarnet(); renderWalkList(); log('restore',{added}); toast(`${added} lot(s) restauré(s)`); }
   catch{ toast('Fichier de sauvegarde illisible'); } });
+
+/* ============================ Partage : export ZIP (local) ; lien de fiche = Premium ============================ */
+const CRC_T=(()=>{ const t=new Uint32Array(256); for(let n=0;n<256;n++){ let c=n; for(let k=0;k<8;k++) c=c&1?0xEDB88320^(c>>>1):c>>>1; t[n]=c>>>0; } return t; })();
+function crc32(u8){ let c=0xFFFFFFFF; for(let i=0;i<u8.length;i++) c=CRC_T[(c^u8[i])&0xFF]^(c>>>8); return (c^0xFFFFFFFF)>>>0; }
+function makeZip(files){ // [{name, data:Uint8Array}] — ZIP sans compression, noms en UTF-8
+  const enc=new TextEncoder(), parts=[], central=[]; let offset=0; const dt=new Date();
+  const dTime=((dt.getHours()<<11)|(dt.getMinutes()<<5)|(dt.getSeconds()>>1))&0xFFFF, dDate=(((dt.getFullYear()-1980)<<9)|((dt.getMonth()+1)<<5)|dt.getDate())&0xFFFF;
+  for(const f of files){ const nm=enc.encode(f.name), crc=crc32(f.data), sz=f.data.length;
+    const lh=new DataView(new ArrayBuffer(30)); lh.setUint32(0,0x04034b50,true); lh.setUint16(4,20,true); lh.setUint16(6,0x0800,true); lh.setUint16(10,dTime,true); lh.setUint16(12,dDate,true); lh.setUint32(14,crc,true); lh.setUint32(18,sz,true); lh.setUint32(22,sz,true); lh.setUint16(26,nm.length,true);
+    parts.push(new Uint8Array(lh.buffer),nm,f.data);
+    const ch=new DataView(new ArrayBuffer(46)); ch.setUint32(0,0x02014b50,true); ch.setUint16(4,20,true); ch.setUint16(6,20,true); ch.setUint16(8,0x0800,true); ch.setUint16(12,dTime,true); ch.setUint16(14,dDate,true); ch.setUint32(16,crc,true); ch.setUint32(20,sz,true); ch.setUint32(24,sz,true); ch.setUint16(28,nm.length,true); ch.setUint32(42,offset,true);
+    central.push(new Uint8Array(ch.buffer),nm); offset+=30+nm.length+sz; }
+  const cd=central.reduce((a,b)=>a+b.length,0); const end=new DataView(new ArrayBuffer(22)); end.setUint32(0,0x06054b50,true); end.setUint16(8,files.length,true); end.setUint16(10,files.length,true); end.setUint32(12,cd,true); end.setUint32(16,offset,true);
+  return new Blob([...parts,...central,new Uint8Array(end.buffer)],{type:'application/zip'}); }
+const xmlEsc=t=>String(t??'').replace(/[<>&'"]/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;',"'":'&apos;','"':'&quot;'}[c]));
+async function blobBytes(b){ if(b.arrayBuffer) return new Uint8Array(await b.arrayBuffer()); return new Uint8Array(await new Response(b).arrayBuffer()); }
+async function buildLotZip(){ const s=selected, d=s.lot.replace(/\s/g,''), base=`lot-${d}`, enc=new TextEncoder(), out=[];
+  let ph=[]; try{ ph=await listPhotos(s.lot); }catch{}
+  const rows=[['fichier','titre','source','date','latitude','longitude','direction_deg']];
+  const feats=[{type:'Feature',properties:{type:'lot',no_lot:s.lot,municipalite:s.muni,mrc:s.mrc,superficie_pi2:Math.round(s.ha*107639.1),superficie_m2:Math.round(s.ha*10000),superficie_acres:+acres(s.ha).toFixed(2),superficie_ha:+s.ha.toFixed(3)},geometry:s.geom}];
+  const kmlP=[]; const ring=(s.geom.type==='Polygon'?s.geom.coordinates[0]:s.geom.coordinates[0][0]).map(c=>c.join(',')).join(' ');
+  kmlP.push(`<Placemark><name>Lot ${xmlEsc(s.lot)}</name><Style><LineStyle><color>ff1f5aff</color><width>3</width></LineStyle><PolyStyle><color>401f5aff</color></PolyStyle></Style><Polygon><outerBoundaryIs><LinearRing><coordinates>${ring}</coordinates></LinearRing></outerBoundaryIs></Polygon></Placemark>`);
+  for(const [i,p] of ph.entries()){ const dt=new Date(p.t); const nm=`photos/${String(i+1).padStart(2,'0')}-${dt.toISOString().slice(0,10)}${p.title?'-'+slug(p.title).slice(0,40):''}.jpg`;
+    out.push({name:`${base}/${nm}`,data:await blobBytes(p.blob)}); const h=p.heading!=null?Math.round(p.heading):'';
+    rows.push([nm,p.title||'',SRC_LABEL[p.src]||p.src||'',dt.toISOString(),p.lat??'',p.lng??'',h]);
+    if(p.lat!=null){ feats.push({type:'Feature',properties:{type:'photo',fichier:nm,titre:p.title||'',date:dt.toISOString(),direction_deg:h===''?null:h},geometry:{type:'Point',coordinates:[p.lng,p.lat]}});
+      kmlP.push(`<Placemark><name>${xmlEsc(p.title||'Photo '+(i+1))}</name><description>${xmlEsc(nm)}${h!==''?' · direction '+h+'°':''} · ${dt.toLocaleString('fr-CA')}</description>${h!==''?`<Style><IconStyle><heading>${h}</heading></IconStyle></Style>`:''}<Point><coordinates>${p.lng},${p.lat}</coordinates></Point></Placemark>`); } }
+  walks.filter(w=>w.pts?.some(([la,ln])=>inPoly([ln,la],s.geom))).forEach(w=>{ feats.push({type:'Feature',properties:{type:'marche',date:new Date(w.start).toISOString(),distance_m:w.dist},geometry:{type:'LineString',coordinates:w.pts.map(([la,ln])=>[ln,la])}});
+    kmlP.push(`<Placemark><name>Marche du ${new Date(w.start).toLocaleDateString('fr-CA')}</name><Style><LineStyle><color>ff4f7d2e</color><width>3</width></LineStyle></Style><LineString><coordinates>${w.pts.map(([la,ln])=>ln+','+la).join(' ')}</coordinates></LineString></Placemark>`); });
+  const kml=`<?xml version="1.0" encoding="UTF-8"?>\n<kml xmlns="http://www.opengis.net/kml/2.2"><Document><name>Lot ${xmlEsc(s.lot)} — ${xmlEsc(s.muni)}</name>${kmlP.join('')}</Document></kml>`;
+  const readme=[`LOT ${s.lot} — ${s.muni}${s.mrc?' (MRC '+s.mrc+')':''}`,'',`Superficie : ${fmt(s.ha*107639.1,0)} pi² · ${fmt(s.ha*10000,0)} m² · ${fmt(acres(s.ha),2)} acres · ${fmt(s.ha,2)} ha`,`Centre : ${s.lat.toFixed(6)}, ${s.lng.toFixed(6)}`,`Carte : https://www.google.com/maps?q=${s.lat.toFixed(6)},${s.lng.toFixed(6)}`,`Cadastre : ${CONFIG.infolot} (n° de lot ${s.lot})`,'',`Photos : ${ph.length} (voir photos.csv pour la position et la direction de chacune)`,'Contour du lot, photos et marches : lot.geojson et lot.kml (s\'ouvre dans Google Earth)','',`Exporté depuis lots.quebec le ${new Date().toLocaleString('fr-CA')}.`,'Données à titre indicatif, sans valeur légale. Ne contient ni nom ni coordonnées de propriétaire, ni notes personnelles.'].join('\r\n');
+  out.push({name:`${base}/LISEZMOI.txt`,data:enc.encode(readme)},{name:`${base}/photos.csv`,data:enc.encode('\ufeff'+rows.map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',')).join('\r\n'))},{name:`${base}/lot.geojson`,data:enc.encode(JSON.stringify({type:'FeatureCollection',features:feats}))},{name:`${base}/lot.kml`,data:enc.encode(kml)});
+  return {blob:makeZip(out),name:`${base}.zip`,photos:ph.length}; }
+$('btnShare').onclick=()=>{ if(!selected) return; $('shareTitle').textContent=`Partager le lot ${selected.lot}`; $('shareModal').hidden=false; log('share_open'); };
+$('shareClose').onclick=()=>{ $('shareModal').hidden=true; };
+$('shareModal').addEventListener('click',e=>{ if(e.target.id==='shareModal') $('shareModal').hidden=true; });
+$('shareZip').onclick=async()=>{ if(!selected) return; const b=$('shareZip'); b.disabled=true; b.textContent='Préparation…';
+  try{ const z=await buildLotZip(); const file=new File([z.blob],z.name,{type:'application/zip'}); log('share_zip',{photos:z.photos,kb:Math.round(z.blob.size/1024)});
+    if(navigator.canShare?.({files:[file]})){ try{ await navigator.share({files:[file],title:`Lot ${selected.lot}`}); }catch{} }
+    else { const a=document.createElement('a'); a.href=URL.createObjectURL(z.blob); a.download=z.name; a.click(); toast(`${z.name} téléchargé · ${z.photos} photo(s)`); }
+    $('shareModal').hidden=true; }
+  catch(e){ toast('Export impossible : '+e.message); log('share_error',{msg:String(e.message).slice(0,80)}); }
+  finally{ b.disabled=false; b.textContent='Exporter photos + GPS (.zip)'; } };
+$('premiumNotify').onclick=e=>{ e.preventDefault(); log('premium_interest',{feature:'share_link'}); location.href='mailto:bonjour@lots.quebec?subject='+encodeURIComponent('Prévenez-moi : lots Premium (partage de fiche)'); };
 
 /* ============================ Couches ============================ */
 let sat=store.get('terrain.sat',false);
