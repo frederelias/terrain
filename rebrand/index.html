@@ -639,6 +639,15 @@ body.walking .peek{bottom:calc(var(--sab) + 170px)}
 .hmthumb[aria-pressed="true"]{border-color:var(--act)}
 .hmthumb img{width:100%;height:100%;object-fit:cover;display:block}
 
+
+/* ---- R5 : coordonnées dans la fiche propriétaire, écriture dans la fiche du lot ---- */
+.ctsum{border:1px solid var(--line);border-radius:14px;background:var(--paper);padding:12px 14px;display:flex;flex-direction:column;gap:3px;font-size:15px;margin-bottom:8px}
+.ctsum b{font-size:16px} .ctsum .empty{color:var(--ink-2);font-size:14px;line-height:1.4}
+.ctedit{display:block;width:100%;min-height:48px;border-radius:12px;background:var(--field);color:var(--ink);font-weight:700;font-size:15px;margin:4px 0 10px;text-align:center}
+.opcoords textarea,.opcoords input{border:0;border-bottom:1.5px solid var(--line);border-radius:0;padding:6px 0;font-size:16px;min-height:44px;background:transparent;width:100%}
+.opcoords .row{display:flex;flex-direction:column;gap:6px}
+.ownerpage .ctedit{margin-top:10px}
+
 /* Éléments retirés de l'ancienne interface */
 .bottom,.mode,.mapbtn,.walkpill,.clearbtn,.legend{display:none !important}
 
@@ -817,12 +826,8 @@ body.walking .peek{bottom:calc(var(--sab) + 170px)}
     <details class="sec" id="secContact">
       <summary>Contacter <span class="c" id="secContactC"></span></summary>
       <div class="in">
-        <label class="fine" for="lotAddrPost">Adresse postale (du Registre ou du rôle)</label>
-        <textarea id="lotAddrPost" rows="2" placeholder="123, chemin du Lac, Ville (Québec) J0T 1A0"></textarea>
-        <div class="row" style="margin-top:8px">
-          <input class="f" id="lotEmail" type="email" placeholder="Courriel" autocomplete="off" aria-label="Courriel du propriétaire">
-          <input class="f" id="lotPhone" type="tel" placeholder="Cellulaire" autocomplete="off" aria-label="Cellulaire du propriétaire">
-        </div>
+        <div class="ctsum" id="ctSum"></div>
+        <button class="ctedit" id="ctToOwner">Ajouter les coordonnées du propriétaire →</button>
         <button class="primary" id="btnPrint">Imprimer la lettre (ou PDF)</button>
         <div class="links">
           <a id="btnMail" href="#" class="off">Courriel</a>
@@ -1019,11 +1024,20 @@ body.walking .peek{bottom:calc(var(--sab) + 170px)}
       <button class="prow" id="opWebBtn" aria-expanded="false"><span class="pic" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="6"/><path d="M20 20l-4-4"/></svg></span><span class="pt"><b>Recherche Web</b><span id="opWebBtnSub">À partir du nom saisi</span></span><span class="chev" aria-hidden="true">›</span></button>
     </div>
     <div id="opWeb" hidden></div>
+    <h3 class="chkh" id="opCoordsH">Coordonnées</h3>
+    <div class="opcard opcoords"><label for="lotAddrPost">Adresse postale</label>
+        <textarea id="lotAddrPost" rows="2" placeholder="123, chemin du Lac, Ville (Québec) J0T 1A0"></textarea>
+        <label for="lotEmail" style="margin-top:10px">Courriel et cellulaire, s'ils sont publics</label><div class="row">
+          <input class="f" id="lotEmail" type="email" placeholder="Courriel" autocomplete="off" aria-label="Courriel du propriétaire">
+          <input class="f" id="lotPhone" type="tel" placeholder="Cellulaire" autocomplete="off" aria-label="Cellulaire du propriétaire">
+        </div>
+        <p class="fine">L'adresse postale vient en général de l'acte au Registre foncier ou du rôle. Ne note que ce qui est public.</p></div>
     <h3 class="chkh">Prochaine action</h3>
     <div class="opcard"><label for="lotOStatus">Statut</label>
       <select id="lotOStatus"><option value="">À rechercher</option><option value="nom">Nom trouvé</option><option value="coord">Adresse ou coordonnées trouvées</option><option value="lettre">Lettre envoyée</option><option value="contacte">Contacté</option><option value="reponse">Réponse reçue</option><option value="refus">Pas intéressé</option></select>
       <label for="lotNextDate" style="margin-top:10px">Relancer ou faire le suivi le</label><input type="date" id="lotNextDate"></div>
     <button class="primary" id="opTask">Ajouter une tâche de suivi →</button>
+    <button class="ctedit" id="opWrite">Écrire au propriétaire → (lettre, courriel, texto)</button>
     <a class="opics" id="opIcs" href="#" hidden>Ajouter aussi à mon agenda (.ics)</a>
     <p class="fine" style="text-align:center">Aucune prise de contact automatique.</p>
   </div>
@@ -1052,7 +1066,7 @@ body.walking .peek{bottom:calc(var(--sab) + 170px)}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script>
 /* ============================ CONFIG ============================ */
-const APP_VERSION='R4';
+const APP_VERSION='R5';
 const CONFIG = {
   ringFraction: 0.70, maxRadius: 1500, coneLength: 150, coneHalfAngle: 25,
   cadastre: 'https://geo.environnement.gouv.qc.ca/donnees/rest/services/Reference/Cadastre_allege/MapServer',
@@ -1216,7 +1230,14 @@ function openOwnerPage(){ if(!selected) return; const ro=selected.roleOwner, cur
   const u=$('opUseRole'); if(u) u.onclick=()=>{ $('lotOwner').value=ro; $('lotOwner').dispatchEvent(new Event('input')); $('opRole').hidden=true; if(!$('lotOStatus').value){ $('lotOStatus').value='nom'; } saveNow(); };
   $('opWeb').hidden=!cur; $('opWebBtn').setAttribute('aria-expanded',!!cur); $('opWebBtnSub').textContent=cur?'Google, Canada411, Facebook, LinkedIn, registres…':'Inscris d\'abord le nom ci-dessus';
   $('ownerPage').hidden=false; log('owner_page'); }
-$('opBack').onclick=()=>{ $('ownerPage').hidden=true; flushSave(); renderSummary(); };
+function renderContactSummary(){ if(!selected) return; const n=$('lotOwner').value.trim(), a=$('lotAddrPost').value.trim(), e=$('lotEmail').value.trim(), t=$('lotPhone').value.trim();
+  const box=$('ctSum'); const any=a||e||t;
+  box.innerHTML=any?`<b>${esc(n||'Propriétaire')}</b>${a?`<span>${esc(a).replace(/\n/g,'<br>')}</span>`:''}${e?`<span>${esc(e)}</span>`:''}${t?`<span>${esc(t)}</span>`:''}`:`<span class="empty">${n?`Aucune coordonnée pour ${esc(n)}.`:'Propriétaire et coordonnées pas encore trouvés.'} La lettre peut tout de même être préparée, sans adresse.</span>`;
+  $('ctToOwner').textContent=any?'Modifier dans la fiche propriétaire →':(n?'Ajouter ses coordonnées →':'Trouver le propriétaire et ses coordonnées →'); }
+$('ctToOwner').onclick=()=>{ openOwnerPage(); setTimeout(()=>{ const h=$('opCoordsH'); h.scrollIntoView?.({block:'start'}); if(!$('lotAddrPost').value.trim()) $('lotAddrPost').focus(); },120); log('btn',{id:'ctToOwner'}); };
+$('opWrite').onclick=()=>{ $('ownerPage').hidden=true; flushSave(); renderSummary(); renderContactSummary(); const sec=$('secContact'); sec.open=true; setTimeout(()=>sec.scrollIntoView?.({behavior:'smooth',block:'start'}),150); log('btn',{id:'opWrite'}); };
+['lotAddrPost','lotEmail','lotPhone','lotOwner'].forEach(id=>$(id).addEventListener('input',()=>{ renderContactSummary(); if(id!=='lotOwner'&&$(id).value.trim()&&['','nom'].includes($('lotOStatus').value)) $('lotOStatus').value='coord'; }));
+$('opBack').onclick=()=>{ $('ownerPage').hidden=true; flushSave(); renderSummary(); renderContactSummary(); };
 $('gOwner').onclick=openOwnerPage;
 $('opWebBtn').onclick=()=>{ const open=$('opWeb').hidden; $('opWeb').hidden=!open; $('opWebBtn').setAttribute('aria-expanded',open); if(open&&!$('lotOwner').value.trim()) $('lotOwner').focus(); };
 $('lotOwner').addEventListener('input',()=>{ const has=!!$('lotOwner').value.trim(); $('opWebBtnSub').textContent=has?'Google, Canada411, Facebook, LinkedIn, registres…':'Inscris d\'abord le nom ci-dessus'; if(has&&!$('lotOStatus').value){ $('lotOStatus').value='nom'; } });
@@ -1450,7 +1471,7 @@ async function openLot(f,m){
   $('lotOwner').value=saved?.owner||''; $('lotEmail').value=saved?.email||''; $('lotPhone').value=saved?.phone||''; $('lotAddrPost').value=saved?.addrPost||''; $('lotNote').value=saved?.note||'';
   heroId=saved?.heroId||null; heroNext=false; $('lotOStatus').value=saved?.ownerStatus||''; $('lotNextDate').value=saved?.nextDate||''; $('opIcs').hidden=!saved?.nextDate; $('lotVisited').checked=!!saved?.visited; $('lotContacted').checked=!!(saved?.tags||[]).includes('c'); setFav(!!saved?.fav);
   syncCentris(saved?.centris||'',saved?.centrisInfo||null); loading=false;
-  renderSummary(); ownerLinks(); contactLinks(); updateFicheState(); renderThumbs(no); renderAdsLot();
+  renderSummary(); ownerLinks(); contactLinks(); renderContactSummary(); updateFicheState(); renderThumbs(no); renderAdsLot();
   $('secExplore').open=false; $('secOwner').open=false; $('secContact').open=!!saved?.owner&&!(saved?.tags||[]).includes('c');
   loadRole(no,f.geometry,m); loadOpenRole(no,m);
   show(sheets.lot); tip('fiche','♥ Garder ajoute ce lot au journal. Tout ce que tu écris ici s\'enregistre tout seul.');
@@ -1617,7 +1638,7 @@ $('btnPrint').onclick=()=>{ if(!selected) return; const to=[$('lotOwner').value.
   let w=null; try{ w=window.open('','_blank'); }catch{}
   if(w){ w.document.open(); w.document.write(html); w.document.close(); }
   else { const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([html],{type:'text/html'})); a.download=`lettre-lot-${selected.lot.replace(/\s/g,'')}.html`; a.click(); toast('Lettre téléchargée — ouvre-la pour l\'imprimer'); }
-  log('btn',{id:'print'}); if(!$('lotContacted').checked) setTimeout(()=>{ if(selected&&confirm('Marquer ce propriétaire comme contacté ?')){ $('lotContacted').checked=true; saveNow(); } },1500); };
+  log('btn',{id:'print'}); if(!['lettre','contacte','reponse','refus'].includes($('lotOStatus').value)) setTimeout(()=>{ if(selected&&confirm('Lettre envoyée ? Le statut passera à « Lettre envoyée » et une relance sera prévue dans 21 jours.')){ $('lotOStatus').value='lettre'; $('lotContacted').checked=true; if(!$('lotNextDate').value) $('lotNextDate').value=new Date(Date.now()+21*864e5).toISOString().slice(0,10); saveNow(); renderSummary(); } },1500); };
 
 /* ============================ Carnet ============================ */
 let favOnly=store.get('terrain.favOnly',false);

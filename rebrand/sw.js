@@ -1,6 +1,6 @@
 // LOTS — Terre de rang (/rebrand/). Coquille hors ligne propre à ce dossier :
 // ne touche jamais au cache de l'app d'origine.
-const CACHE = 'lots-rebrand-R4';
+const CACHE = 'lots-rebrand-R5';
 const SHELL = ['./', './index.html', './manifest.webmanifest', './brand/enseigne-360.png', './brand/enseigne-800.png', './brand/paysage.jpg',
   './icon-192.png', './favicon-32.png', './confidentialite.html',
   'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js', 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css'];
