@@ -1,0 +1,1646 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta name="robots" content="noindex">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="theme-color" content="#1F3D2B">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="lots">
+<title>lots — à qui appartient cette terre ?</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="canonical" href="https://lots.quebec/">
+<meta name="description" content="Dans le bois, devant une terre qui dort : touche la carte et vois le lot, sa superficie, son évaluation et comment joindre son propriétaire. Partout au Québec.">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="lots">
+<meta property="og:locale" content="fr_CA">
+<meta property="og:url" content="https://lots.quebec/">
+<meta property="og:title" content="lots — à qui appartient cette terre ?">
+<meta property="og:description" content="Lots du cadastre, rôle d'évaluation, propriétaire, annonces : partout au Québec, dans ton téléphone. Gratuit, rien n'est envoyé.">
+<meta property="og:image" content="https://lots.quebec/og.png">
+<meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@500;700&display=swap">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<style>
+:root{
+  --bark:#1F3D2B; --moss:#4C6B4A; --field:#E9EDE4; --paper:#FFFFFF; --boot:#E0A422;
+  --ink:#17201A; --ink-2:#5A665C; --line:#C9D1C4; --ok:#2E7D4F; --warn:#B4541E; --gps:#1E6FD9;
+  --sat:env(safe-area-inset-top,0px); --sab:env(safe-area-inset-bottom,0px);
+  font-family:"Atkinson Hyperlegible",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;width:100%;margin:0;background:var(--field);color:var(--ink);overflow:hidden;overflow-x:hidden;position:relative}
+button{font:inherit;cursor:pointer;border:0;background:none;color:inherit}
+
+#map{position:fixed;inset:0;background:#DDE3D6}
+.leaflet-container{font-family:inherit}
+.leaflet-control-attribution{font-size:9px;opacity:.75}
+.leaflet-control-zoom{display:none}
+
+/* Barre haute */
+.topbar{position:fixed;top:0;left:0;right:0;z-index:1000;padding:calc(var(--sat) + 8px) 10px 8px;background:var(--bark);color:#fff;display:flex;align-items:center;gap:6px;flex-wrap:nowrap;overflow:hidden;max-width:100vw;box-sizing:border-box}
+.topbar h1{font-size:18px;font-weight:700;margin:0;flex:1 1 auto;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.topbar h1 small{font-weight:400;opacity:.7;font-size:13px;margin-left:6px}
+.chip{flex:none;padding:0 10px;border-radius:999px;font-size:13px;font-weight:700;background:rgba(255,255,255,.12);color:#fff;border:1px solid rgba(255,255,255,.25);min-height:40px;min-width:40px;display:inline-flex;align-items:center;justify-content:center;white-space:nowrap}
+.chip.rec{background:#C62828;color:#fff;border-color:#C62828;animation:pulse 1s infinite}
+@keyframes pulse{50%{opacity:.55}}
+.chip[aria-pressed="true"]{background:var(--boot);color:var(--ink);border-color:var(--boot)}
+.chip svg{width:18px;height:18px;vertical-align:-4px}
+
+/* Recherche */
+.search{position:fixed;left:0;right:0;z-index:1001;top:calc(var(--sat) + 56px);padding:8px 12px;background:var(--bark);display:none;gap:8px}
+.search.open{display:flex}
+.search input{flex:1;font:inherit;font-size:16px;padding:10px 12px;border-radius:12px;border:0}
+.search button{background:var(--boot);color:var(--ink);font-weight:700;border-radius:12px;padding:0 14px}
+
+/* Viseur central + anneau de scan */
+.pin{position:fixed;left:50%;top:50%;z-index:900;pointer-events:none;transform:translate(-50%,-100%)}
+.pin svg{width:34px;height:44px;filter:drop-shadow(0 2px 3px rgba(0,0,0,.35))}
+.ring{position:fixed;left:50%;top:50%;z-index:890;pointer-events:none;transform:translate(-50%,-50%);border:2px dashed var(--boot);border-radius:50%;box-shadow:0 0 0 2px rgba(255,255,255,.6) inset}
+.ring span{position:absolute;left:50%;transform:translateX(-50%);bottom:-28px;background:var(--bark);color:#fff;font-size:12px;font-weight:700;padding:3px 8px;border-radius:999px;white-space:nowrap}
+
+.mapbtn{position:fixed;right:12px;top:calc(var(--sat) + 136px);z-index:1000;width:56px;height:56px;border-radius:50%;background:#B3261E;color:#fff;font-weight:700;font-size:22px;box-shadow:0 2px 0 #5A120C}
+/* Boussole */
+.compass{position:fixed;right:12px;top:calc(var(--sat) + 64px);z-index:1000;width:56px;height:56px;border-radius:50%;background:var(--paper);box-shadow:0 4px 14px rgba(23,32,26,.18);display:flex;align-items:center;justify-content:center}
+.compass svg{width:44px;height:44px;transition:transform .12s linear}
+.compass .deg{position:absolute;bottom:-18px;left:50%;transform:translateX(-50%);font-size:11px;font-weight:700;color:var(--bark);white-space:nowrap}
+.compass.off svg{opacity:.35}
+
+.mode{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(var(--sab) + 108px);z-index:1000;display:flex;background:var(--paper);border-radius:999px;padding:4px;box-shadow:0 4px 14px rgba(23,32,26,.18)}
+.mode button{min-width:52px;padding:0 14px;border-radius:999px;font-weight:700;font-size:17px;line-height:1;color:var(--ink-2);min-height:40px}
+.mode #modeFav[aria-pressed="true"]{background:#C62828}
+.mode button[aria-pressed="true"]{background:var(--bark);color:#fff}
+.ring.hidden{display:none}
+/* Boutons bas */
+.bottom{position:fixed;left:0;right:0;bottom:calc(var(--sab) + 18px);z-index:1000;display:flex;align-items:center;justify-content:center;gap:12px;padding:0 12px;pointer-events:none}
+.bottom>*{pointer-events:auto}
+.round{width:56px;height:56px;border-radius:50%;background:var(--paper);color:var(--gps);box-shadow:0 6px 18px rgba(23,32,26,.22);display:flex;align-items:center;justify-content:center}
+.round svg{width:26px;height:26px}
+.round.carnet{color:var(--bark);position:relative;font-size:11px;font-weight:700;flex-direction:column;gap:1px}
+.round.carnet svg{width:20px;height:20px}
+.count{position:absolute;top:-4px;right:-4px;background:var(--bark);color:#fff;border-radius:999px;min-width:20px;height:20px;font-size:11px;line-height:20px;text-align:center;padding:0 5px}
+.scan{
+  width:78px;height:78px;border-radius:50%;padding:0;position:relative;
+  background:
+    repeating-conic-gradient(from 0deg, #2A4D39 0deg 4deg, #152B20 4deg 8deg);
+  box-shadow:0 10px 22px rgba(23,32,26,.38), 0 2px 0 #0E1C14, inset 0 1px 0 rgba(255,255,255,.18);
+  transition:transform .08s ease, box-shadow .08s ease;
+}
+.scan .face{
+  position:absolute;inset:7px;border-radius:50%;
+  background:radial-gradient(circle at 35% 30%, #4C6B4A 0%, #1F3D2B 55%, #132A1E 100%);
+  box-shadow:inset 0 2px 3px rgba(255,255,255,.22), inset 0 -3px 6px rgba(0,0,0,.45), 0 1px 0 rgba(255,255,255,.08);
+  display:flex;align-items:center;justify-content:center;color:var(--boot);
+}
+.scan .face svg{width:34px;height:34px;filter:drop-shadow(0 1px 1px rgba(0,0,0,.5))}
+.scan:active, .scan.down{transform:translateY(3px);box-shadow:0 5px 12px rgba(23,32,26,.38), 0 0 0 #0E1C14, inset 0 1px 0 rgba(255,255,255,.1)}
+.scan:active .face, .scan.down .face{box-shadow:inset 0 3px 6px rgba(0,0,0,.55), inset 0 -1px 2px rgba(255,255,255,.1)}
+.scan.busy .face svg{animation:spin .9s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.scan[disabled]{opacity:.9}
+
+.round.walk{color:#fff}
+.round.walk[aria-pressed="true"]{background:#2E7D4F}
+.aim{position:fixed;inset:0;z-index:1400;background:var(--paper,#F7F6F2);color:var(--ink,#141A16);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:24px;text-align:center}
+.aim[hidden]{display:none}
+.aim .dial{position:relative;width:220px;height:220px} .aim .dial svg{width:100%;height:100%} .aim .dial #aimRose{transform-origin:60px 60px;transition:transform .12s linear}
+.aim .dial b{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:"JetBrains Mono",ui-monospace,monospace;font-size:34px;padding-top:40px}
+.aim h2{margin:0;font-size:22px} .aim p{margin:0;max-width:320px;line-height:1.4;color:var(--ink-2,#5C6B62)}
+.aim .fix{min-height:60px;padding:0 28px;border-radius:30px;background:#FF5A1F;color:#141A16;font-size:18px;font-weight:700;box-shadow:0 3px 0 #0B110D}
+.aim .cancel{color:var(--ink-2,#5C6B62);font-weight:700;min-height:44px}
+.step{width:10px;height:16px;border-radius:50% 50% 45% 45%;background:#2E7D4F;opacity:.75;box-shadow:0 0 0 1px #fff}
+.pov{width:30px;height:30px;position:relative}
+.pov .cone{position:absolute;left:15px;top:15px;width:0;height:0;border-left:11px solid transparent;border-right:11px solid transparent;border-bottom:26px solid rgba(255,90,31,.45);transform-origin:0 0;margin-left:-11px}
+.pov .dot{position:absolute;left:9px;top:9px;width:12px;height:12px;border-radius:50%;background:#FF5A1F;border:2px solid #fff;box-shadow:0 0 0 1.5px #141A16}
+.snap{position:fixed;inset:0;z-index:1450;background:#000;color:#fff}
+.snap[hidden]{display:none}
+.snap video,.snap .snapFake{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transform-origin:center;transition:transform .08s}
+.snap .snapFake svg{width:100%;height:100%} .snap .snapFake[hidden]{display:none}
+.snapTop{position:absolute;top:calc(var(--sat) + 10px);left:12px;right:12px;display:flex;gap:8px;align-items:center}
+.snapTop .hd{flex:1;font-family:"JetBrains Mono",ui-monospace,monospace;font-size:18px;font-weight:700;background:rgba(0,0,0,.45);padding:8px 12px;border-radius:999px;width:max-content;flex:none}
+.snapTop button{width:44px;height:44px;border-radius:50%;background:rgba(0,0,0,.45);color:#fff;font-size:20px}
+.snapTop button[aria-pressed="true"]{background:#FF5A1F;color:#141A16}
+.snapTop #snapCancel{margin-left:auto}
+.snapZoom{position:absolute;left:16px;right:16px;bottom:calc(var(--sab) + 130px);display:flex;gap:8px;align-items:center}
+.snapZoom button{min-width:44px;height:36px;border-radius:999px;background:rgba(0,0,0,.45);color:#fff;font-family:"JetBrains Mono",ui-monospace,monospace;font-weight:700}
+.snapZoom button[aria-pressed="true"]{background:#fff;color:#141A16}
+.snapZoom input{flex:1;accent-color:#FF5A1F}
+.snap .shutter{position:absolute;left:50%;transform:translateX(-50%);bottom:calc(var(--sab) + 28px);width:86px;height:86px}
+.snap .shutter .face{inset:9px;background:radial-gradient(circle at 38% 32%,#fff 0%,#E6E6E6 60%,#BDBDBD 100%)}
+.snap .shutter:active{transform:translateX(-50%) translateY(3px)}
+.aim .flat{font-family:"JetBrains Mono",ui-monospace,monospace;font-size:13px;padding:6px 12px;border-radius:999px;background:var(--field,#ECEDE8);color:var(--ink-2,#5C6B62)}
+.aim .flat.ok{background:#E3EFE6;color:#2E7D4F}
+.aim{gap:10px}
+.aim .aimArt{position:relative;width:200px;height:200px}
+.aim .aimArt svg{position:absolute;inset:0;width:100%;height:100%}
+.aim .aimArt .phone{color:var(--ink-2,#5C6B62)} .aim .aimArt .ph{transform-origin:100px 150px;animation:layflat 2.4s ease-in-out infinite}
+@keyframes layflat{0%,15%{transform:none}45%,100%{transform:perspective(300px) rotateX(70deg)}}
+.aim .aimArt .arrow{opacity:0;animation:arrowgo 2.4s ease-in-out infinite}
+@keyframes arrowgo{0%,45%{opacity:0;transform:translateY(16px)}60%{opacity:1;transform:translateY(0)}85%{opacity:1;transform:translateY(-8px)}100%{opacity:0;transform:translateY(-8px)}}
+.aim h2{font-size:24px}
+.aim .dial{width:140px;height:140px} .aim .dial b{font-size:24px;padding-top:28px}
+@media (prefers-reduced-motion:reduce){.aim .aimArt .ph,.aim .aimArt .arrow{animation:none}.aim .aimArt .arrow{opacity:1}.aim .aimArt .ph{transform:perspective(300px) rotateX(70deg)}}
+.bottom{gap:10px;max-width:100vw;box-sizing:border-box}
+@media (max-width:380px){.bottom{gap:6px;padding:0 8px}.round{width:50px;height:50px}.scan{width:72px;height:72px}}
+.round.walk{position:relative;color:var(--bark)}
+.round.walk .pz{display:none;position:absolute;inset:0;align-items:center;justify-content:center;font-size:15px;font-weight:700;color:#fff;background:rgba(0,0,0,.35);border-radius:50%}
+.round.walk[aria-pressed="true"]{background:#2E7D4F;color:#fff}
+.round.walk.moving .go .l{animation:stepL .5s steps(1) 3} .round.walk.moving .go .r{animation:stepR .5s steps(1) 3}
+@keyframes stepL{0%,49%{opacity:1}50%,100%{opacity:.35}} @keyframes stepR{0%,49%{opacity:.35}50%,100%{opacity:1}}
+.round.walk.paused .pz{display:flex}
+.walkpill{position:fixed;left:12px;top:calc(var(--sat) + 64px);z-index:1000;display:flex;align-items:center;gap:10px;background:#B3261E;color:#fff;border-radius:999px;padding:0 16px 0 12px;min-height:44px;box-shadow:0 2px 0 #5A120C}
+.walkpill[hidden]{display:none}
+.walkpill .sq{width:14px;height:14px;border-radius:3px;background:#fff}
+.walkpill b{font-family:"JetBrains Mono",ui-monospace,monospace;font-size:15px}
+.walkpill.paused{background:#5C6B62;box-shadow:0 2px 0 #2E3733}
+.round.carnet svg{width:26px;height:26px}
+.intro{position:fixed;inset:0;z-index:1500;background:var(--paper,#F7F6F2);color:var(--ink,#141A16);display:flex;flex-direction:column}
+.intro[hidden]{display:none}
+.slides{flex:1;display:flex;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.slides::-webkit-scrollbar{display:none}
+.slides article{flex:0 0 100%;scroll-snap-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:calc(var(--sat) + 24px) 28px 20px;text-align:center;gap:14px}
+.slides .ill{width:170px;height:170px} .slides .ill svg{width:100%;height:100%}
+.slides h2{margin:0;font-size:24px;line-height:1.15}
+.slides p{margin:0;font-size:16px;line-height:1.5;color:var(--ink-2,#5C6B62);max-width:340px}
+.introBar{display:flex;align-items:center;gap:12px;padding:12px 16px calc(var(--sab) + 16px)}
+.introBar button{min-height:50px;padding:0 20px;border-radius:12px;font-weight:700;font-size:16px;color:var(--ink-2,#5C6B62)}
+.introBar .main{background:#FF5A1F;color:#141A16;box-shadow:0 3px 0 #0B110D;margin-left:auto;min-width:130px}
+.slides article.setup{justify-content:flex-start;gap:10px;overflow-y:auto}
+.perm{display:flex;flex-direction:column;gap:8px;width:100%;max-width:380px}
+.perm button{display:grid;grid-template-columns:1fr auto;grid-template-rows:auto auto;text-align:left;gap:2px 10px;padding:12px 14px;border-radius:12px;background:var(--field,#ECEDE8);color:var(--ink,#141A16);border:1.5px solid var(--line,#D6D9D2);min-height:60px}
+.perm button b{font-size:15px} .perm button span{grid-column:1;font-size:12.5px;color:var(--ink-2,#5C6B62);line-height:1.35}
+.perm button i{grid-row:1/3;grid-column:2;align-self:center;font-style:normal;font-weight:700;font-size:13px;padding:6px 10px;border-radius:999px;background:#FF5A1F;color:#141A16}
+.perm button i::before{content:"Autoriser"} .perm button[data-p="install"] i::before{content:"Installer"}
+.perm button.ok i{background:#E3EFE6;color:#2E7D4F} .perm button.ok i::before{content:"✓"}
+.perm button.no i{background:#F8E3E0;color:#B3261E} .perm button.no i::before{content:"Refusé"}
+.perm button.na{opacity:.55} .perm button.na i::before{content:"—"} .perm button.na i{background:transparent;color:var(--ink-2)}
+.slides p.fine{font-size:12.5px;max-width:380px}
+.nomore{display:flex;align-items:center;gap:8px;font-size:14px;color:var(--ink-2,#5C6B62);min-height:44px} .nomore input{width:20px;height:20px}
+.dots{display:flex;gap:6px} .dots i{width:8px;height:8px;border-radius:50%;background:var(--line,#D6D9D2)} .dots i.on{background:var(--ink,#141A16)}
+.role{background:var(--field);border-radius:12px;padding:12px 14px;margin:0 0 14px}
+.role h4{margin:0 0 8px;font-size:12px;letter-spacing:.3px;text-transform:uppercase;color:var(--ink-2)}
+.role .own{font-size:20px;font-weight:700;line-height:1.2}
+.role .sub{font-size:13px;color:var(--ink-2);margin:2px 0 10px}
+.role dl{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;margin:0 0 10px;font-size:14px} .role dt{color:var(--ink-2)} .role dd{margin:0;text-align:right;font-variant-numeric:tabular-nums}
+.role button{min-height:44px;width:100%;border-radius:10px;font-weight:700;background:var(--bark);color:#fff}
+.role .muted{font-size:13px;color:var(--ink-2)}
+.role .use{font-size:18px;font-weight:700;line-height:1.2}
+.role .tags{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 10px}
+.role .tags span{font-size:12px;font-weight:700;padding:4px 8px;border-radius:999px;background:var(--paper);border:1px solid var(--line)}
+.role .tags span.hot{background:#FFF1CF;border-color:#E0A422;color:#7A5300}
+.role .src{font-size:11px;color:var(--ink-2);margin-top:6px}
+/* Feuilles */
+.sheet{position:fixed;left:0;right:0;bottom:0;z-index:1100;background:var(--paper);border-radius:18px 18px 0 0;box-shadow:0 -10px 40px rgba(23,32,26,.22);max-height:78vh;display:flex;flex-direction:column;transform:translateY(105%);transition:transform .22s ease;padding-bottom:var(--sab)}
+.sheet.open{transform:translateY(0)}
+.sheet .grip{width:44px;height:5px;border-radius:3px;background:var(--line);margin:10px auto 4px}
+.sheet header{display:flex;align-items:flex-start;gap:10px;padding:6px 18px 10px;border-bottom:1px solid var(--line)}
+.sheet header .t{flex:1;min-width:0}
+.sheet header h2{margin:0;font-size:24px;line-height:1.1;font-weight:700;word-break:break-word}
+.sheet header p{margin:4px 0 0;color:var(--ink-2);font-size:14px}
+.close{width:40px;height:40px;border-radius:12px;background:var(--field);font-size:20px;flex:none}
+.close.heart{color:#B8BFB5;font-size:22px} .close.heart[aria-pressed="true"]{color:#C62828;background:#FBE9DE}
+.sheet .body{overflow:auto;padding:12px 18px 18px;-webkit-overflow-scrolling:touch}
+.facts{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:0 0 14px}
+.fact{background:var(--field);border-radius:12px;padding:10px 12px}
+.fact b{display:block;font-size:19px;line-height:1.15}
+.fact span{font-size:12px;color:var(--ink-2)}
+.fact.wide{grid-column:1/-1}
+.fact.bad{background:#FBE9DE;color:var(--warn)} .fact.good{background:#E2F1E7;color:var(--ok)}
+.actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
+.actions a,.actions button{display:flex;align-items:center;justify-content:center;gap:6px;text-align:center;min-height:50px;padding:8px 10px;border-radius:12px;font-weight:700;font-size:15px;background:var(--bark);color:#fff;text-decoration:none}
+.actions .quiet{background:var(--field);color:var(--bark)} .actions .wide{grid-column:1/-1}
+.sheet h3{font-size:14px;margin:14px 0 6px;color:var(--ink-2);font-weight:700}
+textarea,select,input.f{width:100%;font:inherit;font-size:16px;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:var(--paper);color:var(--ink)}
+textarea{min-height:72px;resize:vertical}
+.row{display:flex;gap:8px;align-items:center} .row>*{flex:1}
+.list{list-style:none;margin:0;padding:0}
+.list li{display:flex;gap:10px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line)}
+.list li .t{flex:1;min-width:0} .list li b{display:block;font-size:17px} .list li span{font-size:13px;color:var(--ink-2);display:block}
+.list li .selbox{width:24px;height:24px;flex:none;accent-color:#B3261E}
+.list li .st{font-size:12px;font-weight:700;padding:4px 8px;border-radius:999px;background:var(--field);color:var(--bark);white-space:nowrap}
+.list li .st.r{background:#E3ECF8;color:#1E4F8F} .list li .st.i{background:#FFF1CF;color:#7A5300} .list li .st.c{background:#E2F1E7;color:var(--ok)}
+.empty{color:var(--ink-2);padding:16px 0;text-align:center;line-height:1.4}
+.toast{position:fixed;left:50%;transform:translateX(-50%);top:calc(var(--sat) + 68px);z-index:1200;background:var(--ink);color:#fff;padding:10px 16px;border-radius:12px;font-size:14px;opacity:0;transition:opacity .2s;pointer-events:none;max-width:88vw;text-align:center}
+.toast.show{opacity:1}
+
+.spin{width:30px;height:30px;border-radius:50%;background:#fff;border:3px solid var(--c);color:var(--c);box-shadow:0 2px 5px rgba(0,0,0,.4);display:flex;align-items:center;justify-content:center;box-sizing:border-box}
+.spin.sq{width:26px;height:26px;border-radius:7px;border-width:2.5px}
+.lgk{display:inline-flex;vertical-align:-6px;margin-right:6px}
+.lgk .spin{width:24px;height:24px;border-width:2.5px;box-shadow:none} .lgk .spin.sq{width:22px;height:22px}
+.lg span{display:inline-flex;align-items:center}
+.saved-pin{width:16px;height:16px;border-radius:50%;background:#2E7D4F;border:2.5px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.45)}
+.switch{display:flex;align-items:center;gap:10px;cursor:pointer;user-select:none;min-height:44px}
+.switch input{position:absolute;opacity:0;width:0;height:0}
+.switch .track{width:52px;height:30px;border-radius:999px;background:#C9D1C4;position:relative;transition:background .15s;flex:none}
+.switch .track::after{content:"";position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.3);transition:transform .15s}
+.switch input:checked+.track{background:#2E7D4F}
+.switch input:checked+.track::after{transform:translateX(22px)}
+.switch .lbl{font-weight:700;font-size:16px}
+.mode.inline{position:static;transform:none;box-shadow:none;background:var(--field);margin:0 0 8px;width:max-content}
+.mode.inline button{width:auto;padding:0 16px;font-size:14px}
+.sources{display:flex;flex-direction:column;gap:8px;margin-bottom:14px}
+.src{display:grid;grid-template-columns:1fr 50px;gap:8px;align-items:center}
+.src a{display:flex;align-items:center;min-height:50px;padding:8px 14px;border-radius:12px;font-weight:700;font-size:15px;background:var(--bark);color:#fff;text-decoration:none}
+.src.muni{grid-template-columns:1fr 1fr 50px}
+.src.centris a{background:#C62828}
+.src .centris-url{font-size:12px;color:var(--ink-2);word-break:break-all;display:flex;gap:8px;align-items:center}
+.src .centris-url:empty{display:none}
+.src .centris-url button{color:#C62828;font-weight:700;font-size:12px;flex:none}
+.centrisData{grid-column:1/-1} .centrisData[hidden]{display:none}
+.src .doc{position:relative;width:50px;height:50px;border-radius:12px;background:var(--field);color:var(--bark);display:flex;align-items:center;justify-content:center}
+.src .doc svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.src .doc .n{position:absolute;top:-6px;right:-6px;background:var(--boot);color:var(--ink);border-radius:999px;min-width:20px;height:20px;font-size:11px;line-height:20px;text-align:center;padding:0 5px}
+.src .st{grid-column:1/-1;display:flex;gap:6px;flex-wrap:wrap}
+.src .st:empty{display:none}
+.src .st img{width:48px;height:48px;object-fit:cover;border-radius:8px;border:1.5px solid var(--line)}
+.photos{display:flex;gap:12px;align-items:flex-start;margin-bottom:14px}
+.scan.cam{width:64px;height:64px;flex:none}
+.scan.cam .face{inset:6px} .scan.cam .face svg{width:28px;height:28px}
+.thumbs{display:flex;gap:8px;flex-wrap:wrap;flex:1;min-height:64px;align-items:center}
+.thumbs img{width:64px;height:64px;object-fit:cover;border-radius:10px;border:1.5px solid var(--line);background:var(--field)}
+.thumbs .hint{font-size:13px;color:var(--ink-2)}
+.viewer{position:fixed;inset:0;z-index:1300;background:rgba(0,0,0,.92);display:flex;align-items:center;justify-content:center}
+.viewer[hidden]{display:none}
+.viewer .vtitle{position:absolute;left:12px;right:12px;bottom:calc(var(--sab) + 80px);display:flex;gap:8px}
+.viewer .vtitle input{flex:1;font:inherit;font-size:16px;padding:12px 14px;border-radius:12px;border:0;background:rgba(255,255,255,.12);color:#fff}
+.viewer .vtitle input::placeholder{color:rgba(255,255,255,.55)}
+.viewer .vtitle button{background:#fff;color:#141A16;font-weight:700;border-radius:12px;padding:0 16px;min-height:44px}
+
+.viewer img{max-width:100%;max-height:100%;object-fit:contain}
+.viewer .close{position:absolute;top:calc(var(--sat) + 12px);right:12px;background:rgba(255,255,255,.15);color:#fff}
+.viewer .del{position:absolute;bottom:calc(var(--sab) + 20px);left:50%;transform:translateX(-50%);background:#C62828;color:#fff;font-weight:700;padding:12px 22px;border-radius:12px}
+.sendrow{display:flex;gap:8px;margin-bottom:14px}
+.sendrow .send{flex:1;display:flex;align-items:center;justify-content:center;min-height:50px;border-radius:12px;font-weight:700;font-size:15px;background:var(--bark);color:#fff;text-decoration:none}
+.sendrow .send.disabled{opacity:.4;pointer-events:none}
+.sendrow .copyico{width:50px;height:50px;border-radius:12px;background:var(--field);color:var(--bark);display:flex;align-items:center;justify-content:center;flex:none}
+.sendrow .copyico svg{width:22px;height:22px}
+.stchips{display:flex;flex-wrap:wrap;gap:8px}
+.stchips button{display:flex;align-items:center;gap:6px;padding:8px 12px;border-radius:999px;border:1.5px solid var(--line);font-weight:700;font-size:14px;min-height:40px;background:var(--paper);color:var(--ink)}
+.stchips button i{width:12px;height:12px;border-radius:50%;display:inline-block}
+.stchips button[aria-pressed="true"]{border-color:var(--bark);background:var(--field)}
+.legend i.round{border-radius:50%;border:2px solid #fff;box-shadow:0 0 0 1px var(--line)}
+.actions a.disabled{opacity:.4;pointer-events:none}
+.saved-label{font-size:12px;line-height:1.25;background:rgba(255,255,255,.88);border-radius:8px;padding:4px 7px;border:1px solid var(--line);text-shadow:none}
+.leaflet-popup-content-wrapper{border-radius:12px;font-family:inherit} .leaflet-popup-content{margin:12px 14px}
+.lot-label{font-weight:700;font-size:11px;color:var(--bark);text-shadow:0 0 3px #fff,0 0 3px #fff;white-space:nowrap}
+.me{width:16px;height:16px;border-radius:50%;background:var(--gps);border:3px solid #fff;box-shadow:0 0 0 5px rgba(30,111,217,.25)}
+.clearbtn{position:fixed;left:12px;bottom:calc(var(--sab) + 248px);z-index:1000;background:var(--paper,#fff);color:var(--ink);border:1.5px solid var(--ink);border-radius:999px;padding:0 12px;min-height:40px;font-weight:700;font-size:13px;box-shadow:0 2px 0 var(--ink)}
+.clearbtn[hidden]{display:none}
+.legend{position:fixed;left:12px;bottom:calc(var(--sab) + 130px);flex-wrap:wrap;z-index:1000;background:rgba(255,255,255,.92);border-radius:10px;padding:6px 10px;font-size:12px;display:none;gap:10px}
+.legend.show{display:flex}
+.legend i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:4px;vertical-align:-1px;border:1.5px solid var(--bark)}
+@media (prefers-reduced-motion:reduce){.sheet,.scan,.compass svg{transition:none}}
+button:focus-visible,a:focus-visible{outline:3px solid var(--boot);outline-offset:2px}
+
+/* ===================== v33 — refonte de l'interface ===================== */
+.topbar{gap:8px}
+.brand{display:flex;align-items:center;gap:7px;flex:none;margin:0}
+.brand svg.logo{height:34px;width:97px;flex:none;display:block}
+.brand b{font-size:23px;font-weight:700;letter-spacing:-.04em;line-height:1;color:#fff}
+.searchbtn{flex:1 1 auto;min-width:0;display:flex;align-items:center;gap:8px;height:42px;border-radius:999px;background:rgba(255,255,255,.14);color:#fff;padding:0 14px;font-size:14px;text-align:left;border:1px solid rgba(255,255,255,.22)}
+.searchbtn span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;opacity:.92}
+.searchbtn svg{width:18px;height:18px;flex:none}
+.chip.icon{width:42px;padding:0}
+.chip.icon svg{width:20px;height:20px}
+
+/* Contrôles de carte, colonne de droite */
+.mapctl{position:fixed;right:12px;top:calc(var(--sat) + 122px);z-index:1000;display:flex;flex-direction:column;gap:12px;align-items:center}
+.mapctl .compass{position:relative;right:auto;top:auto}
+.mapctl .compass .deg{bottom:-16px}
+.ctl{width:52px;height:52px;border-radius:50%;background:var(--paper,#fff);color:#1E6FD9;box-shadow:0 4px 14px rgba(23,32,26,.2);display:flex;align-items:center;justify-content:center;margin-top:8px}
+.ctl svg{width:26px;height:26px}
+
+/* Barre du bas : 4 actions + scan, toutes libellées */
+.navbar{position:fixed;left:0;right:0;bottom:0;z-index:1000;background:var(--bark);padding:6px 6px calc(var(--sab) + 6px);display:grid;grid-template-columns:repeat(5,minmax(0,1fr));align-items:end;box-shadow:0 -4px 18px rgba(0,0,0,.18)}
+.nav{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;min-height:58px;color:#fff;font-size:12px;font-weight:700;border-radius:12px;padding:4px 2px}
+.nav svg{width:26px;height:26px}
+.nav[aria-pressed="true"]{color:#FFC861}
+.nav.walking{color:#9BE3B5}
+.nav .badge{position:absolute;top:2px;right:calc(50% - 26px);min-width:20px;height:20px;padding:0 5px;border-radius:999px;background:var(--boot);color:var(--ink);font-size:11px;line-height:20px;text-align:center}
+.nav .badge[hidden]{display:none}
+.navscan{display:flex;flex-direction:column;align-items:center;gap:4px;color:#fff;font-size:12px;font-weight:700}
+.navscan .scan{position:relative;left:auto;bottom:auto;transform:none;width:70px;height:70px;margin-top:-28px}
+.navscan .scan:active{transform:translateY(3px)}
+.navscan .scan .face svg{width:30px;height:30px}
+
+/* Aperçu permanent du lot sous la pin */
+.peek{position:fixed;left:10px;right:10px;bottom:calc(var(--sab) + 92px);z-index:999;background:var(--paper,#fff);color:var(--ink);border-radius:16px;box-shadow:0 6px 22px rgba(23,32,26,.24);padding:10px 10px 10px 14px;display:flex;align-items:center;gap:10px;min-height:60px}
+.peek[hidden]{display:none}
+.peek .t{flex:1;min-width:0}
+.peek .t b{display:block;font-size:16px;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.peek .t span{display:block;font-size:13px;color:var(--ink-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.peek .go{flex:none;min-height:46px;padding:0 16px;border-radius:12px;background:var(--bark);color:#fff;font-weight:700;font-size:15px}
+.peek .go[hidden]{display:none}
+body.walking .peek{bottom:calc(var(--sab) + 150px)}
+
+/* Bandeau de résultats (scan, filtres) */
+.strip{position:fixed;left:10px;right:74px;top:calc(var(--sat) + 62px);z-index:1001;background:var(--paper,#fff);color:var(--ink);border-radius:14px;box-shadow:0 4px 14px rgba(23,32,26,.2);padding:8px 8px 8px 12px;display:flex;align-items:center;gap:8px}
+.strip[hidden]{display:none}
+.strip .t{flex:1;min-width:0;font-size:13.5px;line-height:1.3}
+.strip .t b{font-size:14.5px}
+.strip .sw{display:inline-block;width:10px;height:10px;border-radius:3px;margin:0 3px 0 6px;vertical-align:-1px;border:1px solid rgba(0,0,0,.25)}
+.strip button{flex:none;min-height:40px;padding:0 12px;border-radius:10px;font-weight:700;font-size:13px;background:var(--field);color:var(--ink)}
+
+/* Marche */
+.walkstrip{position:fixed;left:10px;right:10px;bottom:calc(var(--sab) + 92px);z-index:1000;background:#2E7D4F;color:#fff;border-radius:14px;box-shadow:0 4px 14px rgba(23,32,26,.25);padding:8px 8px 8px 14px;display:flex;align-items:center;gap:10px;min-height:52px}
+.walkstrip[hidden]{display:none}
+.walkstrip .dot{width:12px;height:12px;border-radius:50%;background:#fff;flex:none;animation:wpulse 1.4s infinite}
+.walkstrip.paused{background:#5C6B62} .walkstrip.paused .dot{animation:none;opacity:.5}
+@keyframes wpulse{50%{opacity:.3}}
+.walkstrip .t{flex:1;min-width:0;font-size:13.5px;line-height:1.3}
+.walkstrip .t b{font-family:"JetBrains Mono",ui-monospace,monospace;font-size:15px}
+.walkstrip button{flex:none;min-height:42px;padding:0 14px;border-radius:10px;background:#fff;color:#163D27;font-weight:700;font-size:14px}
+
+/* Mesure */
+.measure{position:fixed;left:10px;right:10px;top:calc(var(--sat) + 62px);z-index:1002;background:var(--ink,#17201A);color:#fff;border-radius:14px;box-shadow:0 4px 14px rgba(0,0,0,.3);padding:10px 12px;display:flex;flex-direction:column;gap:8px}
+.measure[hidden]{display:none}
+.measure .r{font-size:14px;line-height:1.35} .measure .r b{font-family:"JetBrains Mono",ui-monospace,monospace;font-size:16px}
+.measure .b{display:flex;gap:6px;flex-wrap:wrap}
+.measure .b button{min-height:42px;padding:0 12px;border-radius:10px;background:rgba(255,255,255,.14);color:#fff;font-weight:700;font-size:13px}
+.measure .b button.main{background:#FF5A1F;color:#141A16;margin-left:auto}
+.mvx{width:14px;height:14px;border-radius:50%;background:#FF5A1F;border:2.5px solid #fff;box-shadow:0 0 0 1px #141A16}
+
+/* Hors ligne */
+.offline{position:fixed;left:0;right:0;top:calc(var(--sat) + 58px);z-index:1004;background:#B3261E;color:#fff;font-size:13px;line-height:1.35;padding:8px 14px;text-align:center}
+.offline[hidden]{display:none}
+
+/* Conseils contextuels (une fois) */
+.tip{position:fixed;left:14px;right:14px;bottom:calc(var(--sab) + 166px);z-index:1003;background:#17201A;color:#fff;border-radius:14px;padding:12px 12px 12px 14px;font-size:14px;line-height:1.4;display:flex;gap:10px;align-items:center;box-shadow:0 8px 24px rgba(0,0,0,.3)}
+.tip[hidden]{display:none}
+.tip button{flex:none;min-height:42px;padding:0 14px;border-radius:10px;background:#FF5A1F;color:#141A16;font-weight:700}
+
+/* Feuilles : réglages */
+.seg{display:flex;flex-wrap:wrap;gap:6px;margin:4px 0 12px}
+.seg button{min-height:42px;padding:0 13px;border-radius:999px;border:1.5px solid var(--line);background:var(--paper,#fff);color:var(--ink);font-weight:700;font-size:14px}
+.seg button[aria-pressed="true"]{background:var(--bark);color:#fff;border-color:var(--bark)}
+.trow{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:56px;border-bottom:1px solid var(--line)}
+.trow .t{flex:1;min-width:0;font-size:15px;line-height:1.3} .trow .t small{display:block;color:var(--ink-2);font-size:12.5px}
+.sheet .hint{font-size:13px;color:var(--ink-2);line-height:1.4;margin:6px 0 10px}
+.lg{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:13px;margin:6px 0 12px} .lg i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:5px;vertical-align:-1px;border:1px solid rgba(0,0,0,.2)} .lg i.r{border-radius:50%}
+
+/* Fiche : résumé + sections repliables */
+.sum{background:var(--field);border-radius:14px;padding:12px 14px;margin:0 0 10px}
+.sum .own{font-size:20px;font-weight:700;line-height:1.2}
+.sum .own.unk{color:var(--ink-2);font-weight:700;font-size:17px}
+.sum .units{font-size:13px;color:var(--ink-2);margin-top:4px;font-variant-numeric:tabular-nums}
+.sum .units b{color:var(--ink);font-size:15px}
+.sum .tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.sum .tags span{font-size:12px;font-weight:700;padding:4px 9px;border-radius:999px;background:var(--paper,#fff);border:1px solid var(--line)}
+.sum .tags span.hot{background:#FFF1CF;border-color:#E0A422;color:#7A5300}
+.sum .tags span.good{background:#E2F1E7;border-color:#9CCBAA;color:#1F5C36}
+.sum .tags span.bad{background:#F8E3E0;border-color:#E4A79F;color:#8E1E14}
+.keep{min-height:44px;padding:0 14px;border-radius:12px;font-weight:700;font-size:15px;background:var(--field);color:var(--ink);flex:none;display:flex;align-items:center;gap:6px}
+.keep[aria-pressed="true"]{background:#F8E3E0;color:#B3261E}
+.keep span.h{font-size:18px;line-height:1}
+details.sec{border-top:1px solid var(--line)}
+details.sec>summary{list-style:none;min-height:54px;display:flex;align-items:center;gap:10px;font-weight:700;font-size:16px;cursor:pointer}
+details.sec>summary::-webkit-details-marker{display:none}
+details.sec>summary .c{margin-left:auto;font-weight:400;font-size:13px;color:var(--ink-2)}
+details.sec>summary::after{content:"";width:9px;height:9px;border-right:2.5px solid var(--ink-2);border-bottom:2.5px solid var(--ink-2);transform:rotate(45deg);margin:0 6px 4px 4px;flex:none}
+details.sec[open]>summary::after{transform:rotate(-135deg);margin-bottom:-4px}
+details.sec .in{padding:0 0 14px}
+.links{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:8px 0 6px}
+.links a,.links button{display:flex;align-items:center;justify-content:center;text-align:center;min-height:46px;padding:6px 8px;border-radius:12px;background:var(--field);color:var(--ink);font-weight:700;font-size:14px;text-decoration:none;line-height:1.2}
+.links a.off,.links button.off{opacity:.45;pointer-events:none}
+.links .wide{grid-column:1/-1}
+.fine{font-size:12.5px;color:var(--ink-2);line-height:1.4;margin:6px 0}
+.primary{display:flex;align-items:center;justify-content:center;width:100%;min-height:52px;border-radius:12px;background:var(--bark);color:#fff;font-weight:700;font-size:16px;text-decoration:none;margin:8px 0}
+.danger{color:#B3261E;font-weight:700;font-size:14px;min-height:44px;padding:0 4px;margin-top:6px}
+.sheet .version{font-size:12px;color:var(--ink-2);text-align:center;margin:18px 0 4px}
+
+.src.centris{grid-template-columns:1fr auto}
+.src .doc.link{width:auto;padding:0 12px;gap:6px;font-weight:700;font-size:14px}
+.src .doc.link span{display:inline}
+body.isoff .strip,body.isoff .measure{top:calc(var(--sat) + 104px)}
+body.isoff .mapctl{top:calc(var(--sat) + 164px)}
+/* v36 : en-tête jamais tronqué ; contrôles de carte à la Google Maps */
+.topbar h1.brand{flex:0 0 auto;min-width:auto;overflow:visible;max-width:none}
+.mapctl{gap:10px}
+.mapctl .ctl{margin-top:0;width:48px;height:48px}
+.ctl.dark{color:var(--ink,#17201A)} .ctl.dark svg{width:24px;height:24px}
+.ctl[aria-pressed="true"]{background:#FF5A1F;color:#141A16}
+.mapctl .compass{width:48px;height:48px;margin-top:2px}
+.mapctl .compass svg{width:38px;height:38px}
+.mectl{position:fixed;right:12px;bottom:calc(var(--sab) + 166px);z-index:1000}
+.mectl .ctl{margin:0;width:56px;height:56px}
+body.walking .mectl{bottom:calc(var(--sab) + 224px)}
+.measure{right:74px}
+/* v38 : visionneuse — image en haut, barre d'édition en bas, rien ne se chevauche */
+.viewer{display:flex;flex-direction:column;align-items:stretch;justify-content:flex-start;height:100dvh;padding-top:calc(var(--sat) + 60px);box-sizing:border-box}
+.viewer[hidden]{display:none}
+.viewer img{flex:1 1 auto;min-height:0;width:100%;max-height:none;object-fit:contain}
+.viewer .close{position:absolute;top:calc(var(--sat) + 10px);right:12px;width:44px;height:44px;background:rgba(255,255,255,.18);color:#fff}
+.viewer .vbar{flex:none;background:#141A16;padding:12px 14px calc(var(--sab) + 12px);display:flex;flex-direction:column;gap:8px}
+.viewer .vlab{font-size:12.5px;color:#C7CDC8}
+.viewer .vtitle{position:static;left:auto;right:auto;bottom:auto;display:flex;gap:8px}
+.viewer .vtitle input{min-height:46px}
+.viewer .vtitle button{min-height:46px}
+.viewer .del{position:static;left:auto;bottom:auto;transform:none;align-self:flex-start;background:transparent;color:#FF9C8F;padding:0;min-height:44px;font-weight:700}
+/* v40 : partage */
+.modal{position:fixed;inset:0;z-index:1460;background:rgba(10,14,12,.55);display:flex;align-items:flex-end;justify-content:center}
+.modal[hidden]{display:none}
+.modal .mbox{background:var(--paper,#fff);color:var(--ink);width:100%;max-width:520px;border-radius:18px 18px 0 0;padding:18px 18px calc(var(--sab) + 14px);box-shadow:0 -10px 40px rgba(0,0,0,.3)}
+.modal h2{margin:0 0 6px;font-size:21px}
+.modal .prem{display:flex;align-items:center;gap:10px;margin-top:14px}
+.modal .prem button{flex:1;min-height:50px;border-radius:12px;background:var(--field);color:var(--ink-2);font-weight:700;font-size:15px;opacity:.8}
+.badge-p{flex:none;font-size:12px;font-weight:700;padding:5px 10px;border-radius:999px;background:#FFF1CF;color:#7A5300;border:1px solid #E0A422}
+.modal .cancel{width:100%;min-height:46px;margin-top:6px;font-weight:700;color:var(--ink-2)}
+#btnShare{margin-right:6px}
+/* v41 : Journal */
+.jbackup{display:flex;align-items:center;gap:10px;background:#FFF1CF;border:1px solid #E0A422;color:#5C3D00;border-radius:12px;padding:8px 8px 8px 12px;margin:0 0 10px;font-size:14px}
+.jbackup[hidden]{display:none} .jbackup span{flex:1} .jbackup button{min-height:40px;padding:0 12px;border-radius:10px;background:#7A5300;color:#fff;font-weight:700}
+.jtabs{margin:0 0 10px} .jtabs button{flex:1} .jtabs b{font-family:"JetBrains Mono",ui-monospace,monospace;font-size:12px;opacity:.75;margin-left:4px}
+#jSearch{margin-bottom:8px}
+.jfilter{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;margin:0 0 8px;padding-bottom:2px} .jfilter::-webkit-scrollbar{display:none} .jfilter button{flex:none;min-height:40px}
+.jbar{display:flex;align-items:center;gap:8px;margin:0 0 10px;font-size:13px;color:var(--ink-2)}
+.jbar select{flex:1;min-width:0;min-height:42px;border-radius:10px;border:1.5px solid var(--line);background:var(--paper,#fff);color:var(--ink);font:inherit;font-size:14px;padding:0 8px}
+.jbar button{flex:none;min-height:42px;padding:0 12px;border-radius:10px;background:var(--bark);color:#fff;font-weight:700;font-size:13px}
+.jlist{list-style:none;margin:0 0 14px;padding:0;display:flex;flex-direction:column;gap:8px}
+.jcard{display:flex;flex-wrap:wrap;align-items:stretch;background:var(--paper,#fff);border:1.5px solid var(--line);border-radius:14px;overflow:hidden}
+.jcard .selbox{width:26px;height:26px;margin:0 0 0 12px;align-self:center;accent-color:#B3261E}
+.jmain{flex:1 1 200px;min-width:0;display:flex;gap:12px;align-items:flex-start;text-align:left;padding:12px;color:var(--ink)}
+.jico{flex:none;margin-top:2px}
+.jt{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.jt b{font-family:"JetBrains Mono",ui-monospace,monospace;font-size:16px} .jt .jfav{color:#C62828;font-family:inherit}
+.jt span{font-size:13px;color:var(--ink-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.jt .jo{color:var(--ink);font-weight:700;font-size:14px} .jt .jn{font-style:italic}
+.jnext{flex:1 0 100%;min-height:46px;border-top:1px solid var(--line);background:#FFF5EF;color:#B23A0B;font-weight:700;font-size:14px;text-align:left;padding:0 14px}
+.jnext.wait{background:var(--field);color:var(--ink-2)}
+.jempty{list-style:none;background:var(--field);border-radius:14px;padding:16px;font-size:14px;line-height:1.45;color:var(--ink-2);display:flex;flex-direction:column;gap:4px}
+.jempty b{color:var(--ink);font-size:15px} .jempty button{color:var(--bark);font-weight:700;text-decoration:underline;padding:0;min-height:36px;align-self:flex-start}
+#jTools{margin-top:6px}
+/* v42 : pièces jointes */
+.viewer .vdoc{flex:1 1 auto;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:#fff;padding:20px;text-align:center}
+.viewer .vdoc[hidden]{display:none}
+.viewer .vdoc b{font-size:17px;word-break:break-word} .viewer .vdoc span{font-size:13px;color:#C7CDC8}
+.viewer .vdocb{display:flex;gap:10px;margin-top:8px}
+.viewer .vdocb a{min-height:48px;padding:0 20px;border-radius:12px;display:flex;align-items:center;font-weight:700;text-decoration:none;background:#fff;color:#141A16}
+.viewer .vdocb a+a{background:rgba(255,255,255,.16);color:#fff}
+.src .st .att{display:inline-flex;align-items:center;gap:6px;max-width:100%;min-height:44px;padding:0 12px;border-radius:10px;background:var(--field);border:1.5px solid var(--line);font-size:13px;font-weight:700;color:var(--ink)}
+.src .st .att span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:170px}
+/* Éléments retirés de l'ancienne interface */
+.bottom,.mode,.mapbtn,.walkpill,.clearbtn,.legend{display:none !important}
+
+.leaflet-bottom{bottom:calc(var(--sab) + 84px)}
+</style>
+</head>
+<body>
+
+<div id="map" role="application" aria-label="Carte"></div>
+
+<div style="position:fixed;left:0;right:0;bottom:0;z-index:2000;background:#B8321F;color:#fff;font:700 13px system-ui;text-align:center;padding:6px calc(env(safe-area-inset-bottom,0px) + 6px)">Ancienne version (v43) · <a href="/" style="color:#fff">ouvrir la nouvelle LOTS</a></div>
+<header class="topbar">
+  <h1 class="brand" aria-label="LOTS"><svg xmlns="http://www.w3.org/2000/svg" class="logo" viewBox="-60 -60 3546 1246" role="img" aria-label="LOTS"><rect x="47.5" y="47.5" width="3361" height="1061" fill="#F3EBD7" stroke="#141A16" stroke-width="95"/><g fill="#141A16" transform="translate(190 967) scale(1 -1)"><path transform="translate(0 0)" d="M20 0V164H70V614H20V778H442V614H350V164H440V256H639V0Z"/><path transform="translate(708 0)" d="M14 389Q14 600 113.5 696.0Q213 792 396 792Q579 792 678.5 696.0Q778 600 778 389Q778 178 678.5 82.0Q579 -14 396 -14Q213 -14 113.5 82.0Q14 178 14 389ZM464 238V540Q464 578 447.0 596.0Q430 614 396 614Q362 614 345.0 596.0Q328 578 328 540V238Q328 199 345.0 181.5Q362 164 396 164Q430 164 447.0 182.0Q464 200 464 238Z"/><path transform="translate(1555 0)" d="M766 536H594V614H530V164H600V0H180V164H250V614H186V536H14V778H766Z"/><path transform="translate(2390 0)" d="M17 40V238H237Q237 207 251.0 193.0Q265 179 302 179Q333 179 346.5 188.5Q360 198 360 217Q360 233 347.0 244.5Q334 256 302 268L216 298Q105 340 56.5 397.0Q8 454 8 551Q8 669 85.5 730.5Q163 792 344 792Q431 792 507.5 774.5Q584 757 631 728V549H431Q431 599 369 599Q339 599 326.5 591.5Q314 584 314 565Q314 548 328.5 538.0Q343 528 376 517L463 487Q569 451 617.5 393.5Q666 336 666 243Q666 116 580.5 51.0Q495 -14 330 -14Q234 -14 148.5 2.5Q63 19 17 40Z"/></g><rect x="-30" y="-30" width="230" height="230" fill="#FF5A1F" stroke="#141A16" stroke-width="40"/></svg></h1>
+  <button class="searchbtn" id="btnSearch" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg><span>N° de lot, adresse, lien Centris</span></button>
+  <button class="chip icon" id="btnHelp" aria-label="Guide et réglages">?</button>
+</header>
+
+<form class="search" id="search">
+  <input id="q" type="search" placeholder="N° de lot, adresse, code postal, lien Centris" autocomplete="off" enterkeyhint="search" aria-label="Rechercher">
+  <button type="submit">Aller</button>
+</form>
+
+<div class="offline" id="offline" role="status" hidden>Hors ligne — la carte et les données ne se chargent plus. Ton journal, tes marches et tes photos restent disponibles.</div>
+
+<div class="strip" id="strip" role="status" hidden><div class="t" id="stripText"></div><button id="stripFilters">Filtres</button><button id="btnClear" aria-label="Nettoyer la carte">Nettoyer</button></div>
+
+<div class="measure" id="measureBar" hidden>
+  <div class="r" id="measureRead">Touche la carte pour poser des points.</div>
+  <div class="b"><button id="mUndo">↶ Retirer le point</button><button id="mClose">Fermer la forme</button><button id="mClear">Effacer</button><button id="mDone" class="main">Terminer</button></div>
+</div>
+
+<div class="mapctl">
+  <button class="ctl dark" id="btnLayers" aria-label="Couches et légende"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l9 5-9 5-9-5 9-5z"/><path d="M3 13l9 5 9-5"/></svg></button>
+  <button class="ctl dark" id="btnMeasure" aria-pressed="false" aria-label="Mesurer une distance ou une surface"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17L17 3l4 4L7 21z"/><path d="M7 13l2 2M10 10l2 2M13 7l2 2"/></svg></button>
+  <button class="compass off" id="compass" aria-label="Boussole">
+    <svg viewBox="0 0 44 44"><circle cx="22" cy="22" r="20" fill="none" stroke="#C9D1C4" stroke-width="2"/><path d="M22 5 L27 22 L22 20 L17 22 Z" fill="#B4541E"/><path d="M22 39 L27 22 L22 24 L17 22 Z" fill="#C9D1C4"/><text x="22" y="14" text-anchor="middle" font-size="9" font-weight="700" fill="#1F3D2B">N</text></svg>
+    <span class="deg" id="deg">boussole</span>
+  </button>
+</div>
+<div class="mectl"><button class="ctl" id="btnMe" aria-label="Aller à ma position"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="12" cy="12" r="3" fill="currentColor"/><circle cx="12" cy="12" r="8"/><path d="M12 1v3M12 20v3M1 12h3M20 12h3"/></svg></button></div>
+
+<div class="pin" aria-hidden="true"><svg viewBox="0 0 34 44"><path d="M17 1C8 1 1 8 1 17c0 11 16 26 16 26s16-15 16-26C33 8 26 1 17 1z" fill="#1E6FD9" stroke="#fff" stroke-width="2"/><circle cx="17" cy="17" r="6" fill="#fff"/></svg></div>
+<div class="ring" id="ring" aria-hidden="true"><span id="ringLabel">250 m</span></div>
+
+<div class="peek" id="peek" hidden><div class="t"><b id="peekTitle">—</b><span id="peekSub"></span></div><button class="go" id="peekGo">Voir la fiche</button></div>
+
+<div class="walkstrip" id="walkStrip" hidden><span class="dot" aria-hidden="true"></span><div class="t"><b id="walkStat">0 m</b> <span id="walkState">· en marche</span><br><span id="walkLot">Recherche du lot…</span></div><button id="btnWalkStop">Terminer</button></div>
+
+<div class="tip" id="tip" role="status" hidden><span id="tipText"></span><button id="tipOk">OK</button></div>
+
+<nav class="navbar" aria-label="Actions">
+  <button class="nav" id="btnWalk" aria-pressed="false"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 3.5c1.9 0 3 1.6 3 3.6 0 2.1-.7 4.4-2 5.3-.6.4-1.5.4-2.1 0-1.2-.9-1.9-3.2-1.9-5.3 0-2 1.1-3.6 3-3.6z"/><rect x="5.2" y="14" width="3.8" height="2.6" rx="1.3"/><path d="M17 8.5c1.9 0 3 1.6 3 3.6 0 2.1-.7 4.4-2 5.3-.6.4-1.5.4-2.1 0-1.2-.9-1.9-3.2-1.9-5.3 0-2 1.1-3.6 3-3.6z"/><rect x="15.2" y="19" width="3.8" height="2.6" rx="1.3"/></svg><span id="walkLabel">Marcher</span></button>
+  <button class="nav" id="btnPov"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg><span>Photo</span></button>
+  <div class="navscan"><button class="scan" id="btnScan" aria-label="Scanner les lots dans l'anneau"><span class="face"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8" stroke-dasharray="3 3"/><circle cx="12" cy="12" r="3"/></svg></span></button><span aria-hidden="true">Scanner</span></div>
+  <button class="nav" id="btnFilters" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h16M7 12h10M10 18h4"/></svg><span>Filtres</span><b class="badge" id="filterCount" hidden>0</b></button>
+  <button class="nav" id="btnCarnet" aria-label="Journal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 3h11l3 3v15H5z"/><path d="M8 8h8M8 12h8M8 16h5"/></svg><span>Journal</span><b class="badge" id="carnetCount" hidden>0</b></button>
+</nav>
+
+<section class="aim" id="aim" hidden>
+  <div class="aimArt" aria-hidden="true">
+    <svg viewBox="0 0 200 200" class="phone"><g class="ph"><rect x="70" y="40" width="60" height="110" rx="10" fill="none" stroke="currentColor" stroke-width="5"/><rect x="92" y="138" width="16" height="4" rx="2" fill="currentColor"/></g></svg>
+    <svg viewBox="0 0 200 200" class="arrow"><path d="M100 185 V45" stroke="#FF5A1F" stroke-width="18" stroke-linecap="round"/><path d="M48 92 L100 22 L152 92" fill="none" stroke="#FF5A1F" stroke-width="18" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </div>
+  <h2>Pointe vers ta photo</h2>
+  <span class="flat" id="aimFlat">à plat</span>
+  <div class="dial"><svg viewBox="0 0 120 120"><circle cx="60" cy="60" r="54" fill="none" stroke="currentColor" stroke-width="2"/><g id="aimRose"><path d="M60 10 L66 60 L60 54 L54 60 Z" fill="#FF5A1F"/><path d="M60 110 L66 60 L60 66 L54 60 Z" fill="currentColor" opacity=".35"/><text x="60" y="26" text-anchor="middle" font-size="11" font-weight="700" fill="currentColor">N</text></g><path d="M60 2 L66 12 L54 12 Z" fill="currentColor"/></svg><b id="aimDeg">—°</b></div>
+  <button class="fix" id="aimFix">Fixer le point de vue</button>
+  <button class="cancel" id="aimGallery">Choisir une photo existante</button>
+  <button class="cancel" id="aimCancel">Annuler</button>
+</section>
+<section class="snap" id="snap" hidden>
+  <video id="snapVideo" autoplay playsinline muted></video>
+  <div class="snapFake" id="snapFake" hidden><svg viewBox="0 0 400 700" preserveAspectRatio="xMidYMid slice"><rect width="400" height="700" fill="#9DB89A"/><rect y="470" width="400" height="230" fill="#7A6648"/><rect x="40" y="160" width="22" height="330" fill="#4A3524"/><rect x="300" y="120" width="28" height="370" fill="#4A3524"/><circle cx="51" cy="150" r="70" fill="#5F8A55"/><circle cx="314" cy="110" r="90" fill="#5F8A55"/><circle cx="190" cy="80" r="110" fill="#6F9A62"/></svg></div>
+  <div class="snapTop"><span class="hd" id="snapHeading">—°</span><button id="snapTorch" aria-label="Lampe">⚡</button><button id="snapFlip" aria-label="Changer d'objectif">⟲</button><button id="snapCancel" aria-label="Annuler">×</button></div>
+  <div class="snapZoom"><button data-z="1">1×</button><button data-z="2">2×</button><button data-z="4">4×</button><input type="range" id="snapRange" min="1" max="4" step="0.1" value="1" aria-label="Zoom"></div>
+  <button class="scan shutter" id="snapShutter" aria-label="Prendre la photo"><span class="face"></span></button>
+  <canvas id="snapCanvas" hidden></canvas>
+</section>
+
+<section class="intro" id="intro" hidden>
+  <div class="slides" id="slides">
+    <article>
+      <div class="ill"><svg viewBox="0 0 120 120"><rect x="10" y="14" width="100" height="70" rx="10" fill="#DDE3D6"/><path d="M30 14 L40 84 M70 14 L75 84" stroke="#1F3D2B" stroke-width="2" fill="none"/><path d="M60 28c-8 0-14 6-14 14 0 10 14 24 14 24s14-14 14-24c0-8-6-14-14-14z" fill="#1E6FD9" stroke="#fff" stroke-width="2"/><circle cx="60" cy="42" r="5" fill="#fff"/><rect x="14" y="90" width="92" height="22" rx="8" fill="#fff" stroke="#C9D1C4" stroke-width="2"/><rect x="20" y="96" width="46" height="5" rx="2" fill="#1F3D2B"/><rect x="76" y="95" width="24" height="12" rx="4" fill="#1F3D2B"/></svg></div>
+      <h2>Le lot sous la pin s'affiche en bas</h2>
+      <p>Bouge la carte : la carte du bas te dit quel lot est sous la pin bleue. <b>Voir la fiche</b> pour tout savoir. Tu peux aussi toucher n'importe quel lot.</p>
+    </article>
+    <article>
+      <div class="ill"><svg viewBox="0 0 120 120"><circle cx="60" cy="56" r="40" fill="none" stroke="#E0A422" stroke-width="3" stroke-dasharray="6 6"/><rect x="30" y="34" width="26" height="40" fill="#FF5A1F" opacity=".5" stroke="#FF5A1F" stroke-width="2"/><rect x="60" y="30" width="28" height="44" fill="#8A948C" opacity=".15" stroke="#8A948C"/><path d="M20 104h80M32 98v12M60 98v12" stroke="#1F3D2B" stroke-width="3"/></svg></div>
+      <h2>Scanner, puis filtrer</h2>
+      <p><b>Scanner</b> lit tous les lots de l'anneau (pince la carte pour l'agrandir). <b>Filtres</b> allume en orange ceux qui comptent : sans bâtiment, grands, propriétaire depuis longtemps, plusieurs héritiers.</p>
+    </article>
+    <article>
+      <div class="ill"><svg viewBox="0 0 120 120"><rect x="15" y="12" width="90" height="96" rx="12" fill="#fff" stroke="#C9D1C4" stroke-width="2"/><rect x="26" y="24" width="50" height="10" rx="3" fill="#1F3D2B"/><rect x="26" y="42" width="68" height="18" rx="6" fill="#ECEDE8"/><rect x="26" y="68" width="68" height="8" rx="3" fill="#C9D1C4"/><rect x="26" y="82" width="68" height="8" rx="3" fill="#C9D1C4"/><path d="M90 22c-3 0-5 2-5 5 0 4 5 8 5 8s5-4 5-8c0-3-2-5-5-5z" fill="#C62828"/></svg></div>
+      <h2>La fiche : explorer, puis trouver le propriétaire</h2>
+      <p>Rôle d'évaluation, Registre foncier, Canada411, Google, réseaux, Registre des entreprises. <b>♥ Garder</b> met le lot au journal ; tout ce que tu écris s'enregistre seul.</p>
+    </article>
+    <article>
+      <div class="ill"><svg viewBox="0 0 120 120"><ellipse cx="35" cy="80" rx="6" ry="10" fill="#2E7D4F" transform="rotate(-20 35 80)"/><ellipse cx="52" cy="62" rx="6" ry="10" fill="#2E7D4F" transform="rotate(-20 52 62)"/><ellipse cx="70" cy="46" rx="6" ry="10" fill="#2E7D4F" transform="rotate(-20 70 46)"/><circle cx="88" cy="32" r="7" fill="#FF5A1F" stroke="#fff" stroke-width="2"/><path d="M88 32 L76 8 A26 26 0 0 1 100 8 Z" fill="rgba(255,90,31,.4)"/></svg></div>
+      <h2>Marcher, photographier, mesurer</h2>
+      <p><b>Marcher</b> trace tes pas et vibre quand tu changes de lot. <b>Photo</b> garde la direction du regard. En haut : la <b>règle</b> mesure une distance ou une surface, les <b>couches</b> ajoutent la photo aérienne et la légende. Tout reste dans ton téléphone.</p>
+    </article>
+    <article class="setup">
+      <h2>Avant de partir</h2>
+      <p>lots fonctionne mieux installé et avec ces accès. Touche chaque ligne :</p>
+      <div class="perm" id="permList">
+        <button type="button" data-p="install"><b>📲 Installer l'application</b><span>Plein écran, icône sur ton téléphone, partage depuis Centris.</span><i></i></button>
+        <button type="button" data-p="geo"><b>📍 Position</b><span>Indispensable : le lot sous tes pieds, le scan autour de toi, ta marche.</span><i></i></button>
+        <button type="button" data-p="cam"><b>📷 Caméra</b><span>Photos orientées rattachées aux lots.</span><i></i></button>
+        <button type="button" data-p="mic"><b>🎙️ Micro</b><span>Commentaires vocaux pour améliorer l'app.</span><i></i></button>
+        <button type="button" data-p="compass"><b>🧭 Boussole</b><span>Direction du regard et des photos.</span><i></i></button>
+      </div>
+      <p class="fine" id="permHelp">Accès refusé par erreur ? Chrome → ⋮ → Paramètres → Paramètres des sites → lots.quebec.</p>
+      <p class="fine">En utilisant lots, tu acceptes les <a href="confidentialite.html" target="_blank" rel="noopener">conditions et la politique de confidentialité</a>. Données à titre indicatif, sans valeur légale. Respecte toujours la propriété privée.</p>
+      <label class="nomore"><input type="checkbox" id="introOff"> Ne plus afficher au démarrage</label>
+      <h3>Améliorer Lots <span id="logCount" style="font-weight:400"></span></h3>
+      <div class="links" style="width:100%;max-width:380px"><button id="btnMic">Commentaire vocal</button><button id="shareLog">Partager le rapport</button><button id="copyLog">Copier le rapport</button><button id="clearLog">Effacer le rapport</button></div>
+      <p class="fine" id="introVersion"></p>
+    </article>
+  </div>
+  <div class="introBar"><button id="introSkip">Passer</button><div class="dots" id="dots"></div><button id="introNext" class="main">Suivant</button></div>
+</section>
+
+<section class="sheet" id="sheetLot" aria-hidden="true" aria-labelledby="lotNo">
+  <div class="grip"></div>
+  <header><div class="t"><h2 id="lotNo">—</h2><p id="lotWhere">—</p></div><button class="keep" id="btnFav" aria-pressed="false"><span class="h" aria-hidden="true">♥</span><span id="favLabel">Garder</span></button><button class="close" id="btnShare" aria-label="Partager ce lot"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="M7.5 7.5L12 3l4.5 4.5"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></svg></button><button class="close" id="closeLot" aria-label="Fermer">×</button></header>
+  <div class="body">
+    <div class="sum">
+      <div class="own unk" id="sumOwner">Propriétaire inconnu</div>
+      <div class="units" id="sumUnits"></div>
+      <div class="tags" id="sumTags"></div>
+    </div>
+
+    <details class="sec" id="secExplore" open>
+      <summary>Explorer ce lot <span class="c">rôle · registre · cadastre</span></summary>
+      <div class="in">
+        <div class="role" id="roleBox" hidden></div>
+        <div class="role" id="openBox" hidden></div>
+        <h3>Ouvrir les sources officielles</h3>
+        <p class="fine">Le trombone joint à chaque source une capture d'écran ou un document (PDF du Registre, fiche du rôle…), gardé dans ton téléphone.</p>
+        <div class="sources">
+          <div class="src" data-src="registre"><a id="lnkRegistre" target="_blank" rel="noopener">Registre foncier (acte de vente, adresse)</a><button class="doc" data-src="registre" aria-label="Joindre une capture ou un document"><svg viewBox="0 0 24 24"><path d="M20.5 11.5l-8.2 8.2a5 5 0 0 1-7.1-7.1l8.6-8.6a3.4 3.4 0 0 1 4.8 4.8l-8.5 8.5a1.7 1.7 0 0 1-2.4-2.4l7.8-7.8"/></svg><b class="n" hidden></b></button><div class="st" data-thumbs="registre"></div></div>
+          <div class="src" data-src="role"><a id="lnkRole" target="_blank" rel="noopener">Rôle d'évaluation de la MRC</a><button class="doc" data-src="role" aria-label="Joindre une capture ou un document"><svg viewBox="0 0 24 24"><path d="M20.5 11.5l-8.2 8.2a5 5 0 0 1-7.1-7.1l8.6-8.6a3.4 3.4 0 0 1 4.8 4.8l-8.5 8.5a1.7 1.7 0 0 1-2.4-2.4l7.8-7.8"/></svg><b class="n" hidden></b></button><div class="st" data-thumbs="role"></div></div>
+          <div class="src" data-src="infolot"><a id="lnkInfolot" target="_blank" rel="noopener">Infolot (plan du cadastre)</a><button class="doc" data-src="infolot" aria-label="Joindre une capture ou un document"><svg viewBox="0 0 24 24"><path d="M20.5 11.5l-8.2 8.2a5 5 0 0 1-7.1-7.1l8.6-8.6a3.4 3.4 0 0 1 4.8 4.8l-8.5 8.5a1.7 1.7 0 0 1-2.4-2.4l7.8-7.8"/></svg><b class="n" hidden></b></button><div class="st" data-thumbs="infolot"></div></div>
+          <div class="src muni" data-src="muni"><a id="lnkCall" href="#">Appeler la municipalité</a><a id="lnkMuni" target="_blank" rel="noopener">Site web</a><button class="doc" data-src="muni" aria-label="Joindre une capture ou un document"><svg viewBox="0 0 24 24"><path d="M20.5 11.5l-8.2 8.2a5 5 0 0 1-7.1-7.1l8.6-8.6a3.4 3.4 0 0 1 4.8 4.8l-8.5 8.5a1.7 1.7 0 0 1-2.4-2.4l7.8-7.8"/></svg><b class="n" hidden></b></button><div class="st" data-thumbs="muni"></div></div>
+        </div>
+        <div class="links"><button id="copyLot" class="wide">Copier le n° de lot</button></div>
+      </div>
+    </details>
+
+    <details class="sec" id="secOwner">
+      <summary>Trouver le propriétaire <span class="c" id="secOwnerC"></span></summary>
+      <div class="in">
+        <label class="fine" for="lotOwner">Nom du propriétaire (tel qu'au rôle ou au Registre)</label>
+        <input class="f" id="lotOwner" placeholder="Prénom Nom ou nom de l'entreprise" autocomplete="off">
+        <div class="links" id="ownerLinks">
+          <a id="lnkC411" target="_blank" rel="noopener">Canada411</a>
+          <a id="lnkGoogle" target="_blank" rel="noopener">Google</a>
+          <a id="lnkFacebook" target="_blank" rel="noopener">Facebook</a>
+          <a id="lnkLinkedin" target="_blank" rel="noopener">LinkedIn</a>
+          <a id="lnkReq" target="_blank" rel="noopener" hidden>Registre des entreprises</a>
+          <a id="lnkDeces" target="_blank" rel="noopener" hidden>Avis de décès</a>
+          <a id="lnkNoms" target="_blank" rel="noopener" class="wide">Registre foncier : autres terres de ce nom</a>
+        </div>
+        <p class="fine" id="ownerHint">Inscris le nom pour activer les recherches. Elles s'ouvrent préremplies ; l'app ne collecte rien elle-même.</p>
+      </div>
+    </details>
+
+    <details class="sec" id="secContact">
+      <summary>Contacter <span class="c" id="secContactC"></span></summary>
+      <div class="in">
+        <label class="fine" for="lotAddrPost">Adresse postale (du Registre ou du rôle)</label>
+        <textarea id="lotAddrPost" rows="2" placeholder="123, chemin du Lac, Ville (Québec) J0T 1A0"></textarea>
+        <div class="row" style="margin-top:8px">
+          <input class="f" id="lotEmail" type="email" placeholder="Courriel" autocomplete="off" aria-label="Courriel du propriétaire">
+          <input class="f" id="lotPhone" type="tel" placeholder="Cellulaire" autocomplete="off" aria-label="Cellulaire du propriétaire">
+        </div>
+        <button class="primary" id="btnPrint">Imprimer la lettre (ou PDF)</button>
+        <div class="links">
+          <a id="btnMail" href="#" class="off">Courriel</a>
+          <a id="btnSms" href="#" class="off">Texto</a>
+          <button id="copyLetter" class="wide">Copier la lettre</button>
+        </div>
+        <p class="fine">Premier contact : la lettre papier est la voie la plus sûre. Courriels et textos non sollicités sont encadrés par la loi anti-pourriel.</p>
+      </div>
+    </details>
+
+    <details class="sec" id="secPhotos">
+      <summary>Photos <span class="c" id="secPhotosC"></span></summary>
+      <div class="in">
+        <div class="links"><button id="btnPhotoLot">Photo orientée</button><button id="btnPhoto">Depuis la galerie</button></div>
+        <input type="file" id="photoInput" accept="image/*" multiple hidden>
+        <input type="file" id="docInput" accept="image/*,application/pdf,.pdf,.doc,.docx,.xls,.xlsx,.csv,.txt,.rtf,.html,.htm,.mht,.mhtml" multiple hidden>
+        <div class="thumbs" id="thumbs"></div>
+      </div>
+    </details>
+
+    <details class="sec" id="secSale">
+      <summary>En vente ? <span class="c" id="secSaleC"></span></summary>
+      <div class="in">
+        <div class="src centris" id="srcCentris"><a id="lnkCentris" target="_blank" rel="noopener">Centris — annonces de la municipalité</a><button class="doc link" id="btnCentrisPaste" aria-label="Coller le lien d'une annonce Centris"><svg viewBox="0 0 24 24"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1.5 1.5"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1.5-1.5"/></svg><span>Coller</span></button><div class="st centris-url" id="centrisUrl"></div>
+          <div class="centrisData" id="centrisData" hidden><div class="row"><input class="f" id="cPrice" inputmode="numeric" placeholder="Prix ($)" aria-label="Prix demandé"><input class="f" id="cBroker" placeholder="Courtier" aria-label="Courtier"></div></div></div>
+        <p class="fine">Trouvé une annonce ? Dans Centris : Partager → lots. Ou copie son lien, reviens ici et touche « Coller ».</p>
+        <h3>Chercher une annonce autour de ce lot</h3>
+        <div class="links" id="adsLot"></div>
+      </div>
+    </details>
+
+    <details class="sec" id="secFollow">
+      <summary>Suivi et notes <span class="c" id="secFollowC"></span></summary>
+      <div class="in">
+        <div class="trow"><div class="t">Visité</div><label class="switch"><input type="checkbox" id="lotVisited"><span class="track"></span><span class="lbl" hidden></span></label></div>
+        <div class="trow"><div class="t">Propriétaire contacté</div><label class="switch"><input type="checkbox" id="lotContacted"><span class="track"></span></label></div>
+        <h3>Note de terrain</h3>
+        <textarea id="lotNote" placeholder="Accès par chemin forestier, ruisseau au nord, aucune construction visible…"></textarea>
+        <p class="fine" id="saveState">Enregistrement automatique.</p>
+        <button class="danger" id="btnRemove" hidden>Retirer ce lot du journal</button>
+      </div>
+    </details>
+  </div>
+</section>
+
+<section class="sheet" id="sheetFilters" aria-hidden="true">
+  <div class="grip"></div>
+  <header><div class="t"><h2>Filtres</h2><p>Les lots du scan qui passent tous les filtres s'allument en orange</p></div><button class="close" id="closeFilters" aria-label="Fermer">×</button></header>
+  <div class="body">
+    <div class="trow"><div class="t">Probablement vacant<small>Aucune adresse civique sur le lot</small></div><label class="switch"><input type="checkbox" id="fVacant"><span class="track"></span></label></div>
+    <h3>Superficie minimale</h3>
+    <div class="seg" id="fMinAc" role="group" aria-label="Superficie minimale"><button data-v="0">Toutes</button><button data-v="2">2 acres</button><button data-v="5">5</button><button data-v="10">10</button><button data-v="25">25</button><button data-v="50">50</button><button data-v="100">100+</button></div>
+    <h3>Propriétaire inscrit depuis</h3>
+    <div class="seg" id="fSince" role="group" aria-label="Ancienneté du propriétaire"><button data-v="0">Peu importe</button><button data-v="10">10 ans +</button><button data-v="20">20 ans +</button><button data-v="30">30 ans +</button><button data-v="40">40 ans +</button></div>
+    <div class="trow"><div class="t">3 propriétaires ou plus<small>Souvent une succession ou une indivision</small></div><label class="switch"><input type="checkbox" id="fMulti"><span class="track"></span></label></div>
+    <h3>Type de propriétaire</h3>
+    <div class="seg" id="fType" role="group" aria-label="Type de propriétaire"><button data-v="all">Tous</button><button data-v="p">Particulier</button><button data-v="e">Entreprise ou organisme</button></div>
+    <p class="hint">Ancienneté, nombre et type viennent du rôle d'évaluation 2026 (données ouvertes) ; un lot absent du rôle ne passe pas ces filtres.</p>
+    <div class="links"><button id="fReset" class="wide">Réinitialiser les filtres</button></div>
+  </div>
+</section>
+
+<section class="sheet" id="sheetLayers" aria-hidden="true">
+  <div class="grip"></div>
+  <header><div class="t"><h2>Couches</h2><p>Ce qui s'affiche sur la carte</p></div><button class="close" id="closeLayers" aria-label="Fermer">×</button></header>
+  <div class="body">
+    <div class="trow"><div class="t">Photo aérienne</div><label class="switch"><input type="checkbox" id="lyrSat"><span class="track"></span></label></div>
+    <div class="trow"><div class="t">Terres publiques louées<small>Baux de villégiature et abris sommaires (zoom rapproché)</small></div><label class="switch"><input type="checkbox" id="lyrBauxT" checked><span class="track"></span></label></div>
+    <div class="trow"><div class="t">Seulement mes favoris<small>Masque les autres lots du journal</small></div><label class="switch"><input type="checkbox" id="lyrFavOnly"><span class="track"></span></label></div>
+    <h3>Annonces à vendre ici</h3>
+    <p class="hint">Chaque site s'ouvre sur la zone que tu regardes, au plus près de ce qu'il accepte.</p>
+    <div class="links" id="adsMap"></div>
+    <h3>Légende</h3>
+    <p class="hint">Lots du scan</p>
+    <div class="lg"><span><i style="background:#E0A422"></i><span class="lgk" style="color:#A86F00" id="lgLeaf"></span>sans adresse, probablement vacant</span><span><i style="background:#B8BFB5"></i><span class="lgk" style="color:#5C6B62" id="lgHouse"></span>bâti</span><span><i style="background:#FF5A1F"></i>passe tes filtres</span></div>
+    <p class="hint">Ton journal</p>
+    <div class="lg" id="legendSaved"></div>
+    <p class="hint">Terres publiques louées</p>
+    <div class="lg" id="legendBaux"></div>
+  </div>
+</section>
+
+<section class="sheet" id="sheetCarnet" aria-hidden="true" aria-labelledby="jTitle">
+  <div class="grip"></div>
+  <header><div class="t"><h2 id="jTitle">Journal</h2><p id="jSub">Dans ce téléphone seulement</p></div><button class="close" id="closeCarnet" aria-label="Fermer">×</button></header>
+  <div class="body">
+    <div class="jbackup" id="jBackup" hidden><span id="jBackupText"></span><button id="jBackupGo">Sauvegarder</button></div>
+    <div class="seg jtabs" role="group" aria-label="Contenu du journal"><button id="jTabLots" aria-pressed="true">Lots <b id="jNLots"></b></button><button id="jTabWalks" aria-pressed="false">Marches <b id="jNWalks"></b></button></div>
+    <div id="jLots">
+      <input class="f" id="jSearch" type="search" placeholder="Chercher : n° de lot, ville, propriétaire, note" aria-label="Chercher dans le journal" autocomplete="off">
+      <div class="seg jfilter" id="jFilter" role="group" aria-label="Filtrer"><button data-v="todo">À faire</button><button data-v="all">Tous</button><button data-v="fav">♥ Favoris</button><button data-v="contacted">Contactés</button><button data-v="sale">En vente</button></div>
+      <div class="jbar"><label for="jSort">Trier</label><select id="jSort"><option value="next">Prochaine action</option><option value="recent">Modifiés récemment</option><option value="size">Plus grands</option><option value="near">Plus proches de moi</option><option value="muni">Par municipalité</option></select><button id="btnFitFav">Voir sur la carte</button></div>
+      <ul class="jlist" id="carnetList"></ul>
+      <div class="actions" id="selActions" hidden><button id="selDelete" class="wide" style="background:#B3261E">Supprimer la sélection</button></div>
+    </div>
+    <div id="jWalks" hidden><ul class="list" id="walkList"></ul></div>
+    <details class="sec" id="jTools"><summary>Sauvegarder, exporter, supprimer</summary><div class="in">
+      <div class="links"><button id="btnBackup">Sauvegarder</button><button id="btnRestore">Restaurer</button><button id="exportCsv">Exporter (CSV)</button><button id="shareCsv">Partager (CSV)</button><button id="copyRegistre" class="wide">Copier les favoris sans propriétaire</button><button id="selMode" class="wide">Sélectionner pour supprimer</button></div>
+      <input type="file" id="restoreInput" accept="application/json,.json" hidden>
+      <p class="fine">La sauvegarde (lots, notes, marches) est un fichier à garder ailleurs : sans elle, vider le navigateur efface ton journal. Les photos restent dans le téléphone ; exporte-les lot par lot avec Partager, dans la fiche.</p>
+    </div></details>
+    <p class="version" id="carnetVersion"></p>
+    <p class="version"><a href="confidentialite.html" target="_blank" rel="noopener">Confidentialité et conditions</a> · <a href="mailto:bonjour@lots.quebec?subject=Lots">Nous écrire</a> · Aide et rapport : bouton ?</p>
+  </div>
+</section>
+
+<div class="viewer" id="viewer" hidden><img id="viewerImg" alt=""><div class="vdoc" id="viewerDoc" hidden><svg viewBox="0 0 24 24" width="64" height="64" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4M9 12h6M9 16h6"/></svg><b id="viewerDocName"></b><span id="viewerDocMeta"></span><div class="vdocb"><a id="viewerDocOpen" target="_blank" rel="noopener">Ouvrir</a><a id="viewerDocSave">Enregistrer</a></div></div><button class="close" id="viewerClose" aria-label="Fermer">×</button><div class="vbar"><label class="vlab" for="viewerTitle">Titre</label><div class="vtitle"><input id="viewerTitle" placeholder="Ex. : chemin d'accès, côté nord" autocomplete="off" enterkeyhint="done"><button id="viewerRename">Renommer</button></div><button class="del" id="viewerDel">Supprimer</button></div></div>
+
+<div class="modal" id="shareModal" hidden role="dialog" aria-modal="true" aria-labelledby="shareTitle">
+  <div class="mbox">
+    <h2 id="shareTitle">Partager le lot</h2>
+    <button class="primary" id="shareZip">Exporter photos + GPS (.zip)</button>
+    <p class="fine">Photos, position et direction de chaque prise, contour du lot et marches qui le traversent (GeoJSON et KML pour Google Earth), avec une fiche résumé. Fabriqué dans ton téléphone, rien n'est envoyé à un serveur. Le nom du propriétaire, ses coordonnées et tes notes ne sont pas inclus.</p>
+    <div class="prem"><button id="shareLink" disabled>Lien de fiche partageable</button><span class="badge-p">Premium · bientôt</span></div>
+    <p class="fine">Envoie la fiche complète par un simple lien, à jour, à un conjoint, un courtier ou un notaire. <a href="#" id="premiumNotify">Me prévenir au lancement</a></p>
+    <button class="cancel" id="shareClose">Fermer</button>
+  </div>
+</div>
+<div class="toast" id="toast" role="status"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script>
+/* ============================ CONFIG ============================ */
+const APP_VERSION='v43';
+const CONFIG = {
+  ringFraction: 0.70, maxRadius: 1500, coneLength: 150, coneHalfAngle: 25,
+  cadastre: 'https://geo.environnement.gouv.qc.ca/donnees/rest/services/Reference/Cadastre_allege/MapServer',
+  sda:      'https://servicescarto.mrnf.gouv.qc.ca/pes/rest/services/Territoire/SDA_WMS/MapServer',
+  baux:     'https://servicescarto.mrnf.gouv.qc.ca/pes/rest/services/Territoire/Droits_fonciers_WMS/MapServer',
+  roleArg:  'https://sig.argenteuil.qc.ca/server/rest/services/DB_PROD/Unite_evaluation_MRC_PUBLIC/FeatureServer/129',
+  lotsArg:  'https://sig.argenteuil.qc.ca/server/rest/services/DB_PROD/lots_cadastre/FeatureServer/208',
+  adresses: 'https://servicescarto.mern.gouv.qc.ca/pes/rest/services/Territoire/AQ_ADRESSES_WMS/MapServer',
+  geocode:  'https://servicescarto.mrnf.gouv.qc.ca/pes/rest/services/Territoire/Adresse_Geocodage/GeocodeServer',
+  infolot:  'https://appli.foncier.gouv.qc.ca/infolot/',
+  registre: 'https://www.registrefoncier.gouv.qc.ca',
+  req:      'https://www.registreentreprises.gouv.qc.ca',
+  centris:  'https://www.centris.ca/fr/a-vendre',
+  roles: { 'argenteuil':'https://experience.arcgis.com/experience/5f786b7891884c1ebb5e929e7d881bf6/', "pays-d'en-haut":'', 'matawinie':'https://carte.matawinie.org/public/', "d'autray":'' },
+  // Rôle par municipalité (prioritaire sur la MRC) : nom exact en minuscules → URL publique du rôle
+  rolesMuni: { 'laval':'https://pdi.pgmunicipal.com/immosoft/controller/ImmoNetPub/U4051/trouverParAdresse?init_mapping=&fourn_seq=173' }
+};
+const $=id=>document.getElementById(id);
+function esc(s){ return String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+var toastT; function toast(m){ const t=$('toast'); if(!t) return; t.textContent=m; t.classList.add('show'); clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove('show'),4500); }
+async function copy(t,msg){ try{ await navigator.clipboard.writeText(t); if(msg) toast(msg); }catch{ if(msg) toast('Copie impossible — note : '+t); } }
+const store={ get(k,d){ try{ const v=localStorage.getItem(k); return v==null?d:JSON.parse(v); }catch{ return d; } }, set(k,v){ try{ localStorage.setItem(k,JSON.stringify(v)); }catch{} } };
+
+/* ============================ Journal d'usage (local) ============================ */
+let LOG=store.get('terrain.log',[]);
+const SESSION=Date.now().toString(36).slice(-5);
+let ctx={screen:'carte',lot:null,last:null};
+function log(type,data={}){ const e={t:new Date().toISOString(),s:SESSION,type,screen:ctx.screen,lot:ctx.lot,...data};
+  LOG.push(e); if(LOG.length>3000) LOG=LOG.slice(-3000); ctx.last=type; store.set('terrain.log',LOG); }
+log('app_open',{v:APP_VERSION,standalone:!!(window.matchMedia&&matchMedia('(display-mode: standalone)').matches),vw:innerWidth,vh:innerHeight,ua:navigator.userAgent.slice(0,80),online:navigator.onLine});
+window.addEventListener('error',e=>log('js_error',{msg:String(e.message).slice(0,160),line:e.lineno}));
+window.addEventListener('unhandledrejection',e=>log('js_error',{msg:String(e.reason?.message||e.reason).slice(0,160)}));
+document.addEventListener('visibilitychange',()=>log(document.hidden?'app_hide':'app_show'));
+
+/* ============================ Statuts du journal ============================ */
+const TAGS={c:['Contacté','#6A3FB5']};
+const STATUS={...TAGS,i:['Favori','#E0A422'],e:['En vente','#C62828'],s:['Visité','#2E7D4F'],v:['À voir','#8A948C']};
+function keyOf(r){ const t=r.tags||[]; return r.centris?'e':t.includes('c')?'c':r.fav?'i':r.visited?'s':'v'; }
+const stColor=k=>(STATUS[k]||STATUS.v)[1];
+const ICO={
+  i:'<path d="M12 20.5s-7.5-4.6-7.5-10A4.3 4.3 0 0 1 12 7.6a4.3 4.3 0 0 1 7.5 2.9c0 5.4-7.5 10-7.5 10z" fill="currentColor" stroke="none"/>',
+  v:'<path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="3" fill="currentColor"/>',
+  s:'<path d="M4.5 12.5l4.5 4.5 10.5-11"/>',
+  c:'<rect x="3" y="6" width="18" height="12" rx="1.5"/><path d="M3.5 7l8.5 6.5L20.5 7"/>',
+  e:'<path d="M3 12.5V4h8.5L21 13.5 12.5 22z"/><circle cx="7.5" cy="8.5" r="1.6" fill="currentColor"/>',
+  cabin:'<path d="M3 11.5L12 4l9 7.5"/><path d="M5.5 10v10h13V10"/><path d="M10 20v-5h4v5"/>',
+  tent:'<path d="M2.5 20h19L12 4z"/><path d="M12 4v16M9 20l3-6 3 6"/>',
+  doc:'<path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4M9 12h6M9 16h6"/>',
+  house:'<path d="M3.5 11L12 4l8.5 7"/><path d="M6 9.5V20h12V9.5"/>',
+  star:'<path d="M12 3.5l2.6 5.6 6 .7-4.5 4.1 1.2 6-5.3-3-5.3 3 1.2-6L3.4 9.8l6-.7z" fill="currentColor" stroke="none"/>',
+  leaf:'<path d="M5 19c0-8 5-13 14-14 0 9-5 14-13 14z"/><path d="M5 19l8-8"/>'};
+const icoSvg=(k,sz=16)=>`<svg viewBox="0 0 24 24" width="${sz}" height="${sz}" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICO[k]||''}</svg>`;
+const pinHtml=(k,col,shape)=>`<div class="spin ${shape||''}" style="--c:${col}">${icoSvg(k,shape==='sq'?14:16)}</div>`;
+const labelOf=r=>[r.fav?'♥':null,r.visited?'Visité':'À voir',...(r.tags||[]).filter(k=>TAGS[k]).map(k=>TAGS[k][0]),r.centris?'En vente':null].filter(Boolean).join(' · ');
+function migrate(r){ if(!r.tags){ const st=r.status; r.tags=['i','c','e'].includes(st)?[st]:[]; r.visited=st==='s'; delete r.status; } if(r.tags.includes('i')) r.fav=true; r.tags=r.tags.filter(k=>k==='c'); return r; }
+let carnet=store.get('terrain.carnet',[]).map(migrate);
+
+/* ============================ Réseau : hors ligne et connexion faible ============================ */
+let netFails=[];
+function setOffline(v,weak){ const el=$('offline'); el.hidden=!v; el.textContent= weak ? 'Connexion faible ou service injoignable — certaines données ne se chargent pas.' : 'Hors ligne — la carte et les données ne se chargent plus. Ton journal, tes marches et tes photos restent disponibles.'; document.body.classList.toggle('isoff',!!v); }
+window.addEventListener('online',()=>{ netFails=[]; setOffline(false); log('net',{on:true}); });
+window.addEventListener('offline',()=>{ setOffline(true); log('net',{on:false}); });
+if(!navigator.onLine) setOffline(true);
+async function netFetch(url,opts){
+  try{ const r=await fetch(url,opts); if(netFails.length){ netFails=[]; if(navigator.onLine) setOffline(false); } return r; }
+  catch(e){ const now=Date.now(); netFails=netFails.filter(t=>now-t<20000); netFails.push(now); if(!navigator.onLine) setOffline(true); else if(netFails.length>=2) setOffline(true,true); throw e; } }
+
+/* ============================ Carte ============================ */
+const lastView=store.get('terrain.view',null);
+const map = L.map('map',{zoomControl:false}).setView(lastView?[lastView.lat,lastView.lng]:[46.05,-74.15], lastView?lastView.z:10);
+map.on('moveend',()=>{ const c=map.getCenter(); store.set('terrain.view',{lat:+c.lat.toFixed(5),lng:+c.lng.toFixed(5),z:map.getZoom()}); });
+const baseOSM = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© OpenStreetMap'});
+const baseSat = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{maxZoom:19,attribution:'Imagerie © Esri, Maxar, Earthstar'});
+baseOSM.addTo(map);
+let tileErr=0; [baseOSM,baseSat].forEach(l=>{ l.on('tileerror',()=>{ if(++tileErr>=6 && navigator.onLine) setOffline(true,true); }); l.on('tileload',()=>{ if(tileErr){ tileErr=0; if(navigator.onLine && !netFails.length) setOffline(false); } }); });
+const ArcGISExport = L.TileLayer.extend({
+  initialize(base,layers,opts){ this._base=base; this._layers=layers; L.TileLayer.prototype.initialize.call(this,'',opts); },
+  getTileUrl(c){ const n=Math.pow(2,c.z), half=20037508.342789244, res=(2*half)/n;
+    const minx=-half+c.x*res, maxx=minx+res, maxy=half-c.y*res, miny=maxy-res;
+    return `${this._base}/export?bbox=${minx},${miny},${maxx},${maxy}&bboxSR=3857&imageSR=3857&size=256,256&format=png32&transparent=true&dpi=96&layers=show:${this._layers}&f=image`; }
+});
+const lyrCadastre = new ArcGISExport(CONFIG.cadastre,'0',{maxZoom:19,minZoom:13,opacity:.9,attribution:'Cadastre © Gouv. du Québec'}).addTo(map);
+const lyrMuni = new ArcGISExport(CONFIG.sda,'2',{maxZoom:19,minZoom:9,opacity:.6}).addTo(map);
+const bauxGroup=L.layerGroup().addTo(map), scanGroup=L.layerGroup().addTo(map), coneGroup=L.layerGroup().addTo(map), savedGroup=L.layerGroup().addTo(map), measureGroup=L.layerGroup().addTo(map);
+let bauxOn=store.get('terrain.baux',true);
+map.on('moveend zoomend',()=>{ clearTimeout(window._bauxT); window._bauxT=setTimeout(loadBaux,300); });
+
+/* ============================ Requêtes ============================ */
+async function query(base,layerId,params){
+  const p=new URLSearchParams({f:'geojson',inSR:'4326',outSR:'4326',spatialRel:'esriSpatialRelIntersects',returnGeometry:'true',outFields:'*',...params});
+  const r=await netFetch(`${base}/${layerId}/query?${p}`); if(!r.ok) throw new Error(`HTTP ${r.status}`);
+  const j=await r.json(); if(j.error) throw new Error(j.error.message||'Erreur service'); return j; }
+const ptParams=(lat,lng)=>({geometry:`${lng},${lat}`,geometryType:'esriGeometryPoint'});
+const around=(base,layer,lat,lng,r,extra={})=>query(base,layer,{...ptParams(lat,lng),distance:String(r),units:'esriSRUnit_Meter',...extra});
+const lotAt=(lat,lng)=>query(CONFIG.cadastre,0,ptParams(lat,lng));
+const muniAt=(lat,lng)=>query(CONFIG.sda,2,{...ptParams(lat,lng),returnGeometry:'false'});
+const bauxAt=async(lat,lng)=>{ const [a,b]=await Promise.all([query(CONFIG.baux,0,{...ptParams(lat,lng),distance:'40',units:'esriSRUnit_Meter',returnGeometry:'false'}).catch(()=>({features:[]})), query(CONFIG.baux,1,{...ptParams(lat,lng),returnGeometry:'false'}).catch(()=>({features:[]}))]); return {features:[...a.features,...b.features]}; };
+const addrInEnvelope=b=>query(CONFIG.adresses,0,{geometry:`${b.getWest()},${b.getSouth()},${b.getEast()},${b.getNorth()}`,geometryType:'esriGeometryEnvelope'});
+const bauxColor=t=>/villégiature/i.test(t)?'#2E6BE6':/abri/i.test(t)?'#2E7D4F':'#6A6A5A';
+const bauxIco=t=>/villégiature/i.test(t)?'cabin':/abri/i.test(t)?'tent':'doc';
+const bauxDate=v=>v?new Date(v).toLocaleDateString('fr-CA',{year:'numeric',month:'short'}):'';
+function bauxPopup(p){ return `<div style="font:14px/1.35 inherit;min-width:180px"><b>${esc(p.DE_PRECS_N||'Bail sur terre publique')}</b><br><span style="color:#5C6B62">${esc(p.NM_ORGAN_A||'')}${p.DA_PRISE_E?' · depuis '+bauxDate(p.DA_PRISE_E):''}</span><br><small style="color:#5C6B62">Terre publique louée — le titulaire n'est pas dans les données ouvertes.</small></div>`; }
+let bauxBusy=false;
+async function loadBaux(){ if(!bauxOn||map.getZoom()<12){ bauxGroup.clearLayers(); return; } if(bauxBusy) return; bauxBusy=true;
+  try{ const b=map.getBounds(); const env={geometry:`${b.getWest()},${b.getSouth()},${b.getEast()},${b.getNorth()}`,geometryType:'esriGeometryEnvelope'};
+    const [pts,polys]=await Promise.all([query(CONFIG.baux,0,env), map.getZoom()>=13?query(CONFIG.baux,1,env).catch(()=>({features:[]})):Promise.resolve({features:[]})]);
+    bauxGroup.clearLayers();
+    polys.features.forEach(f=>{ const col=bauxColor(f.properties.DE_PRECS_N||''); L.geoJSON(f,{style:{color:col,weight:2,dashArray:'4 3',fillColor:col,fillOpacity:.08}}).bindPopup(bauxPopup(f.properties)).addTo(bauxGroup); });
+    pts.features.forEach(f=>{ const [lng,lat]=f.geometry.coordinates; const col=bauxColor(f.properties.DE_PRECS_N||''); L.marker([lat,lng],{icon:L.divIcon({className:'',html:pinHtml(bauxIco(f.properties.DE_PRECS_N||''),col,'sq'),iconSize:[26,26],iconAnchor:[13,13]})}).bindPopup(bauxPopup(f.properties)).on('click',()=>log('bail_tap')).addTo(bauxGroup); });
+  }catch(e){ log('baux_error',{msg:String(e.message).slice(0,80)}); } finally{ bauxBusy=false; } }
+
+/* ============================ Géométrie ============================ */
+const rad=d=>d*Math.PI/180;
+function ringArea(c){const R=6378137;let a=0,n=c.length;if(n<3)return 0;for(let i=0;i<n;i++){const p1=c[i],p2=c[(i+1)%n];a+=(rad(p2[0])-rad(p1[0]))*(2+Math.sin(rad(p1[1]))+Math.sin(rad(p2[1])));}return Math.abs(a*R*R/2);}
+function polyArea(g){if(!g)return 0;if(g.type==='Polygon')return g.coordinates.reduce((s,r,i)=>i?s-ringArea(r):ringArea(r),0);if(g.type==='MultiPolygon')return g.coordinates.reduce((s,p)=>s+p.reduce((t,r,i)=>i?t-ringArea(r):ringArea(r),0),0);return 0;}
+function inRing(pt,ring){let ok=false;for(let i=0,j=ring.length-1;i<ring.length;j=i++){const xi=ring[i][0],yi=ring[i][1],xj=ring[j][0],yj=ring[j][1];if(((yi>pt[1])!==(yj>pt[1]))&&(pt[0]<(xj-xi)*(pt[1]-yi)/(yj-yi)+xi))ok=!ok;}return ok;}
+function inPoly(pt,g){if(!g)return false;const polys=g.type==='Polygon'?[g.coordinates]:g.type==='MultiPolygon'?g.coordinates:[];return polys.some(p=>inRing(pt,p[0])&&!p.slice(1).some(h=>inRing(pt,h)));}
+function destination(lat,lng,bearing,dist){const R=6371000,b=rad(bearing),la=rad(lat),lo=rad(lng),d=dist/R;const la2=Math.asin(Math.sin(la)*Math.cos(d)+Math.cos(la)*Math.sin(d)*Math.cos(b));const lo2=lo+Math.atan2(Math.sin(b)*Math.sin(d)*Math.cos(la),Math.cos(d)-Math.sin(la)*Math.sin(la2));return [la2*180/Math.PI,lo2*180/Math.PI];}
+const fmt=(n,d=2)=>Number(n||0).toLocaleString('fr-CA',{maximumFractionDigits:d,minimumFractionDigits:d});
+const ft2=ha=>fmt(ha*107639.1,0)+' pi²';
+const acres=ha=>ha*2.471054;
+const unitsLine=ha=>`<b>${fmt(ha*107639.1,0)} pi²</b> · ${fmt(ha*10000,0)} m² · ${fmt(acres(ha),2)} acres · ${fmt(ha,2)} ha`;
+function addrLabel(p){const k=Object.keys(p);const civ=k.find(x=>/CIV/i.test(x)),odo=k.find(x=>/ODON|RUE|VOIE/i.test(x));return [civ&&p[civ],odo&&p[odo]].filter(Boolean).join(' ');}
+const fmtDist=m=>m>=1000?fmt(m/1000,2)+' km':Math.round(m)+' m';
+const fmtTime=s=>`${String(Math.floor(s/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`;
+const bearing=(a,b)=>{ const y=Math.sin(rad(b[1]-a[1]))*Math.cos(rad(b[0])), x=Math.cos(rad(a[0]))*Math.sin(rad(b[0]))-Math.sin(rad(a[0]))*Math.cos(rad(b[0]))*Math.cos(rad(b[1]-a[1])); return (Math.atan2(y,x)*180/Math.PI+360)%360; };
+const slug=t=>(t||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+const centrisCityUrl=m=>m?`${CONFIG.centris}~${slug(m)}?view=Map`:`${CONFIG.centris}?view=Map`;
+const money=v=>v==null||v===''?'—':Number(v).toLocaleString('fr-CA',{maximumFractionDigits:0})+' $';
+
+/* ============================ Anneau de scan ============================ */
+const ring=$('ring'), ringLabel=$('ringLabel');
+function ringPx(){ const h=innerHeight-200, w=innerWidth; return Math.max(60,Math.min(w,h)*CONFIG.ringFraction/2); }
+function ringMeters(){ const c=map.getCenter(), p=map.latLngToContainerPoint(c); return Math.min(CONFIG.maxRadius, map.distance(c, map.containerPointToLatLng(p.add([ringPx(),0])))); }
+function drawRing(){ const px=ringPx(); ring.style.width=ring.style.height=px*2+'px'; const m=ringMeters(); ringLabel.textContent = m>=1000? fmt(m/1000,1)+' km' : Math.round(m)+' m'; }
+map.on('zoom move resize',drawRing); window.addEventListener('resize',drawRing); drawRing();
+let mvT; map.on('moveend',()=>{ clearTimeout(mvT); mvT=setTimeout(()=>log('map_move',{z:+map.getZoom().toFixed(1),r:Math.round(ringMeters())}),800); });
+
+/* ============================ Feuilles ============================ */
+const sheets={lot:$('sheetLot'),carnet:$('sheetCarnet'),filters:$('sheetFilters'),layers:$('sheetLayers')};
+function anySheetOpen(){ return Object.values(sheets).some(s=>s.classList.contains('open')); }
+function show(s){ Object.values(sheets).forEach(x=>{ if(x!==s) hide(x,true); }); s.classList.add('open'); s.setAttribute('aria-hidden','false'); ctx.screen=Object.keys(sheets).find(k=>sheets[k]===s)||'?'; $('peek').hidden=true; }
+function hide(s,silent){ if(!s.classList.contains('open')) return; s.classList.remove('open'); s.setAttribute('aria-hidden','true'); if(!silent) log('close_'+ctx.screen); if(s===sheets.lot){ flushSave(); ctx.lot=null; } ctx.screen='carte'; if(!silent) setTimeout(updatePeek,50); }
+$('closeLot').onclick=()=>hide(sheets.lot); $('closeCarnet').onclick=()=>hide(sheets.carnet); $('closeFilters').onclick=()=>{ hide(sheets.filters); if(filtersActive()&&!scanLots.length) toast('Filtres prêts — touche Scanner pour les appliquer aux lots autour de la pin'); }; $('closeLayers').onclick=()=>hide(sheets.layers);
+
+/* ============================ Conseils contextuels (une fois chacun) ============================ */
+let tipQueue=[];
+function tip(key,text){ const seen=store.get('terrain.tips',{}); if(seen[key]) return; seen[key]=1; store.set('terrain.tips',seen); tipQueue.push(text); if($('tip').hidden) nextTip(); }
+function nextTip(){ const t=tipQueue.shift(); if(!t){ $('tip').hidden=true; return; } $('tipText').textContent=t; $('tip').hidden=false; clearTimeout(window._tipT); window._tipT=setTimeout(nextTip,9000); }
+$('tipOk').onclick=()=>{ clearTimeout(window._tipT); nextTip(); };
+
+/* ============================ Position ============================ */
+let me=null, meMarker=null, meCircle=null;
+function locate(){return new Promise((res,rej)=>{if(!navigator.geolocation)return rej(new Error('Pas de GPS dans ce navigateur'));
+  navigator.geolocation.getCurrentPosition(p=>res(p.coords),e=>rej(new Error(e.code===1?'Accès à la position refusé. Autorise-le dans les réglages du navigateur.':'Position introuvable — attends un signal GPS et réessaie.')),{enableHighAccuracy:true,timeout:15000,maximumAge:5000});});}
+function showMe(c){ me=[c.latitude,c.longitude];
+  if(meMarker){meMarker.setLatLng(me);meCircle.setLatLng(me).setRadius(c.accuracy||10);}
+  else{meMarker=L.marker(me,{icon:L.divIcon({className:'',html:'<div class="me"></div>',iconSize:[16,16],iconAnchor:[8,8]}),zIndexOffset:1000,interactive:false}).addTo(map);
+       meCircle=L.circle(me,{radius:c.accuracy||10,color:'#1E6FD9',weight:1,fillOpacity:.08,interactive:false}).addTo(map);} }
+$('btnMe').onclick=async()=>{ const t0=Date.now(); try{ const c=await locate(); showMe(c); map.setView(me,Math.max(map.getZoom(),16)); drawCone(); log('locate',{ms:Date.now()-t0,acc:Math.round(c.accuracy||0)}); }catch(e){toast(e.message);log('locate_error',{msg:e.message});} };
+let centeredOnce=false;
+if(navigator.geolocation) navigator.geolocation.watchPosition(p=>{ showMe(p.coords); drawCone();
+  if(!centeredOnce){ centeredOnce=true; map.setView(me,Math.max(map.getZoom(),15)); log('auto_center',{acc:Math.round(p.coords.accuracy||0)}); }
+  walkPoint(p.coords.latitude,p.coords.longitude,p.coords.accuracy||99); },()=>{},{enableHighAccuracy:true,maximumAge:3000});
+
+/* ============================ Boussole ============================ */
+let heading=null, compassOn=false, tiltFlat=false;
+const compassEl=$('compass'), degEl=$('deg'), needle=compassEl.querySelector('svg');
+function onOrient(e){ if(typeof e.beta==='number'&&typeof e.gamma==='number') tiltFlat=Math.abs(e.beta)<20&&Math.abs(e.gamma)<20; let h=null;
+  if(typeof e.webkitCompassHeading==='number') h=e.webkitCompassHeading; else if(e.absolute!==false && typeof e.alpha==='number') h=(360-e.alpha)%360;
+  if(h===null) return; heading=h; needle.style.transform=`rotate(${-h}deg)`; degEl.textContent=Math.round(h)+'°'; drawCone(); }
+let coneT=0; function drawCone(){ if(heading===null||!me) return; const now=Date.now(); if(now-coneT<150) return; coneT=now;
+  const pts=[me]; for(let a=-CONFIG.coneHalfAngle;a<=CONFIG.coneHalfAngle;a+=5) pts.push(destination(me[0],me[1],heading+a,CONFIG.coneLength));
+  coneGroup.clearLayers(); L.polygon(pts,{color:'#1E6FD9',weight:1,fillColor:'#1E6FD9',fillOpacity:.18,interactive:false}).addTo(coneGroup); }
+async function enableCompass(quiet){
+  try{ if(typeof DeviceOrientationEvent!=='undefined' && typeof DeviceOrientationEvent.requestPermission==='function'){ const r=await DeviceOrientationEvent.requestPermission(); if(r!=='granted') throw new Error('refusé'); }
+    if('ondeviceorientationabsolute' in window) window.addEventListener('deviceorientationabsolute',onOrient); else window.addEventListener('deviceorientation',onOrient);
+    compassOn=true; compassEl.classList.remove('off'); degEl.textContent='…'; log('compass_on'); if(!quiet) toast('Boussole activée — le cône bleu montre où tu pointes');
+  }catch{ if(!quiet) toast('Boussole indisponible sur cet appareil'); } }
+compassEl.onclick=()=>{ if(!compassOn) enableCompass(); else { log('compass_off'); compassOn=false; compassEl.classList.add('off'); degEl.textContent='boussole'; heading=null; coneGroup.clearLayers(); window.removeEventListener('deviceorientationabsolute',onOrient); window.removeEventListener('deviceorientation',onOrient); } };
+if(typeof DeviceOrientationEvent!=='undefined' && typeof DeviceOrientationEvent.requestPermission!=='function') enableCompass(true);
+
+/* ============================ Recherche ============================ */
+const searchForm=$('search'), q=$('q');
+function closeSearch(){ searchForm.classList.remove('open'); $('btnSearch').setAttribute('aria-pressed','false'); }
+$('btnSearch').onclick=()=>{ const open=searchForm.classList.toggle('open'); $('btnSearch').setAttribute('aria-pressed',open); if(open){ q.focus(); log('search_open'); } };
+const lotDigits=t=>{ const d=(t||'').replace(/^lot\s*/i,'').replace(/[\s.\-]/g,''); return /^\d{6,8}$/.test(d)?d:null; };
+const lotFmt=d=>d.replace(/\B(?=(\d{3})+(?!\d))/g,' ');
+async function goToLot(d){ const f1=lotFmt(d); toast('Recherche du lot '+f1+'…');
+  try{ const j=await query(CONFIG.cadastre,0,{where:`NO_LOT IN ('${f1}','${d}')`}); const f=j.features?.[0];
+    if(!f){ log('lot_search',{found:false}); return toast('Lot '+f1+' introuvable au cadastre rénové'); }
+    const b=L.geoJSON(f).getBounds(), c=b.getCenter(); map.fitBounds(b.pad(.4),{maxZoom:17});
+    highlightOne(f); let m=null; try{ const mj=await muniAt(c.lat,c.lng); m=mj.features?.[0]?.properties||null; }catch{}
+    log('lot_search',{found:true}); openLot(f,m);
+  }catch(e){ toast('Cadastre indisponible : '+e.message); } }
+async function geocode(text){ try{ const r=await netFetch(`${CONFIG.geocode}/findAddressCandidates?${new URLSearchParams({SingleLine:text,outSR:'4326',maxLocations:'1',f:'json'})}`); const j=await r.json(); const c=j.candidates?.[0]; if(c&&c.score>=60) return [c.location.y,c.location.x,c.address]; }catch{}
+  try{ const r=await netFetch(`https://nominatim.openstreetmap.org/search?${new URLSearchParams({q:text+', Québec, Canada',format:'json',limit:'1'})}`); const j=await r.json(); if(j[0]) return [+j[0].lat,+j[0].lon,j[0].display_name.split(',').slice(0,2).join(',')]; }catch{} return null; }
+searchForm.onsubmit=async e=>{ e.preventDefault(); const text=q.value.trim(); if(!text) return; q.blur(); closeSearch();
+  const ld=lotDigits(text); if(ld){ hide(sheets.lot,true); return goToLot(ld); }
+  if(/centris\.ca/i.test(text)){ const info=parseCentris(text); if(info){ hide(sheets.lot,true); return goToCentris(info); } }
+  toast('Recherche…'); const hit=await geocode(text); log('search',{len:text.length,hit:!!hit});
+  if(!hit) return toast('Lieu introuvable'); map.setView([hit[0],hit[1]],15); toast(hit[2]||text); };
+
+/* ============================ Rôle 2026 (données ouvertes MAMH, CC-BY 4.0) ============================ */
+const ROLE_BASE='https://raw.githubusercontent.com/frederelias/terrain/role-data/data/role/';
+const roleTiles={}; let roleDomains=null;
+async function roleTile(pre){ if(roleTiles[pre]!==undefined) return roleTiles[pre]; try{ const r=await netFetch(`${ROLE_BASE}lots/${pre}.json`); roleTiles[pre]=r.ok?await r.json():null; }catch{ roleTiles[pre]=null; } return roleTiles[pre]; }
+async function domains(){ if(roleDomains) return roleDomains; try{ const r=await netFetch(ROLE_BASE+'domains.json'); roleDomains=r.ok?await r.json():{}; }catch{ roleDomains={}; } return roleDomains; }
+async function roleFor(no){ const d=String(no).replace(/\D/g,''); if(d.length<6) return null; const t=await roleTile(d.slice(0,4)); return t?.[d]||null; }
+function adrLabel(a,D){ if(!a) return ''; const t=a.split(' '); const G=D.CODE_GENERIQUE_ADRESSE||{}, Lk=D.CODE_LIEN_ADRESSE||{}; const out=[];
+  t.forEach((w,i)=>{ if(G[w]&&i<=1) out.push(G[w]); else if(/^[A-Z]$/.test(w)&&i<=2){ if(Lk[w]) out.push(Lk[w].toLowerCase()); } else out.push(w.charAt(0)+w.slice(1).toLowerCase()); }); return out.join(' ').replace(/\s+/g,' '); }
+const roleSince=r=>r&&r[10]?+r[10]:null, roleNb=r=>r?r[11]||0:0, roleStatut=r=>r?r[12]||'':'';
+const roleType=r=>{ const s=roleStatut(r); return s.includes('1')&&s.includes('2')?'Particulier et entreprise':s.includes('2')?'Entreprise ou organisme':s?'Particulier':''; };
+
+/* ============================ Filtres de prospection ============================ */
+const F0={vacant:false,minAc:0,since:0,multi:false,type:'all'};
+let F={...F0,...store.get('terrain.filters',{})};
+const filtersActive=()=>F.vacant||F.minAc>0||F.since>0||F.multi||F.type!=='all';
+const filtersNeedRole=()=>F.since>0||F.multi||F.type!=='all';
+function filterCount(){ return [F.vacant,F.minAc>0,F.since>0,F.multi,F.type!=='all'].filter(Boolean).length; }
+function renderFilterUI(){ $('fVacant').checked=F.vacant; $('fMulti').checked=F.multi;
+  [['fMinAc','minAc'],['fSince','since'],['fType','type']].forEach(([id,k])=>$(id).querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.v)===String(F[k]))));
+  const n=filterCount(); $('filterCount').textContent=n; $('filterCount').hidden=!n; $('btnFilters').setAttribute('aria-pressed',n>0); }
+function setFilter(k,v){ F[k]=v; store.set('terrain.filters',F); renderFilterUI(); log('filter',{k,v}); applyFilters(); }
+$('fVacant').onchange=e=>setFilter('vacant',e.target.checked); $('fMulti').onchange=e=>setFilter('multi',e.target.checked);
+[['fMinAc','minAc',Number],['fSince','since',Number],['fType','type',String]].forEach(([id,k,cast])=>$(id).querySelectorAll('button').forEach(b=>b.onclick=()=>setFilter(k,cast(b.dataset.v))));
+$('fReset').onclick=()=>{ F={...F0}; store.set('terrain.filters',F); renderFilterUI(); applyFilters(); toast('Filtres réinitialisés'); };
+$('btnFilters').onclick=()=>{ renderFilterUI(); show(sheets.filters); log('btn',{id:'btnFilters'}); if(!scanLots.length) tip('filtres','Règle tes filtres, puis touche Scanner : les lots qui passent s\'allumeront en orange.'); };
+$('stripFilters').onclick=()=>$('btnFilters').click();
+renderFilterUI();
+function lotMatches(s){ if(F.vacant&&s.built) return false; if(F.minAc>0&&acres(s.ha)<F.minAc) return false;
+  if(filtersNeedRole()){ const r=s.role; if(!r) return false;
+    if(F.since>0){ const y=roleSince(r); if(!y||new Date().getFullYear()-y<F.since) return false; }
+    if(F.multi&&roleNb(r)<3) return false;
+    if(F.type==='p'&&roleStatut(r)!=='1') return false; if(F.type==='e'&&!roleStatut(r).includes('2')) return false; }
+  return true; }
+
+/* ============================ Scan ============================ */
+const btnScan=$('btnScan'); let scanLots=[], lastMuni=null, scanMeta=null;
+function lotStyle(no,built,state){ const saved=carnet.find(x=>x.lot===no);
+  if(saved) return {color:stColor(keyOf(saved)),weight:4,fillColor:stColor(keyOf(saved)),fillOpacity:.3};
+  if(state==='ok') return {color:'#C2410C',weight:3,fillColor:'#FF5A1F',fillOpacity:.38};
+  if(state==='no') return {color:'#8A948C',weight:1,fillColor:'#8A948C',fillOpacity:.05};
+  return {color:'#1F3D2B',weight:2,fillColor:built?'#B8BFB5':'#E0A422',fillOpacity:built?.25:.28}; }
+function restyleScan(){ scanLots.forEach(s=>s.layer.setStyle(lotStyle(s.no,s.built,s.state))); }
+btnScan.onclick=async()=>{ if(measuring) return toast('Termine d\'abord la mesure'); if(map.getZoom()<12) return toast('Rapproche-toi un peu : le scan lit les lots d\'un secteur, pas d\'une région');
+  const c=map.getCenter(), r=ringMeters(), t0=Date.now(); btnScan.disabled=true; btnScan.classList.add('busy'); navigator.vibrate?.(12);
+  try{ const res=await scanAt(c.lat,c.lng,r); log('scan',{ms:Date.now()-t0,r:Math.round(r),z:+map.getZoom().toFixed(1),lots:res.lots,vacant:res.vacant,muni:res.muni||null}); }
+  catch(e){ showStrip(`<b>Scan impossible</b> — ${esc(e.message)}`); log('scan_error',{ms:Date.now()-t0,msg:e.message}); }
+  finally{ btnScan.disabled=false; btnScan.classList.remove('busy'); } };
+async function scanAt(lat,lng,radius){
+  clearScan(true);
+  const [lots,addrs,muni]=await Promise.all([ around(CONFIG.cadastre,0,lat,lng,radius), around(CONFIG.adresses,0,lat,lng,radius+60).catch(()=>({features:[]})), muniAt(lat,lng).catch(()=>null) ]);
+  lastMuni=muni?.features?.[0]?.properties||null;
+  L.circle([lat,lng],{radius,color:'#E0A422',weight:1,dashArray:'4 4',fill:false,interactive:false}).addTo(scanGroup);
+  if(!lots.features.length){ scanMeta={n:0,vacant:0,radius}; showStrip(`<b>Aucun lot cadastré</b> dans ${Math.round(radius)} m${lastMuni?' · '+esc(lastMuni.MUS_NM_MUN):''}. Probablement une terre publique.`); return {lots:0,vacant:0,muni:lastMuni?.MUS_NM_MUN}; }
+  const pts=addrs.features.map(f=>f.geometry.coordinates); let vacant=0;
+  lots.features.forEach(f=>{ const built=pts.some(p=>inPoly(p,f.geometry)); if(!built) vacant++;
+    const no=f.properties.NO_LOT, ha=polyArea(f.geometry)/10000;
+    const layer=L.geoJSON(f,{style:lotStyle(no,built)});
+    layer.bindTooltip(`${built?'<span style="color:#5C6B62">'+icoSvg('house',13)+'</span> ':'<span style="color:#A86F00">'+icoSvg('leaf',13)+'</span> '}${no}<br>${ft2(ha)}`,{permanent:true,direction:'center',className:'lot-label'});
+    layer.on('click',ev=>{ L.DomEvent.stopPropagation(ev); if(measuring) return addMeasurePoint(ev.latlng); log('lot_tap',{from:'scan',built}); openLot(f,lastMuni); });
+    layer.addTo(scanGroup); scanLots.push({f,no,ha,built,layer,role:undefined,state:null}); });
+  scanMeta={n:lots.features.length,vacant,radius};
+  await applyFilters();
+  tip('scan','Jaune : aucune adresse, probablement vacant. Orange : passe tes filtres. Touche un lot pour sa fiche.');
+  return {lots:lots.features.length,vacant,muni:lastMuni?.MUS_NM_MUN}; }
+async function applyFilters(){ if(!scanLots.length) return;
+  if(filtersNeedRole()) await Promise.all(scanLots.map(async s=>{ if(s.role===undefined) s.role=await roleFor(s.no); }));
+  const on=filtersActive(); let ok=0, unknown=0;
+  scanLots.forEach(s=>{ const m=on?lotMatches(s):null; s.state=on?(m?'ok':'no'):null; if(m) ok++; if(on&&filtersNeedRole()&&!s.role) unknown++;
+    s.layer.setStyle(lotStyle(s.no,s.built,s.state)); s.layer.getTooltip?.()?.setOpacity(on&&!m?0:1); });
+  const sw=(c)=>`<i class="sw" style="background:${c}"></i>`;
+  let txt=`<b>${scanMeta.n} lots</b> dans ${Math.round(scanMeta.radius)} m${lastMuni?' · '+esc(lastMuni.MUS_NM_MUN):''}<br><span style="color:#A86F00">${icoSvg('leaf',14)}</span> ${scanMeta.vacant} sans adresse · <span style="color:#5C6B62">${icoSvg('house',14)}</span> ${scanMeta.n-scanMeta.vacant} avec adresse`;
+  if(on) txt=`<b>${ok} lot${ok>1?'s':''} sur ${scanMeta.n}</b> passent tes ${filterCount()} filtre${filterCount()>1?'s':''}${sw('#FF5A1F')}${unknown?`<br>${unknown} sans données au rôle`:''}`;
+  showStrip(txt); log('filter_apply',{on,ok,n:scanMeta.n}); }
+function showStrip(html){ $('stripText').innerHTML=html; $('strip').hidden=false; }
+function clearScan(keepStrip){ scanGroup.clearLayers(); scanLots=[]; scanMeta=null; if(!keepStrip) $('strip').hidden=true; }
+$('btnClear').onclick=()=>{ clearScan(); log('btn',{id:'btnClear'}); };
+function highlightOne(f){ clearScan(true); const l=L.geoJSON(f,{style:lotStyle(f.properties.NO_LOT,false)}); l.on('click',ev=>{ L.DomEvent.stopPropagation(ev); if(measuring) return addMeasurePoint(ev.latlng); openLot(f,lastMuni); }); l.addTo(scanGroup);
+  scanLots.push({f,no:f.properties.NO_LOT,ha:polyArea(f.geometry)/10000,built:false,layer:l,role:undefined,state:null}); showStrip(`<b>Lot ${esc(f.properties.NO_LOT)}</b> surligné`); }
+map.on('click',async e=>{ if(measuring) return addMeasurePoint(e.latlng); if(map.getZoom()<13){ toast('Rapproche-toi pour toucher un lot'); log('map_tap_too_far',{z:+map.getZoom().toFixed(1)}); return; } log('map_tap'); await identify(e.latlng.lat,e.latlng.lng); });
+async function identify(lat,lng){ try{
+  const [lots,muni]=await Promise.all([lotAt(lat,lng),muniAt(lat,lng).catch(()=>null)]);
+  const f=lots.features[0], m=muni?.features?.[0]?.properties;
+  if(!f){ toast(m?`Aucun lot cadastré ici — ${m.MUS_NM_MUN}. Probablement une terre publique.`:'Aucun lot cadastré ici.'); log('identify_empty'); return; }
+  highlightOne(f); lastMuni=m||lastMuni; openLot(f,m);
+}catch(e){ toast('Service indisponible : '+e.message); } }
+
+/* ============================ Aperçu du lot sous la pin ============================ */
+let peek={no:null,geom:null,f:null,m:null}, peekBusy=false;
+async function updatePeek(){ const el=$('peek');
+  if(anySheetOpen()||measuring||!$('aim').hidden||!$('snap').hidden){ el.hidden=true; return; }
+  if(map.getZoom()<15){ $('peekTitle').textContent='Rapproche-toi pour lire les lots'; $('peekSub').textContent='Le lot sous la pin bleue s\'affichera ici.'; $('peekGo').hidden=true; el.hidden=false; return; }
+  const c=map.getCenter();
+  if(peek.geom&&inPoly([c.lng,c.lat],peek.geom)){ el.hidden=false; return; }
+  if(peekBusy) return; peekBusy=true;
+  try{ const [lots,muni]=await Promise.all([lotAt(c.lat,c.lng),muniAt(c.lat,c.lng).catch(()=>null)]); const f=lots.features[0], m=muni?.features?.[0]?.properties||null;
+    if(!f){ peek={no:null,geom:null,f:null,m}; $('peekTitle').textContent='Aucun lot cadastré sous la pin'; $('peekSub').textContent=m?`${m.MUS_NM_MUN} · probablement une terre publique`:'Probablement une terre publique'; $('peekGo').hidden=true; }
+    else { const no=f.properties.NO_LOT, ha=polyArea(f.geometry)/10000; peek={no,geom:f.geometry,f,m};
+      const saved=carnet.find(x=>x.lot===no);
+      $('peekTitle').textContent=`Lot ${no} · ${fmt(acres(ha),1)} acres`; $('peekSub').textContent=[m?.MUS_NM_MUN,saved?'♥ dans ton journal'+(saved.owner?' · '+saved.owner:''):null].filter(Boolean).join(' · ')||'—'; $('peekGo').hidden=false;
+      roleFor(no).then(async r=>{ if(peek.no!==no||!r) return; const D=await domains(); const use=(D.CODE_UTILISATION_CUBF_3||{})[r[1]]; const y=roleSince(r);
+        $('peekSub').textContent=[m?.MUS_NM_MUN,use,y?'inscrit depuis '+y:null,saved?'♥':null].filter(Boolean).join(' · '); }); }
+    el.hidden=anySheetOpen()||measuring; if(!el.hidden&&peek.no) tip('peek','Le lot sous la pin bleue s\'affiche ici. Bouge la carte, puis « Voir la fiche ».');
+  }catch(e){ $('peekTitle').textContent='Lot sous la pin indisponible'; $('peekSub').textContent='Service du cadastre injoignable — réessaie plus tard.'; $('peekGo').hidden=true; el.hidden=false; }
+  finally{ peekBusy=false; } }
+map.on('moveend',()=>{ clearTimeout(window._peekT); window._peekT=setTimeout(updatePeek,450); });
+$('peekGo').onclick=()=>{ if(!peek.f) return; log('peek_open'); highlightOne(peek.f); openLot(peek.f,peek.m); };
+
+/* ============================ Fiche ============================ */
+let selected=null, loading=false;
+/* Projection MTM zone 8 (NAD83, méridien central -73,5°) — pour cadrer les visualiseurs municipaux du sud-ouest du Québec */
+function mtm8(lat,lng){ const a=6378137, f=1/298.257222101, e2=f*(2-f), ep2=e2/(1-e2), k0=0.9999, l0=-73.5*Math.PI/180;
+  const phi=lat*Math.PI/180, lam=lng*Math.PI/180, s=Math.sin(phi), c=Math.cos(phi), N=a/Math.sqrt(1-e2*s*s), T=Math.tan(phi)**2, C=ep2*c*c, A=(lam-l0)*c;
+  const M=a*((1-e2/4-3*e2**2/64-5*e2**3/256)*phi-(3*e2/8+3*e2**2/32+45*e2**3/1024)*Math.sin(2*phi)+(15*e2**2/256+45*e2**3/1024)*Math.sin(4*phi)-(35*e2**3/3072)*Math.sin(6*phi));
+  return [304800+k0*N*(A+(1-T+C)*A**3/6+(5-18*T+T*T+72*C-58*ep2)*A**5/120), k0*(M+N*Math.tan(phi)*(A*A/2+(5-T+9*C+4*C*C)*A**4/24+(61-58*T+T*T+600*C-330*ep2)*A**6/720))]; }
+// Visualiseurs qui acceptent un cadrage dans l'URL : on ouvre directement sur le lot
+const ROLE_ZOOM={ 'matawinie':b=>{ const [x1,y1]=mtm8(b.getSouth(),b.getWest()), [x2,y2]=mtm8(b.getNorth(),b.getEast()); const pad=250, w=Math.max(600,x2-x1+2*pad), h=Math.max(600,y2-y1+2*pad), cx=(x1+x2)/2, cy=(y1+y2)/2;
+  return `https://carte.matawinie.org/public/?autozoom=region;${Math.round(cx-w/2)};${Math.round(cy-h/2)};${Math.round(w)};${Math.round(h)}`; } };
+function roleUrl(m,lot,b){ { const k=Object.keys(ROLE_ZOOM).find(k=>(m?.MUS_NM_MRC||'').toLowerCase().includes(k)); if(k&&b) return ROLE_ZOOM[k](b); } const mrc=(m?.MUS_NM_MRC||'').toLowerCase(), mun=(m?.MUS_NM_MUN||'').toLowerCase().trim();
+  if(CONFIG.rolesMuni?.[mun]) return CONFIG.rolesMuni[mun];
+  for(const k in CONFIG.roles){ if(mrc.includes(k)&&CONFIG.roles[k]) return CONFIG.roles[k].replace('{lot}',encodeURIComponent(lot||'')); }
+  const site=m?.SITE_WEB?(m.SITE_WEB.startsWith('http')?m.SITE_WEB:'https://'+m.SITE_WEB):null; return site||CONFIG.infolot; }
+async function openLot(f,m){
+  flushSave();
+  const no=f.properties.NO_LOT, area=polyArea(f.geometry), b=L.geoJSON(f).getBounds(), c=b.getCenter();
+  selected={lot:no,muni:m?.MUS_NM_MUN||'',mrc:m?.MUS_NM_MRC||'',lat:c.lat,lng:c.lng,ha:area/10000,geom:f.geometry}; ctx.lot=no; loading=true;
+  selected.role=null; selected.built=null;
+  log('lot_open',{lot:no,ha:+(area/10000).toFixed(2),muni:selected.muni});
+  $('lotNo').textContent=`Lot ${no}`; $('lotWhere').textContent=m?`${m.MUS_NM_MUN} · MRC ${m.MUS_NM_MRC}`:'Municipalité inconnue';
+  $('sumUnits').innerHTML=unitsLine(area/10000);
+  $('lnkInfolot').href=CONFIG.infolot; $('lnkRegistre').href=CONFIG.registre; $('lnkRole').href=roleUrl(m,no,b);
+  const tel=(m?.TELEPHONE||'').replace(/[^+\d]/g,''); $('lnkCall').href=tel?'tel:'+tel:'#'; $('lnkCall').textContent=m?.TELEPHONE?'Appeler · '+m.TELEPHONE:'Appeler la municipalité'; $('lnkCall').classList.toggle('disabled',!tel);
+  const site=m?.SITE_WEB?(m.SITE_WEB.startsWith('http')?m.SITE_WEB:'https://'+m.SITE_WEB):null; $('lnkMuni').href=site||CONFIG.infolot; $('lnkMuni').textContent=site?`Site de ${m.MUS_NM_MUN}`:'Site web';
+  const saved=carnet.find(x=>x.lot===no);
+  $('lotOwner').value=saved?.owner||''; $('lotEmail').value=saved?.email||''; $('lotPhone').value=saved?.phone||''; $('lotAddrPost').value=saved?.addrPost||''; $('lotNote').value=saved?.note||'';
+  $('lotVisited').checked=!!saved?.visited; $('lotContacted').checked=!!(saved?.tags||[]).includes('c'); setFav(!!saved?.fav);
+  syncCentris(saved?.centris||'',saved?.centrisInfo||null); loading=false;
+  renderSummary(); ownerLinks(); contactLinks(); updateFicheState(); renderThumbs(no); renderAdsLot();
+  $('secExplore').open=true; $('secOwner').open=false; $('secContact').open=!!saved?.owner&&!(saved?.tags||[]).includes('c');
+  loadRole(no,f.geometry,m); loadOpenRole(no,m);
+  show(sheets.lot); tip('fiche','♥ Garder ajoute ce lot au journal. Tout ce que tu écris ici s\'enregistre tout seul.');
+  addrInEnvelope(b).then(r=>{ if(selected?.lot!==no) return; const inside=r.features.filter(x=>inPoly(x.geometry.coordinates,f.geometry)); selected.built=inside.length>0; selected.builtAddr=inside.slice(0,2).map(x=>addrLabel(x.properties)).filter(Boolean).join(', '); renderSummary(); })
+    .catch(()=>{ if(selected?.lot===no){ selected.built='?'; renderSummary(); } });
+  bauxAt(c.lat,c.lng).then(bx=>{ if(selected?.lot!==no) return; selected.baux=bx.features?.length||0; renderSummary(); }).catch(e=>log('tenure_error',{msg:String(e.message).slice(0,120)}));
+}
+function renderSummary(){ if(!selected) return; const s=selected, r=s.role, own=$('lotOwner').value.trim()||s.roleOwner||'';
+  const o=$('sumOwner'); o.textContent=own||'Propriétaire inconnu'; o.classList.toggle('unk',!own);
+  const tags=[];
+  if(r){ const use=(roleDomains?.CODE_UTILISATION_CUBF_3||{})[r[1]]; if(use) tags.push(`<span>${esc(use)}</span>`); }
+  if(s.built===true) tags.push(`<span class="bad">Bâti${s.builtAddr?' · '+esc(s.builtAddr):''}</span>`); else if(s.built===false) tags.push('<span class="good">Aucune adresse · probablement vacant</span>');
+  if(r){ const y=roleSince(r), yrs=y?new Date().getFullYear()-y:null; if(y) tags.push(`<span class="${yrs>=25?'hot':''}">Inscrit depuis ${y}</span>`); const nb=roleNb(r); if(nb) tags.push(`<span class="${nb>=3?'hot':''}">${nb} propriétaire${nb>1?'s':''}</span>`); const t=roleType(r); if(t) tags.push(`<span>${t}</span>`); if(r[7]&&r[7]!=='0') tags.push(`<span>Zone agricole ${r[7]==='2'?'100 %':'partielle'}</span>`); }
+  if(s.baux) tags.push(`<span class="bad">Bail sur terre publique</span>`);
+  if(centrisUrl) tags.push(`<span class="bad">En vente${centrisInfo?.price?' · '+money(centrisInfo.price):''}</span>`);
+  $('sumTags').innerHTML=tags.join(''); }
+function updateFicheState(){ if(!selected) return; const saved=carnet.find(x=>x.lot===selected.lot);
+  $('btnRemove').hidden=!saved; $('saveState').textContent=saved?'Dans ton journal · enregistrement automatique.':'Pas encore dans le journal · tout ce que tu écris l\'y ajoute.';
+  $('secOwnerC').textContent=$('lotOwner').value.trim()?'nom connu':''; $('secContactC').textContent=$('lotContacted').checked?'contacté':'';
+  $('secSaleC').textContent=centrisUrl?'annonce attachée':''; $('secFollowC').textContent=[$('lotVisited').checked?'visité':null,$('lotNote').value.trim()?'note':null].filter(Boolean).join(' · '); }
+
+/* ---- Garder (♥) et enregistrement automatique ---- */
+function setFav(on){ $('btnFav').setAttribute('aria-pressed',on); $('favLabel').textContent=on?'Gardé':'Garder'; }
+$('btnFav').onclick=()=>{ if(!selected) return; const on=$('btnFav').getAttribute('aria-pressed')!=='true'; setFav(on); navigator.vibrate?.(10); log('fav',{on}); saveNow(); toast(on?'Gardé dans ton journal':'Retiré des favoris'); };
+function collect(){ const s=selected; const tags=$('lotContacted').checked?['c']:[];
+  return {lot:s.lot,muni:s.muni,mrc:s.mrc,lat:s.lat,lng:s.lng,ha:s.ha,geom:s.geom,owner:$('lotOwner').value.trim(),email:$('lotEmail').value.trim(),phone:$('lotPhone').value.trim(),addrPost:$('lotAddrPost').value.trim(),note:$('lotNote').value.trim(),tags,visited:$('lotVisited').checked,fav:$('btnFav').getAttribute('aria-pressed')==='true',centris:centrisUrl,centrisInfo}; }
+let saveT=null;
+function saveNow(){ clearTimeout(saveT); saveT=null; if(!selected||loading) return; const rec=collect(); const i=carnet.findIndex(x=>x.lot===rec.lot);
+  const has=rec.fav||rec.owner||rec.email||rec.phone||rec.addrPost||rec.note||rec.visited||rec.tags.length||rec.centris;
+  if(i<0&&!has){ updateFicheState(); return; }
+  const today=new Date().toISOString().slice(0,10);
+  if(i<0){ carnet.unshift({...rec,date:today,updated:today}); toast('Ajouté à ton journal'); log('save',{new:true}); }
+  else { carnet[i]={...carnet[i],...rec,updated:today}; log('save',{fav:rec.fav,owner:!!rec.owner,note:!!rec.note,centris:!!rec.centris}); }
+  persist(); restyleScan(); renderSaved(); updateFicheState(); renderSummary(); }
+function saveSoon(){ if(loading) return; clearTimeout(saveT); saveT=setTimeout(saveNow,700); updateFicheState(); }
+function flushSave(){ if(saveT) saveNow(); }
+['lotOwner','lotEmail','lotPhone','lotAddrPost','lotNote','cPrice','cBroker'].forEach(id=>$(id).addEventListener('input',saveSoon));
+['lotVisited','lotContacted'].forEach(id=>$(id).addEventListener('change',e=>{ log(id,{v:e.target.checked}); saveNow(); }));
+$('lotOwner').addEventListener('input',()=>{ ownerLinks(); contactLinks(); renderSummary(); });
+['lotEmail','lotPhone','lotAddrPost'].forEach(id=>$(id).addEventListener('input',contactLinks));
+window.addEventListener('pagehide',flushSave); document.addEventListener('visibilitychange',()=>{ if(document.hidden) flushSave(); });
+$('btnRemove').onclick=()=>{ if(!selected) return; if(!confirm(`Retirer le lot ${selected.lot} de ton journal ? Les photos restent dans le téléphone.`)) return;
+  carnet=carnet.filter(x=>x.lot!==selected.lot); persist(); restyleScan(); renderSaved(); setFav(false); updateFicheState(); log('remove'); toast('Retiré du journal'); };
+
+/* ---- Trouver le propriétaire ---- */
+const corp=/\b(inc|ltée|ltee|limitée|ltd|enr|s\.?e\.?n\.?c|senc|compagnie|cie|société|societe|corporation|corp|fiducie|ferme|gestion|holding|placements|immeubles|investissements)\b|\d{4}-\d{4}\s+québec/i;
+function ownerLinks(){ const n=$('lotOwner').value.trim(), where=selected?.muni||'', enc=encodeURIComponent, r=selected?.role;
+  const set=(id,url)=>{ const a=$(id); a.href=url||'#'; a.classList.toggle('off',!url); };
+  set('lnkC411', n?`https://www.canada411.ca/search/si/1/${enc(n)}/${enc(where)}`:null);
+  set('lnkGoogle', n?`https://www.google.com/search?q=${enc(`"${n}" ${where}`)}`:null);
+  set('lnkFacebook', n?`https://www.facebook.com/search/people/?q=${enc(n)}`:null);
+  set('lnkLinkedin', n?`https://www.linkedin.com/search/results/people/?keywords=${enc(n)}`:null);
+  set('lnkNoms', n?CONFIG.registre:null);
+  const isCorp=(r&&roleStatut(r).includes('2'))||corp.test(n); $('lnkReq').hidden=!isCorp; set('lnkReq', n?CONFIG.req:null);
+  const y=roleSince(r); const old=y&&new Date().getFullYear()-y>=30; $('lnkDeces').hidden=!old; set('lnkDeces', n?`https://www.google.com/search?q=${enc(`"${n}" avis de décès ${where}`)}`:null);
+  const h=$('ownerHint'); h.hidden=false; h.textContent=n?'Les recherches s\'ouvrent préremplies ; l\'app ne collecte rien elle-même.':(/argenteuil/i.test(selected?.mrc||'')?'Pas de nom ? Le rôle de la MRC, dans « Explorer ce lot », l\'affiche quand il est publié. Sinon : Registre foncier, index des immeubles (environ 1 $).':'Pas de nom ? Dans « Explorer ce lot » : le rôle de la MRC (gratuit, souvent nominatif) ou le Registre foncier, index des immeubles (environ 1 $). Le n° de lot est copié en ouvrant.'); }
+['lnkC411','lnkGoogle','lnkFacebook','lnkLinkedin','lnkReq','lnkDeces','lnkNoms','lnkInfolot','lnkRegistre','lnkRole','lnkMuni','lnkCall'].forEach(id=>$(id).addEventListener('click',()=>log('btn',{id})));
+$('lnkReq').addEventListener('click',()=>{ const n=$('lotOwner').value.trim(); if(n) copy(n,'Nom copié — colle-le dans la recherche du Registre des entreprises'); });
+$('lnkNoms').addEventListener('click',()=>{ const n=$('lotOwner').value.trim(); if(n) copy(n,'Nom copié — Registre foncier → Index des noms'); });
+['lnkInfolot','lnkRegistre','lnkRole'].forEach(id=>$(id).addEventListener('click',()=>{ if(selected) copy(selected.lot,'N° de lot copié'); }));
+$('copyLot').onclick=()=>copy(selected?.lot||'','Numéro de lot copié');
+
+/* ---- Rôle d'évaluation en direct : MRC d'Argenteuil (un lot à la fois) ---- */
+async function arcq(url,params){ const r=await netFetch(`${url}/query?${new URLSearchParams({f:'json',outFields:'*',returnGeometry:'false',...params})}`); if(!r.ok) throw new Error('HTTP '+r.status); const j=await r.json(); if(j.error) throw new Error(j.error.message||'erreur'); return j.features||[]; }
+function interiorPoint(g){ const b=L.geoJSON({type:'Feature',geometry:g}).getBounds(); const c=b.getCenter(); if(inPoly([c.lng,c.lat],g)) return c;
+  for(let i=1;i<8;i++) for(let j=1;j<8;j++){ const lat=b.getSouth()+(b.getNorth()-b.getSouth())*i/8, lng=b.getWest()+(b.getEast()-b.getWest())*j/8; if(inPoly([lng,lat],g)) return L.latLng(lat,lng); } return c; }
+async function loadRole(no,geom,m){ const box=$('roleBox'); box.hidden=true; box.innerHTML='';
+  if(!/argenteuil/i.test(m?.MUS_NM_MRC||'')) return;
+  box.hidden=false; box.innerHTML='<h4>Rôle d\'évaluation · MRC d\'Argenteuil</h4><div class="muted">Lecture du rôle…</div>';
+  const digits=String(no).replace(/\D/g,''), spaced=digits.replace(/\B(?=(\d{3})+(?!\d))/g,' '); let feat=null, how='';
+  try{ const lk=await arcq(CONFIG.lotsArg,{where:`idlot IN ('${spaced}','${digits}')`,outFields:'nomatricul'}); const mat=lk[0]?.attributes?.nomatricul;
+    if(mat){ const r=await arcq(CONFIG.roleArg,{where:`matricul10='${String(mat).replace(/'/g,"''")}'`}); feat=r[0]?.attributes; how='lot'; } }catch(e){ log('role_lookup_error',{step:'lot',msg:String(e.message).slice(0,60)}); }
+  if(!feat){ try{ const pt=interiorPoint(geom); const r=await arcq(CONFIG.roleArg,{geometry:`${pt.lng},${pt.lat}`,geometryType:'esriGeometryPoint',inSR:'4326',spatialRel:'esriSpatialRelIntersects'}); feat=r[0]?.attributes; how='point'; }catch(e){ log('role_lookup_error',{step:'point',msg:String(e.message).slice(0,60)}); } }
+  if(selected?.lot!==no) return;
+  if(!feat){ box.innerHTML='<h4>Rôle d\'évaluation · MRC d\'Argenteuil</h4><div class="muted">Pas de lecture directe pour ce lot — utilise « Rôle d\'évaluation de la MRC » plus bas.</div>'; log('role_lookup',{found:false}); return; }
+  const a=feat; const owner=[a.prenom,a.nom].filter(x=>x&&String(x).trim()).join(' ').trim().replace(/\s+/g,' ').toLowerCase().replace(/(^|[\s'-])\S/g,c=>c.toUpperCase());
+  const civ=[a.nocivinf&&(a.nocivinf+(a.nocivinfa||'')), a.typgeneri, a.typlien, a.voiepubliq, a.orientatio].filter(x=>x&&String(x).trim()).join(' ').replace(/\s+/g,' ');
+  const sup=a.supterrain?Number(a.supterrain):null; selected.roleOwner=owner||'';
+  box.innerHTML=`<h4>Rôle d'évaluation · MRC d'Argenteuil</h4><div class="own">${owner?esc(owner):'Propriétaire non publié'}</div><div class="sub">${owner?'Premier propriétaire inscrit au rôle':''}${civ?(owner?' · ':'')+esc(civ):''}</div>
+    <dl><dt>Matricule (n° au rôle)</dt><dd>${esc(a.matricul10||'—')}</dd>${sup?`<dt>Superficie au rôle</dt><dd>${fmt(sup*10.7639,0)} pi²</dd>`:''}<dt>Terrain</dt><dd>${money(a.valterrain)}</dd><dt>Bâtiment</dt><dd>${money(a.valbatim)}</dd><dt>Immeuble</dt><dd><b>${money(a.valimmeu)}</b></dd></dl>
+    ${owner?'<button type="button" id="roleUse">Utiliser ce nom</button>':''}`;
+  log('role_lookup',{found:true,how,owner:!!owner}); renderSummary();
+  const btn=$('roleUse'); if(btn){ if($('lotOwner').value.trim()===owner) btn.hidden=true;
+    btn.onclick=()=>{ $('lotOwner').value=owner; ownerLinks(); contactLinks(); btn.hidden=true; saveNow(); log('role_use'); }; } }
+async function loadOpenRole(no,m){ const box=$('openBox'); box.hidden=true; box.innerHTML='';
+  const [r,D]=await Promise.all([roleFor(no),domains()]); if(selected?.lot!==no) return; if(!r){ log('open_role',{found:false}); return; }
+  selected.role=r; ownerLinks(); renderSummary();
+  const [mat,cubf,sup,vt,vb,vi,an,agri,foret,adr]=r; const isArg=/argenteuil/i.test(m?.MUS_NM_MRC||'');
+  box.innerHTML=`<h4>Rôle 2026 · données ouvertes</h4>${adr?`<div class="sub">${esc(adrLabel(adr,D))}</div>`:''}
+    ${isArg?'':`<dl>${sup?`<dt>Superficie au rôle</dt><dd>${fmt(sup*10.7639,0)} pi²</dd>`:''}<dt>Terrain</dt><dd>${money(vt)}</dd><dt>Bâtiment</dt><dd>${money(vb)}</dd><dt>Immeuble</dt><dd><b>${money(vi)}</b></dd>${an&&an!=='0000'?`<dt>Construction</dt><dd>${esc(an)}</dd>`:''}${foret?`<dt>Forêt au rôle</dt><dd>${fmt(foret*10.7639,0)} pi²</dd>`:''}<dt>Matricule (n° au rôle)</dt><dd>${esc(mat||'—')}</dd></dl>`}
+    <div class="src">Source : rôle d'évaluation foncière du Québec 2026, MAMH, Données Québec (CC-BY 4.0). Noms et adresses des propriétaires non diffusés.</div>`;
+  box.hidden=false; log('open_role',{found:true,cubf}); }
+
+/* ---- Centris ---- */
+let centrisUrl='', centrisInfo=null, pendingCentris=null;
+function parseCentris(text){ text=(text||'').trim(); const m=text.match(/https?:\/\/(?:www\.)?centris\.ca\/\S+/i); const url=m?m[0].replace(/[\)\]\.,]+$/,''):null; if(!url) return null;
+  const info={url}; const idm=url.match(/\/(\d{7,9})(?:[\/?#]|$)/); if(idm) info.id=idm[1]; const pm=url.match(/centris\.ca\/fr\/([a-z-]+)~a-vendre~([a-z0-9-]+)/i); if(pm){ info.type=pm[1].replace(/-/g,' '); info.city=pm[2].replace(/-/g,' '); }
+  const t=text.match(/(.+?) à vendre à (.+?), (.+?), (.+?), (\d{7,9})/); if(t){ info.type=t[1].trim(); info.city=t[2].trim(); info.address=t[4].trim(); info.id=t[5]; }
+  const pr=text.match(/(\d{1,3}(?:[ \u00a0,]\d{3})+|\d{4,})\s?\$/); if(pr) info.price=pr[1].replace(/[^\d]/g,''); return info; }
+function syncCentris(url,info){ centrisUrl=url||''; centrisInfo=info||(url?{url}:null); const a=$('lnkCentris'), box=$('centrisUrl'), d=$('centrisData');
+  if(centrisUrl){ a.href=centrisUrl; const i=centrisInfo||{}; a.textContent=`Ouvrir l'annonce ${i.id||''}`; box.innerHTML=`<span>${esc([i.type,i.address,i.city].filter(Boolean).join(' · ')||centrisUrl.replace(/^https?:\/\//,'').slice(0,60))}</span><button type="button" id="centrisClear">retirer</button>`; $('centrisClear').onclick=()=>{ syncCentris('',null); saveNow(); toast('Annonce retirée'); }; d.hidden=false; $('cPrice').value=i.price||''; $('cBroker').value=i.broker||''; }
+  else { a.href=centrisCityUrl(selected?.muni); a.textContent='Centris — annonces de la municipalité'; box.innerHTML=''; d.hidden=true; }
+  if(!loading){ renderSummary(); updateFicheState(); } }
+['cPrice','cBroker'].forEach(id=>$(id).addEventListener('input',()=>{ if(!centrisInfo) return; centrisInfo.price=$('cPrice').value.replace(/[^\d]/g,''); centrisInfo.broker=$('cBroker').value.trim(); }));
+async function goToCentris(info){ const qq=[info.address,info.city].filter(Boolean).join(', '); if(!qq) return false; toast('Recherche de l\'adresse de l\'annonce…'); const pos=await geocode(qq); if(!pos){ toast('Adresse introuvable — place la pin toi-même'); return false; }
+  map.setView([pos[0],pos[1]],info.address&&/\d/.test(info.address)?17:15); log('centris_geocode',{civic:/\d/.test(info.address||'')});
+  if(/\d/.test(info.address||'')){ await identify(pos[0],pos[1]); if(selected){ syncCentris(info.url,info); saveNow(); toast(`Annonce ${info.id||''} attachée au lot ${selected.lot}`); return true; } }
+  pendingCentris=info; toast('Touche le lot visé : l\'annonce y sera attachée'); return true; }
+async function attachCentris(text){ const info=parseCentris(text); if(!info) return toast('Pas une annonce Centris'); if(!selected){ return goToCentris(info); } syncCentris(info.url,info); saveNow(); log('centris_link',{id:!!info.id,price:!!info.price}); toast(`Annonce ${info.id||''} attachée`); }
+$('btnCentrisPaste').onclick=async()=>{ let t=''; try{ t=(await navigator.clipboard.readText()).trim(); }catch{} if(!/centris\.ca/i.test(t)) t=(prompt('Colle le lien ou le texte partagé de l\'annonce Centris :',t&&/^https?:/.test(t)?t:'')||'').trim(); if(t) attachCentris(t); };
+$('lnkCentris').addEventListener('click',()=>{ if(selected&&!centrisUrl) toast('Pour revenir : le X en haut à gauche. Trouvé ? Partager → lots'); log('btn',{id:'lnkCentris',has:!!centrisUrl}); });
+/* ---- Sources d'annonces : chacune reçoit le maximum qu'elle accepte dans son adresse ---- */
+const MRC_REGION={'argenteuil':'laurentides',"les pays-d'en-haut":'laurentides',"pays-d'en-haut":'laurentides','les laurentides':'laurentides','antoine-labelle':'laurentides','la rivière-du-nord':'laurentides','rivière-du-nord':'laurentides','thérèse-de blainville':'laurentides','deux-montagnes':'laurentides','mirabel':'laurentides',
+  'matawinie':'lanaudiere',"d'autray":'lanaudiere','joliette':'lanaudiere','montcalm':'lanaudiere',"l'assomption":'lanaudiere','les moulins':'lanaudiere',
+  'papineau':'outaouais','pontiac':'outaouais',"les collines-de-l'outaouais":'outaouais','la vallée-de-la-gatineau':'outaouais','maskinongé':'mauricie','mékinac':'mauricie','les chenaux':'mauricie'};
+const regionOf=mrc=>MRC_REGION[(mrc||'').toLowerCase().replace(/^mrc (de |des |du |d')?/,'').trim()]||MRC_REGION[(mrc||'').toLowerCase()]||null;
+function listingSources(o){ // o: {lat,lng,zoom,bounds,muni,mrc}
+  const enc=encodeURIComponent, z=Math.round(o.zoom), b=o.bounds, reg=regionOf(o.mrc);
+  const place=(z>=11&&o.muni)?slug(o.muni):(reg||slug(o.muni||''));
+  const centris=cat=>`${CONFIG.centris.replace('/a-vendre','')}/${cat}~a-vendre${place?'~'+place:''}?view=Map`;
+  const rc=(type)=>`https://www.realtor.ca/map#ZoomLevel=${z}&Center=${o.lat.toFixed(6)}%2C${o.lng.toFixed(6)}&LatitudeMax=${b.getNorth().toFixed(5)}&LongitudeMax=${b.getEast().toFixed(5)}&LatitudeMin=${b.getSouth().toFixed(5)}&LongitudeMin=${b.getWest().toFixed(5)}&Sort=6-D&PropertyTypeGroupID=1&TransactionTypeId=2&PropertySearchTypeId=${type}&Currency=CAD`;
+  const km=Math.max(2,Math.min(100,Math.round(map.distance([b.getSouth(),b.getWest()],[b.getNorth(),b.getEast()])/2000)));
+  const near=o.muni?`${o.muni}, QC`:'Québec';
+  const gsite=(site,extra)=>`https://www.google.com/search?q=${enc(`site:${site} ${extra} "${o.muni||''}"`)}&tbs=qdr:m`;
+  return [
+    {k:'realtor',label:'Realtor.ca · terrains (même vue)',url:rc(6)},
+    {k:'realtor_rec',label:'Realtor.ca · chalets et récréatif',url:rc(2)},
+    {k:'realtor_agri',label:'Realtor.ca · terres agricoles',url:rc(4)},
+    {k:'centris',label:`Centris · terrains${place?' · '+(place===reg?reg:o.muni):''}`,url:centris('terrain')},
+    {k:'centris_terre',label:'Centris · terres',url:centris('terre')},
+    {k:'kijiji',label:`Kijiji · terrains (${km} km)`,url:`https://www.kijiji.ca/b-land-for-sale/quebec/c641l9001?radius=${km}.0&address=${enc(near)}&ll=${o.lat.toFixed(5)},${o.lng.toFixed(5)}`},
+    {k:'lespac',label:'LesPAC · terrains',url:gsite('lespac.com','terrain')},
+    {k:'duproprio',label:'DuProprio · terrains',url:gsite('duproprio.com','terrain')},
+    {k:'appartogo',label:'Appartogo · terrains',url:reg&&o.muni?`https://appartogo.com/fr/terrain-vendre/canada/quebec/${reg}/${slug(o.muni)}`:gsite('appartogo.com','terrain')},
+    {k:'marketplace',label:'Facebook Marketplace',url:`https://www.facebook.com/marketplace/search/?query=${enc('terrain '+(o.muni||''))}`}
+  ]; }
+function renderAds(boxId,o){ const box=$(boxId); if(!box) return; box.innerHTML='';
+  listingSources(o).forEach(sr=>{ const a=document.createElement('a'); a.href=sr.url; a.target='_blank'; a.rel='noopener'; a.textContent=sr.label; a.onclick=()=>{ log('ads',{src:sr.k,where:boxId}); if(sr.k.startsWith('centris')) toast('Pour revenir : le X en haut à gauche. Trouvé ? Partager → lots'); }; box.appendChild(a); }); }
+async function renderAdsMap(){ const c=map.getCenter(); let m=lastMuni; try{ const j=await muniAt(c.lat,c.lng); m=j.features?.[0]?.properties||m; }catch{}
+  renderAds('adsMap',{lat:c.lat,lng:c.lng,zoom:map.getZoom(),bounds:map.getBounds(),muni:m?.MUS_NM_MUN||'',mrc:m?.MUS_NM_MRC||''}); }
+function renderAdsLot(){ if(!selected) return; const g=L.geoJSON({type:'Feature',geometry:selected.geom}).getBounds().pad(2.5);
+  renderAds('adsLot',{lat:selected.lat,lng:selected.lng,zoom:Math.max(13,Math.min(16,map.getBoundsZoom(g))),bounds:g,muni:selected.muni,mrc:selected.mrc}); }
+
+/* ---- Lettre et contact ---- */
+function letter(){ const d=new Date().toLocaleDateString('fr-CA',{year:'numeric',month:'long',day:'numeric'}); const who=$('lotOwner').value.trim();
+  return {subject:`Votre terrain — lot ${selected.lot}, ${selected.muni||''}`.trim(),
+  body:`Le ${d}\n\nObjet : votre terrain — lot ${selected.lot}, ${selected.muni||'[municipalité]'}\n\n${who?'Bonjour '+who+',':'Madame, Monsieur,'}\n\nJe me permets de vous écrire au sujet du terrain boisé que vous possédez à ${selected.muni||'[municipalité]'} (lot ${selected.lot} du cadastre du Québec, environ ${ft2(selected.ha)}). J'ai parcouru le secteur récemment et ce terrain correspond exactement à ce que je cherche pour un projet personnel et familial, à long terme.\n\nSi vous envisagiez un jour de le vendre, en tout ou en partie, j'aimerais beaucoup en discuter avec vous, sans aucune pression. Je suis un acheteur sérieux, en mesure de conclure simplement, et je prendrais en charge les frais de notaire.\n\nVous pouvez me joindre par téléphone au [votre numéro] ou par courriel à [votre courriel]. Même si ce n'est pas le bon moment, je serais heureux d'en reparler plus tard.\n\nMerci de votre attention,\n\n[Votre nom]`,
+  sms:`Bonjour${who?' '+who:''}, je m'appelle [votre nom]. Je m'intéresse à votre terrain boisé à ${selected.muni||''} (lot ${selected.lot}, env. ${ft2(selected.ha)}). Si vous pensiez un jour le vendre, j'aimerais en discuter, sans pression. Merci !`}; }
+function contactLinks(){ if(!selected) return; const L_=letter(), em=$('lotEmail').value.trim(), ph=$('lotPhone').value.trim().replace(/[^+\d]/g,'');
+  const m=$('btnMail'), s=$('btnSms'); m.href=em?`mailto:${encodeURIComponent(em)}?subject=${encodeURIComponent(L_.subject)}&body=${encodeURIComponent(L_.body)}`:'#'; m.classList.toggle('off',!em); m.textContent=em?'Courriel':'Courriel (ajoute une adresse)';
+  s.href=ph?`sms:${ph}?&body=${encodeURIComponent(L_.sms)}`:'#'; s.classList.toggle('off',!ph); s.textContent=ph?'Texto':'Texto (ajoute un cellulaire)'; }
+$('btnMail').addEventListener('click',()=>{ if(selected){ copy(letter().body,null); log('btn',{id:'send_mail'}); } });
+$('btnSms').addEventListener('click',()=>{ if(selected){ copy(letter().sms,null); log('btn',{id:'send_sms'}); } });
+$('copyLetter').onclick=()=>{ if(!selected) return; const to=[$('lotOwner').value.trim(),$('lotAddrPost').value.trim()].filter(Boolean).join('\n'); copy((to?to+'\n\n':'')+letter().body,'Lettre copiée'); log('btn',{id:'copyLetter'}); };
+$('btnPrint').onclick=()=>{ if(!selected) return; const to=[$('lotOwner').value.trim(),$('lotAddrPost').value.trim()].filter(Boolean).join('\n');
+  const html=`<!doctype html><html lang="fr"><head><meta charset="utf-8"><title>Lettre — lot ${esc(selected.lot)}</title><style>body{font:12pt/1.55 Georgia,'Times New Roman',serif;max-width:6.5in;margin:.9in auto;white-space:pre-wrap;color:#111}.to{margin-bottom:2em}@media print{body{margin:.8in}}</style></head><body>${to?`<div class="to">${esc(to)}</div>`:''}${esc(letter().body)}<script>onload=function(){setTimeout(function(){print()},300)}<\/script></body></html>`;
+  let w=null; try{ w=window.open('','_blank'); }catch{}
+  if(w){ w.document.open(); w.document.write(html); w.document.close(); }
+  else { const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([html],{type:'text/html'})); a.download=`lettre-lot-${selected.lot.replace(/\s/g,'')}.html`; a.click(); toast('Lettre téléchargée — ouvre-la pour l\'imprimer'); }
+  log('btn',{id:'print'}); if(!$('lotContacted').checked) setTimeout(()=>{ if(selected&&confirm('Marquer ce propriétaire comme contacté ?')){ $('lotContacted').checked=true; saveNow(); } },1500); };
+
+/* ============================ Carnet ============================ */
+let favOnly=store.get('terrain.favOnly',false);
+function persist(){ try{ localStorage.setItem('terrain.carnet',JSON.stringify(carnet,(k,v)=>k==='_tried'?undefined:v)); }catch{ toast('Stockage local plein ou indisponible'); } renderCount(); }
+function renderCount(){ const c=$('carnetCount'); c.textContent=carnet.length; c.hidden=!carnet.length; }
+function savedLabel(r){ return `<span style="color:${stColor(keyOf(r))}">${icoSvg(keyOf(r),14)}</span> <b>Lot ${esc(r.lot)}</b><br>${labelOf(r)}${r.owner?'<br>'+esc(r.owner):''}${r.ha?'<br>'+ft2(r.ha):''}`; }
+function renderSaved(){ savedGroup.clearLayers(); const zoomed=map.getZoom()>=14;
+  carnet.filter(r=>!favOnly||r.fav).forEach(r=>{ const col=stColor(keyOf(r));
+    const go=ev=>{ L.DomEvent.stopPropagation(ev); if(measuring) return addMeasurePoint(ev.latlng); identify(r.lat,r.lng); };
+    if(zoomed&&r.geom){ const pg=L.geoJSON({type:'Feature',geometry:r.geom},{style:{color:col,weight:4,fillColor:col,fillOpacity:.22}}).addTo(savedGroup);
+      pg.bindTooltip(savedLabel(r),{permanent:true,direction:'center',className:'lot-label saved-label'}); pg.on('click',go); }
+    else { const mk=L.marker([r.lat,r.lng],{icon:L.divIcon({className:'',html:pinHtml(keyOf(r),col),iconSize:[30,30],iconAnchor:[15,15]})}).addTo(savedGroup);
+      mk.bindTooltip(`Lot ${esc(r.lot)} · ${labelOf(r)}${r.owner?' · '+esc(r.owner):''}`); mk.on('click',go); } });
+  $('legendSaved').innerHTML=['e','c','i','s','v'].map(k=>`<span><span class="lgk">${pinHtml(k,stColor(k))}</span>${STATUS[k][0]}</span>`).join('');
+  $('legendBaux').innerHTML=[['cabin','#2E6BE6','bail de villégiature'],['tent','#2E7D4F','abri sommaire'],['doc','#6A6A5A','autre bail']].map(([k,c,t])=>`<span><span class="lgk">${pinHtml(k,c,'sq')}</span>${t}</span>`).join('');
+  $('lgLeaf').innerHTML=icoSvg('leaf',16); $('lgHouse').innerHTML=icoSvg('house',16);
+  const missing=carnet.filter(r=>!r.geom&&!r._tried); missing.slice(0,10).forEach(async r=>{ r._tried=true; try{ const j=await lotAt(r.lat,r.lng); const f=j.features?.[0]; if(f){ r.geom=f.geometry; persist(); renderSaved(); } }catch{} }); }
+map.on('zoomend',()=>renderSaved());
+$('btnCarnet').onclick=()=>{ log('btn',{id:'btnCarnet'}); renderWalkList(); renderCarnet(); $('carnetVersion').textContent=`lots ${APP_VERSION} · tes données restent dans ce téléphone`; show(sheets.carnet); };
+async function photoCounts(){ try{ const all=await dbAll('photos'); const m={}; all.forEach(p=>{ if(p.lot) m[p.lot]=(m[p.lot]||0)+1; }); return m; }catch{ return {}; } }
+let selMode=false, selSet=new Set();
+$('selMode').onclick=()=>{ selMode=!selMode; selSet.clear(); $('selMode').textContent=selMode?'Annuler la sélection':'Sélectionner pour supprimer'; if(selMode){ J.tab='lots'; $('jTools').open=false; $('carnetList').scrollIntoView?.({block:'start'}); } $('selActions').hidden=!selMode; renderCarnet(); };
+$('selDelete').onclick=()=>{ if(!selSet.size) return toast('Rien de sélectionné'); if(!confirm(`Supprimer ${selSet.size} lot(s) du journal ? Les photos restent dans le téléphone.`)) return; carnet=carnet.filter(x=>!selSet.has(x.lot)); persist(); restyleScan(); renderSaved(); log('carnet_delete',{n:selSet.size}); selSet.clear(); selMode=false; $('selMode').textContent='Sélectionner pour supprimer'; $('selActions').hidden=true; renderCarnet(); };
+let J={tab:'lots',filter:'todo',q:'',sort:'next',...store.get('terrain.journal',{})}; J.q='';
+const daysSince=d=>d?Math.floor((Date.now()-new Date(d).getTime())/864e5):null;
+function nextAction(r){ const t=r.tags||[];
+  if(t.includes('c')){ const d=daysSince(r.updated||r.date); return d>=21?{rank:1,label:`Relancer · ${d} j`,sec:'secContact',todo:true}:{rank:7,label:'En attente de réponse',sec:'secFollow',todo:false}; }
+  if(r.centris&&!r.owner) return {rank:5,label:'Voir l\'annonce',sec:'secSale',todo:true};
+  if(!r.owner) return {rank:4,label:'Trouver le propriétaire',sec:'secOwner',todo:true};
+  if(!r.addrPost&&!r.email&&!r.phone) return {rank:3,label:'Trouver son adresse',sec:'secContact',todo:true};
+  return {rank:2,label:'Envoyer la lettre',sec:'secContact',todo:true}; }
+function journalRows(){ const q=J.q.trim().toLowerCase(), qd=q.replace(/\s/g,'');
+  let rows=carnet.map(r=>({r,n:nextAction(r)}));
+  if(q) rows=rows.filter(({r})=>(r.lot||'').replace(/\s/g,'').includes(qd)&&qd.length>0||[r.muni,r.owner,r.note,r.mrc].some(v=>(v||'').toLowerCase().includes(q)));
+  rows=rows.filter(({r,n})=>J.filter==='all'||(J.filter==='todo'&&n.todo)||(J.filter==='fav'&&r.fav)||(J.filter==='contacted'&&(r.tags||[]).includes('c'))||(J.filter==='sale'&&r.centris));
+  const by={next:(a,b)=>a.n.rank-b.n.rank||(b.r.fav-a.r.fav)||((b.r.updated||'').localeCompare(a.r.updated||'')),
+    recent:(a,b)=>(b.r.updated||b.r.date||'').localeCompare(a.r.updated||a.r.date||''), size:(a,b)=>b.r.ha-a.r.ha,
+    muni:(a,b)=>(a.r.muni||'').localeCompare(b.r.muni||'','fr')||a.n.rank-b.n.rank,
+    near:(a,b)=>me?map.distance(me,[a.r.lat,a.r.lng])-map.distance(me,[b.r.lat,b.r.lng]):0};
+  return rows.sort(by[J.sort]||by.next); }
+function saveJ(){ store.set('terrain.journal',{tab:J.tab,filter:J.filter,sort:J.sort}); }
+function renderJournalChrome(){ const todo=carnet.filter(r=>nextAction(r).todo).length;
+  $('jSub').textContent=carnet.length?`${carnet.length} lot${carnet.length>1?'s':''} · ${todo} à faire · ${walks.length} marche${walks.length>1?'s':''} · dans ce téléphone seulement`:'Dans ce téléphone seulement';
+  $('jNLots').textContent=carnet.length||''; $('jNWalks').textContent=walks.length||'';
+  $('jTabLots').setAttribute('aria-pressed',J.tab==='lots'); $('jTabWalks').setAttribute('aria-pressed',J.tab==='walks'); $('jLots').hidden=J.tab!=='lots'; $('jWalks').hidden=J.tab!=='walks';
+  $('jFilter').querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.v===J.filter)); $('jSort').value=J.sort;
+  const lb=store.get('terrain.lastBackup',0), d=lb?Math.floor((Date.now()-lb)/864e5):null; const need=carnet.length>0&&(d===null||d>=14);
+  $('jBackup').hidden=!need; if(need) $('jBackupText').textContent=d===null?'Ton journal n\'a jamais été sauvegardé.':`Dernière sauvegarde il y a ${d} jours.`; }
+$('jTabLots').onclick=()=>{ J.tab='lots'; saveJ(); renderCarnet(); }; $('jTabWalks').onclick=()=>{ J.tab='walks'; saveJ(); renderJournalChrome(); renderWalkList(); };
+$('jFilter').querySelectorAll('button').forEach(b=>b.onclick=()=>{ J.filter=b.dataset.v; saveJ(); log('journal_filter',{v:J.filter}); renderCarnet(); });
+$('jSort').onchange=e=>{ J.sort=e.target.value; saveJ(); if(J.sort==='near'&&!me) toast('Position inconnue — touche Ma position sur la carte'); renderCarnet(); };
+$('jSearch').addEventListener('input',e=>{ J.q=e.target.value; renderCarnet(); });
+$('jBackupGo').onclick=()=>{ $('btnBackup').click(); renderJournalChrome(); };
+async function openFromJournal(r,sec){ hide(sheets.carnet,true); map.setView([r.lat,r.lng],16); await identify(r.lat,r.lng);
+  if(sec&&selected?.lot===r.lot){ const el=$(sec); el.open=true; setTimeout(()=>el.scrollIntoView?.({behavior:'smooth',block:'start'}),250); } }
+async function renderCarnet(){ renderJournalChrome(); const ul=$('carnetList'); const pc=await photoCounts(); ul.innerHTML='';
+  if(!carnet.length){ ul.innerHTML='<li class="jempty"><b>Ton journal est vide</b>Ouvre la fiche d\'un lot et touche <b>♥ Garder</b> — ou écris simplement une note : le lot s\'ajoute ici avec sa prochaine étape.</li>'; return; }
+  const rows=journalRows();
+  if(!rows.length){ ul.innerHTML=`<li class="jempty"><b>Aucun lot ne correspond</b>${J.q?'Essaie un autre mot, ou ':''}<button type="button" id="jReset">voir tous les lots</button></li>`; $('jReset').onclick=()=>{ J.q=''; $('jSearch').value=''; J.filter='all'; saveJ(); renderCarnet(); }; return; }
+  rows.forEach(({r,n})=>{ const k=keyOf(r), col=stColor(k), li=document.createElement('li'); li.className='jcard';
+    const dist=me?` · ${fmtDist(map.distance(me,[r.lat,r.lng]))}`:'';
+    li.innerHTML=`${selMode?`<input type="checkbox" class="selbox" ${selSet.has(r.lot)?'checked':''} aria-label="Sélectionner le lot ${esc(r.lot)}">`:''}<button type="button" class="jmain"><span class="jico">${pinHtml(k,col)}</span><span class="jt"><b>Lot ${esc(r.lot)}${r.fav?' <span class="jfav" aria-label="favori">♥</span>':''}</b><span>${esc(r.muni||'—')} · ${fmt(acres(r.ha),1)} acres${dist}${pc[r.lot]?` · 📷 ${pc[r.lot]}`:''}</span>${r.owner?`<span class="jo">${esc(r.owner)}</span>`:''}${r.note?`<span class="jn">${esc(r.note)}</span>`:''}</span></button><button type="button" class="jnext${n.todo?'':' wait'}">${esc(n.label)} ›</button>`;
+    li.querySelector('.jmain').onclick=()=>{ if(selMode){ const cb=li.querySelector('.selbox'); cb.checked=!cb.checked; cb.checked?selSet.add(r.lot):selSet.delete(r.lot); return; } log('journal_open',{via:'card'}); openFromJournal(r,null); };
+    li.querySelector('.jnext').onclick=()=>{ log('journal_open',{via:'next',action:n.sec}); openFromJournal(r,n.sec); };
+    li.querySelector('.selbox')?.addEventListener('change',e=>{ e.target.checked?selSet.add(r.lot):selSet.delete(r.lot); });
+    ul.appendChild(li); }); }
+$('btnFitFav').onclick=()=>{ const l=journalRows().map(x=>x.r); if(!l.length) return toast('Aucun lot à afficher'); hide(sheets.carnet,true); map.fitBounds(L.latLngBounds(l.map(r=>[r.lat,r.lng])).pad(.3),{maxZoom:16}); log('journal_fit',{n:l.length}); };
+function csv(){ const head=['lot','municipalite','mrc','pi2','hectares','proprietaire','adresse_postale','courriel','telephone','favori','statut','centris','centris_no','prix','courtier','note','date','lat','lng'];
+  const rows=carnet.map(r=>[r.lot,r.muni,r.mrc,Math.round(r.ha*107639.1),r.ha.toFixed(3),r.owner||'',r.addrPost||'',r.email||'',r.phone||'',r.fav?'oui':'',labelOf(r),r.centris||'',r.centrisInfo?.id||'',r.centrisInfo?.price||'',r.centrisInfo?.broker||'',r.note||'',r.date||'',r.lat.toFixed(6),r.lng.toFixed(6)].map(v=>`"${String(v??'').replace(/"/g,'""')}"`).join(','));
+  return '\ufeff'+[head.join(','),...rows].join('\n'); }
+$('exportCsv').onclick=()=>{ log('btn',{id:'exportCsv'}); if(!carnet.length) return toast('Journal vide'); const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([csv()],{type:'text/csv;charset=utf-8'})); a.download=`lots-${new Date().toISOString().slice(0,10)}.csv`; a.click(); };
+$('copyRegistre').onclick=()=>{ const l=carnet.filter(r=>r.fav&&!r.owner); if(!l.length) return toast('Aucun favori sans propriétaire'); copy(l.map(r=>`${r.lot}\t${r.muni}`).join('\n'),`${l.length} lot(s) copié(s) — à chercher au Registre`); };
+$('shareCsv').onclick=async()=>{ log('btn',{id:'shareCsv'}); if(!carnet.length) return toast('Journal vide'); const file=new File([csv()],'lots.csv',{type:'text/csv'});
+  if(navigator.canShare?.({files:[file]})){ try{ await navigator.share({files:[file],title:'Journal Lots'}); }catch{} } else copy(csv(),'CSV copié'); };
+
+$('btnBackup').onclick=()=>{ const data={app:'lots',v:APP_VERSION,date:new Date().toISOString(),carnet,walks,filters:F}; const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([JSON.stringify(data)],{type:'application/json'})); a.download=`lots-sauvegarde-${new Date().toISOString().slice(0,10)}.json`; a.click(); store.set('terrain.lastBackup',Date.now()); log('backup',{n:carnet.length}); toast('Sauvegarde téléchargée — garde-la dans Drive ou par courriel'); };
+$('btnRestore').onclick=()=>$('restoreInput').click();
+$('restoreInput').addEventListener('change',async e=>{ const f=e.target.files[0]; e.target.value=''; if(!f) return;
+  try{ const data=JSON.parse(await f.text()); if(!Array.isArray(data.carnet)) throw new Error('format');
+    const byLot=new Map(carnet.map(r=>[r.lot,r])); let added=0; data.carnet.map(migrate).forEach(r=>{ if(!byLot.has(r.lot)){ byLot.set(r.lot,r); added++; } });
+    if(!confirm(`Restaurer ${data.carnet.length} lot(s) (${added} nouveau(x)) et ${data.walks?.length||0} marche(s) ? Les lots déjà présents sont gardés tels quels.`)) return;
+    carnet=[...byLot.values()]; const wids=new Set(walks.map(x=>x.id)); (data.walks||[]).forEach(x=>{ if(!wids.has(x.id)) walks.push(x); }); store.set('terrain.walks',walks);
+    persist(); renderSaved(); renderWalks(); renderCarnet(); renderWalkList(); log('restore',{added}); toast(`${added} lot(s) restauré(s)`); }
+  catch{ toast('Fichier de sauvegarde illisible'); } });
+
+/* ============================ Partage : export ZIP (local) ; lien de fiche = Premium ============================ */
+const CRC_T=(()=>{ const t=new Uint32Array(256); for(let n=0;n<256;n++){ let c=n; for(let k=0;k<8;k++) c=c&1?0xEDB88320^(c>>>1):c>>>1; t[n]=c>>>0; } return t; })();
+function crc32(u8){ let c=0xFFFFFFFF; for(let i=0;i<u8.length;i++) c=CRC_T[(c^u8[i])&0xFF]^(c>>>8); return (c^0xFFFFFFFF)>>>0; }
+function makeZip(files){ // [{name, data:Uint8Array}] — ZIP sans compression, noms en UTF-8
+  const enc=new TextEncoder(), parts=[], central=[]; let offset=0; const dt=new Date();
+  const dTime=((dt.getHours()<<11)|(dt.getMinutes()<<5)|(dt.getSeconds()>>1))&0xFFFF, dDate=(((dt.getFullYear()-1980)<<9)|((dt.getMonth()+1)<<5)|dt.getDate())&0xFFFF;
+  for(const f of files){ const nm=enc.encode(f.name), crc=crc32(f.data), sz=f.data.length;
+    const lh=new DataView(new ArrayBuffer(30)); lh.setUint32(0,0x04034b50,true); lh.setUint16(4,20,true); lh.setUint16(6,0x0800,true); lh.setUint16(10,dTime,true); lh.setUint16(12,dDate,true); lh.setUint32(14,crc,true); lh.setUint32(18,sz,true); lh.setUint32(22,sz,true); lh.setUint16(26,nm.length,true);
+    parts.push(new Uint8Array(lh.buffer),nm,f.data);
+    const ch=new DataView(new ArrayBuffer(46)); ch.setUint32(0,0x02014b50,true); ch.setUint16(4,20,true); ch.setUint16(6,20,true); ch.setUint16(8,0x0800,true); ch.setUint16(12,dTime,true); ch.setUint16(14,dDate,true); ch.setUint32(16,crc,true); ch.setUint32(20,sz,true); ch.setUint32(24,sz,true); ch.setUint16(28,nm.length,true); ch.setUint32(42,offset,true);
+    central.push(new Uint8Array(ch.buffer),nm); offset+=30+nm.length+sz; }
+  const cd=central.reduce((a,b)=>a+b.length,0); const end=new DataView(new ArrayBuffer(22)); end.setUint32(0,0x06054b50,true); end.setUint16(8,files.length,true); end.setUint16(10,files.length,true); end.setUint32(12,cd,true); end.setUint32(16,offset,true);
+  return new Blob([...parts,...central,new Uint8Array(end.buffer)],{type:'application/zip'}); }
+const xmlEsc=t=>String(t??'').replace(/[<>&'"]/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;',"'":'&apos;','"':'&quot;'}[c]));
+async function blobBytes(b){ if(b.arrayBuffer) return new Uint8Array(await b.arrayBuffer()); return new Uint8Array(await new Response(b).arrayBuffer()); }
+async function buildLotZip(){ const s=selected, d=s.lot.replace(/\s/g,''), base=`lot-${d}`, enc=new TextEncoder(), out=[];
+  let ph=[]; try{ ph=(await listPhotos(s.lot)).filter(p=>p.kind!=='doc'&&(!p.src||p.src==='terrain'||p.src==='marche')); }catch{}
+  const rows=[['fichier','titre','source','date','latitude','longitude','direction_deg']];
+  const feats=[{type:'Feature',properties:{type:'lot',no_lot:s.lot,municipalite:s.muni,mrc:s.mrc,superficie_pi2:Math.round(s.ha*107639.1),superficie_m2:Math.round(s.ha*10000),superficie_acres:+acres(s.ha).toFixed(2),superficie_ha:+s.ha.toFixed(3)},geometry:s.geom}];
+  const kmlP=[]; const ring=(s.geom.type==='Polygon'?s.geom.coordinates[0]:s.geom.coordinates[0][0]).map(c=>c.join(',')).join(' ');
+  kmlP.push(`<Placemark><name>Lot ${xmlEsc(s.lot)}</name><Style><LineStyle><color>ff1f5aff</color><width>3</width></LineStyle><PolyStyle><color>401f5aff</color></PolyStyle></Style><Polygon><outerBoundaryIs><LinearRing><coordinates>${ring}</coordinates></LinearRing></outerBoundaryIs></Polygon></Placemark>`);
+  for(const [i,p] of ph.entries()){ const dt=new Date(p.t); const nm=`photos/${String(i+1).padStart(2,'0')}-${dt.toISOString().slice(0,10)}${p.title?'-'+slug(p.title).slice(0,40):''}.jpg`;
+    out.push({name:`${base}/${nm}`,data:await blobBytes(p.blob)}); const h=p.heading!=null?Math.round(p.heading):'';
+    rows.push([nm,p.title||'',SRC_LABEL[p.src]||p.src||'',dt.toISOString(),p.lat??'',p.lng??'',h]);
+    if(p.lat!=null){ feats.push({type:'Feature',properties:{type:'photo',fichier:nm,titre:p.title||'',date:dt.toISOString(),direction_deg:h===''?null:h},geometry:{type:'Point',coordinates:[p.lng,p.lat]}});
+      kmlP.push(`<Placemark><name>${xmlEsc(p.title||'Photo '+(i+1))}</name><description>${xmlEsc(nm)}${h!==''?' · direction '+h+'°':''} · ${dt.toLocaleString('fr-CA')}</description>${h!==''?`<Style><IconStyle><heading>${h}</heading></IconStyle></Style>`:''}<Point><coordinates>${p.lng},${p.lat}</coordinates></Point></Placemark>`); } }
+  walks.filter(w=>w.pts?.some(([la,ln])=>inPoly([ln,la],s.geom))).forEach(w=>{ feats.push({type:'Feature',properties:{type:'marche',date:new Date(w.start).toISOString(),distance_m:w.dist},geometry:{type:'LineString',coordinates:w.pts.map(([la,ln])=>[ln,la])}});
+    kmlP.push(`<Placemark><name>Marche du ${new Date(w.start).toLocaleDateString('fr-CA')}</name><Style><LineStyle><color>ff4f7d2e</color><width>3</width></LineStyle></Style><LineString><coordinates>${w.pts.map(([la,ln])=>ln+','+la).join(' ')}</coordinates></LineString></Placemark>`); });
+  const kml=`<?xml version="1.0" encoding="UTF-8"?>\n<kml xmlns="http://www.opengis.net/kml/2.2"><Document><name>Lot ${xmlEsc(s.lot)} — ${xmlEsc(s.muni)}</name>${kmlP.join('')}</Document></kml>`;
+  const readme=[`LOT ${s.lot} — ${s.muni}${s.mrc?' (MRC '+s.mrc+')':''}`,'',`Superficie : ${fmt(s.ha*107639.1,0)} pi² · ${fmt(s.ha*10000,0)} m² · ${fmt(acres(s.ha),2)} acres · ${fmt(s.ha,2)} ha`,`Centre : ${s.lat.toFixed(6)}, ${s.lng.toFixed(6)}`,`Carte : https://www.google.com/maps?q=${s.lat.toFixed(6)},${s.lng.toFixed(6)}`,`Cadastre : ${CONFIG.infolot} (n° de lot ${s.lot})`,'',`Photos : ${ph.length} (voir photos.csv pour la position et la direction de chacune)`,'Contour du lot, photos et marches : lot.geojson et lot.kml (s\'ouvre dans Google Earth)','',`Exporté depuis lots.quebec le ${new Date().toLocaleString('fr-CA')}.`,'Données à titre indicatif, sans valeur légale. Ne contient ni nom ni coordonnées de propriétaire, ni notes personnelles.'].join('\r\n');
+  out.push({name:`${base}/LISEZMOI.txt`,data:enc.encode(readme)},{name:`${base}/photos.csv`,data:enc.encode('\ufeff'+rows.map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',')).join('\r\n'))},{name:`${base}/lot.geojson`,data:enc.encode(JSON.stringify({type:'FeatureCollection',features:feats}))},{name:`${base}/lot.kml`,data:enc.encode(kml)});
+  return {blob:makeZip(out),name:`${base}.zip`,photos:ph.length}; }
+$('btnShare').onclick=()=>{ if(!selected) return; $('shareTitle').textContent=`Partager le lot ${selected.lot}`; $('shareModal').hidden=false; log('share_open'); };
+$('shareClose').onclick=()=>{ $('shareModal').hidden=true; };
+$('shareModal').addEventListener('click',e=>{ if(e.target.id==='shareModal') $('shareModal').hidden=true; });
+$('shareZip').onclick=async()=>{ if(!selected) return; const b=$('shareZip'); b.disabled=true; b.textContent='Préparation…';
+  try{ const z=await buildLotZip(); const file=new File([z.blob],z.name,{type:'application/zip'}); log('share_zip',{photos:z.photos,kb:Math.round(z.blob.size/1024)});
+    if(navigator.canShare?.({files:[file]})){ try{ await navigator.share({files:[file],title:`Lot ${selected.lot}`}); }catch{} }
+    else { const a=document.createElement('a'); a.href=URL.createObjectURL(z.blob); a.download=z.name; a.click(); toast(`${z.name} téléchargé · ${z.photos} photo(s)`); }
+    $('shareModal').hidden=true; }
+  catch(e){ toast('Export impossible : '+e.message); log('share_error',{msg:String(e.message).slice(0,80)}); }
+  finally{ b.disabled=false; b.textContent='Exporter photos + GPS (.zip)'; } };
+$('premiumNotify').onclick=e=>{ e.preventDefault(); log('premium_interest',{feature:'share_link'}); location.href='mailto:bonjour@lots.quebec?subject='+encodeURIComponent('Prévenez-moi : lots Premium (partage de fiche)'); };
+
+/* ============================ Couches ============================ */
+let sat=store.get('terrain.sat',false);
+function applyBase(){ if(sat){ map.removeLayer(baseOSM); baseSat.addTo(map); } else { map.removeLayer(baseSat); baseOSM.addTo(map); } lyrMuni.bringToFront(); lyrCadastre.bringToFront(); }
+$('btnLayers').onclick=()=>{ renderAdsMap(); $('lyrSat').checked=sat; $('lyrBauxT').checked=bauxOn; $('lyrFavOnly').checked=favOnly; renderSaved(); show(sheets.layers); log('btn',{id:'btnLayers'}); };
+$('lyrSat').onchange=e=>{ sat=e.target.checked; store.set('terrain.sat',sat); applyBase(); log('basemap',{sat}); };
+$('lyrBauxT').onchange=e=>{ bauxOn=e.target.checked; store.set('terrain.baux',bauxOn); if(bauxOn) loadBaux(); else bauxGroup.clearLayers(); log('baux',{on:bauxOn}); };
+$('lyrFavOnly').onchange=e=>{ favOnly=e.target.checked; store.set('terrain.favOnly',favOnly); renderSaved(); log('fav_only',{on:favOnly}); };
+
+/* ============================ Photos (IndexedDB, local) ============================ */
+const DB=new Promise((res,rej)=>{ if(!window.indexedDB) return rej(new Error('IndexedDB indisponible')); const r=indexedDB.open('terrain',2); r.onupgradeneeded=()=>{ const db=r.result; if(!db.objectStoreNames.contains('photos')){ const st=db.createObjectStore('photos',{keyPath:'id'}); st.createIndex('lot','lot'); } if(!db.objectStoreNames.contains('layers')) db.createObjectStore('layers',{keyPath:'id'}); }; r.onsuccess=()=>res(r.result); r.onerror=()=>rej(r.error); });
+DB.catch(()=>{});
+async function dbTx(mode,fn,storeName='photos'){ const db=await DB; return new Promise((res,rej)=>{ const tx=db.transaction(storeName,mode), st=tx.objectStore(storeName); const out=fn(st); tx.oncomplete=()=>res(out?.result??out); tx.onerror=()=>rej(tx.error); }); }
+async function dbAll(storeName){ const db=await DB; return new Promise(res=>{ const qq=db.transaction(storeName).objectStore(storeName).getAll(); qq.onsuccess=()=>res(qq.result); qq.onerror=()=>res([]); }); }
+async function listPhotos(lot){ const db=await DB; return new Promise((res,rej)=>{ const qq=db.transaction('photos').objectStore('photos').index('lot').getAll(lot); qq.onsuccess=()=>res(qq.result.sort((a,b)=>a.t-b.t)); qq.onerror=()=>rej(qq.error); }); }
+function shrink(file,max=1280){ return new Promise(res=>{ const img=new Image(); img.onload=()=>{ const k=Math.min(1,max/Math.max(img.width,img.height)); const c=document.createElement('canvas'); c.width=Math.round(img.width*k); c.height=Math.round(img.height*k); c.getContext('2d').drawImage(img,0,0,c.width,c.height); c.toBlob(b=>{ URL.revokeObjectURL(img.src); res(b); },'image/jpeg',.82); }; img.onerror=()=>res(file); img.src=URL.createObjectURL(file); }); }
+const SRC_LABEL={infolot:'Infolot',registre:'Registre foncier',role:'Rôle',muni:'Municipalité',centris:'Centris',terrain:'Photo',marche:'Photo orientée'};
+let pendingSrc='terrain', povTarget=null;
+$('btnPhoto').onclick=()=>{ if(!selected) return; pendingSrc='terrain'; navigator.vibrate?.(12); $('photoInput').click(); };
+document.querySelectorAll('.src .doc[data-src]').forEach(b=>b.onclick=()=>{ if(!selected) return; pendingSrc=b.dataset.src; navigator.vibrate?.(12); log('btn',{id:'doc_'+pendingSrc}); $('docInput').click(); });
+const isImg=f=>/^image\//.test(f.type)&&!/svg/.test(f.type);
+const kb=n=>n>=1048576?fmt(n/1048576,1)+' Mo':Math.max(1,Math.round(n/1024))+' Ko';
+$('docInput').addEventListener('change',async e=>{ const files=[...e.target.files]; e.target.value=''; if(!files.length||!selected) return; const lot=selected.lot, src=pendingSrc; let n=0;
+  for(const f of files){ try{ if(f.size>25*1048576){ toast(`${f.name} dépasse 25 Mo — non joint`); continue; }
+      const rec={id:Date.now()+'-'+Math.random().toString(36).slice(2,7),lot,src,t:Date.now(),title:f.name.replace(/\.[^.]+$/,'')};
+      if(isImg(f)){ rec.blob=await shrink(f,1800); rec.kind='img'; } else { rec.blob=f; rec.kind='doc'; rec.name=f.name; rec.type=f.type||'application/octet-stream'; rec.size=f.size; }
+      await dbTx('readwrite',st=>st.put(rec)); n++; }catch(err){ log('attach_error',{msg:String(err.message).slice(0,80)}); } }
+  log('attach',{n,src}); if(n) toast(`${n} pièce${n>1?'s':''} jointe${n>1?'s':''} · ${SRC_LABEL[src]||src}`); renderThumbs(lot);
+  if(n&&!carnet.find(x=>x.lot===lot)){ setFav(true); saveNow(); } });
+$('photoInput').addEventListener('change',async e=>{ const files=[...e.target.files]; e.target.value=''; if(!files.length) return;
+  if(pendingSrc==='marche'){ const pos=me?[me[0],me[1]]:null; let lotNo=povTarget; if(!lotNo&&pos){ try{ const j=await lotAt(pos[0],pos[1]); lotNo=j.features?.[0]?.properties?.NO_LOT||null; }catch{} } let n=0;
+    for(const f of files){ try{ const blob=await shrink(f); const id=Date.now()+'-'+Math.random().toString(36).slice(2,7); await dbTx('readwrite',st=>st.put({id,lot:lotNo,src:'marche',t:Date.now(),blob,lat:pos?.[0]??null,lng:pos?.[1]??null,heading:aimHeading,walk:walk?.id||null})); if(walk) walk.photos.push(id); n++; }catch(err){ log('photo_error',{msg:String(err.message).slice(0,100)}); } }
+    log('photos_walk',{n,lot:!!lotNo}); toast(`${n} photo(s)${lotNo?' · lot '+lotNo:''}`); renderPov(); if(selected&&selected.lot===lotNo) renderThumbs(lotNo); povTarget=null; return; }
+  if(!selected) return; const lot=selected.lot; let n=0;
+  for(const f of files){ try{ const blob=await shrink(f); await dbTx('readwrite',st=>st.put({id:Date.now()+'-'+Math.random().toString(36).slice(2,7),lot,src:pendingSrc,t:Date.now(),blob})); n++; }catch(err){ log('photo_error',{msg:String(err.message).slice(0,100)}); } }
+  log('photos_add',{n,src:pendingSrc}); toast(`${n} image${n>1?'s':''} · ${SRC_LABEL[pendingSrc]||pendingSrc} · lot ${lot}`); renderThumbs(lot);
+  if(!carnet.find(x=>x.lot===lot)){ setFav(true); saveNow(); } });
+let thumbUrls=[];
+async function renderThumbs(lot){ const box=$('thumbs'); thumbUrls.forEach(u=>URL.revokeObjectURL(u)); thumbUrls=[]; box.innerHTML='';
+  document.querySelectorAll('.src .st').forEach(d=>{ if(d.dataset.thumbs) d.innerHTML=''; }); document.querySelectorAll('.src .doc .n').forEach(n=>{ n.hidden=true; n.textContent=''; });
+  let ph=[]; try{ ph=await listPhotos(lot); }catch{ box.innerHTML='<span class="hint">Stockage photo indisponible sur ce navigateur</span>'; $('secPhotosC').textContent=''; return; }
+  if(selected?.lot!==lot) return;
+  const field=ph.filter(p=>!p.src||p.src==='terrain'||p.src==='marche'); $('secPhotosC').textContent=ph.length?`${ph.length}`:'';
+  if(!field.length) box.innerHTML='<span class="hint">Chemin d\'accès, pancarte, bornes… Les captures d\'écran du Registre ou du rôle se rangent sous chaque source.</span>';
+  ph.forEach(p=>{ const u=URL.createObjectURL(p.blob); thumbUrls.push(u); let im;
+    if(p.kind==='doc'){ im=document.createElement('button'); im.type='button'; im.className='att'; im.innerHTML=`${icoSvg('doc',16)}<span>${esc(p.title||p.name||'Document')}</span>`; im.setAttribute('aria-label','Document : '+(p.title||p.name||'')); }
+    else { im=document.createElement('img'); im.src=u; im.alt=p.title||'Photo du lot'; }
+    im.onclick=()=>openViewer(p,u);
+    const src=p.src&&p.src!=='terrain'&&p.src!=='marche'?p.src:null; if(src){ const d=document.querySelector(`.src .st[data-thumbs="${src}"]`); if(d){ d.appendChild(im); const n=document.querySelector(`.src .doc[data-src="${src}"] .n`); if(n){ n.hidden=false; n.textContent=String(+n.textContent+1); } return; } }
+    box.appendChild(im); }); }
+let viewing=null;
+function openViewer(p,u){ viewing=p; const doc=p.kind==='doc'; $('viewerImg').hidden=doc; $('viewerDoc').hidden=!doc;
+  if(doc){ $('viewerDocName').textContent=p.name||p.title||'Document'; $('viewerDocMeta').textContent=`${(p.name||'').split('.').pop().toUpperCase()} · ${kb(p.size||p.blob.size||0)} · joint le ${new Date(p.t).toLocaleDateString('fr-CA')}`; $('viewerDocOpen').href=u; $('viewerDocSave').href=u; $('viewerDocSave').download=p.name||'document'; } else $('viewerImg').src=u; $('viewerTitle').value=p.title||''; $('viewer').hidden=false; log('photo_view'); }
+$('viewerTitle').addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); $('viewerRename').click(); } });
+$('viewerRename').onclick=async()=>{ if(!viewing) return; const t=$('viewerTitle').value.trim(); viewing.title=t; await dbTx('readwrite',st=>st.put(viewing)); $('viewerTitle').blur(); log('photo_rename',{len:t.length}); toast(t?'Renommée : '+t:'Titre effacé'); if(viewing.lot) renderThumbs(viewing.lot); renderPov(); };
+$('viewerClose').onclick=()=>{ $('viewer').hidden=true; viewing=null; };
+$('viewerDel').onclick=async()=>{ if(!viewing) return; if(!confirm(viewing.kind==='doc'?'Supprimer ce document ?':'Supprimer cette image ?')) return; await dbTx('readwrite',st=>st.delete(viewing.id)); log('photo_delete'); $('viewer').hidden=true; if(viewing.lot) renderThumbs(viewing.lot); renderPov(); viewing=null; };
+
+/* ============================ Marcher le terrain (+ alerte de limite) ============================ */
+let walk=null, walkLayer=L.layerGroup().addTo(map), stepsLayer=L.layerGroup().addTo(map), povLayer=L.layerGroup().addTo(map), aimHeading=null;
+let walks=store.get('terrain.walks',[]);
+let curLot=null, lastBQ=0, bqBusy=false;
+function walkUI(){ const on=!!walk, p=on&&walk.paused; document.body.classList.toggle('walking',on); $('walkStrip').hidden=!on; $('walkStrip').classList.toggle('paused',!!p);
+  $('btnWalk').classList.toggle('walking',on); $('btnWalk').setAttribute('aria-pressed',on); $('walkLabel').textContent=!on?'Marcher':p?'Reprendre':'Pause';
+  $('btnWalk').setAttribute('aria-label',!on?'Commencer une marche':p?'Reprendre la marche':'Mettre la marche en pause');
+  $('walkState').textContent=p?'· en pause, position non enregistrée':'· en marche'; if(on) $('walkStat').textContent=fmtDist(walk.dist); }
+function startWalk(){ walk={id:Date.now().toString(36),start:Date.now(),pts:[],dist:0,photos:[],side:1,lastStep:null,paused:false,pausedMs:0,pausedAt:null}; curLot=null; lastBQ=0;
+  walkLayer.clearLayers(); stepsLayer.clearLayers(); walk.line=L.polyline([],{color:'#2E7D4F',weight:3,opacity:.5,dashArray:'2 8',interactive:false}).addTo(walkLayer);
+  $('walkLot').textContent='Recherche du lot…'; walkUI(); if(!compassOn) enableCompass(true); log('walk_start');
+  tip('walk','Tes pas se dessinent sur la carte. Le téléphone vibre quand tu passes d\'un lot à l\'autre.'); if(me) walkPoint(me[0],me[1],5); }
+function walkElapsed(){ return Math.round((Date.now()-walk.start-walk.pausedMs-(walk.pausedAt?Date.now()-walk.pausedAt:0))/1000); }
+function walkPoint(lat,lng,acc){ if(!walk||walk.paused||acc>35) return; const p=[lat,lng]; const last=walk.pts.at(-1);
+  if(last){ const d=map.distance([last.lat,last.lng],p); if(d<4) return; walk.dist+=d; const brg=bearing([last.lat,last.lng],p);
+    if(!walk.lastStep||map.distance(walk.lastStep,p)>=6){ walk.side*=-1; const off=destination(lat,lng,brg+90*walk.side,1.1); L.marker(off,{icon:L.divIcon({className:'',html:`<div class="step" style="transform:rotate(${brg}deg)"></div>`,iconSize:[10,16],iconAnchor:[5,8]}),interactive:false}).addTo(stepsLayer); walk.lastStep=p; } }
+  walk.pts.push({lat,lng,t:Date.now()}); walk.line.addLatLng(p); $('walkStat').textContent=fmtDist(walk.dist); checkBoundary(lat,lng); }
+async function checkBoundary(lat,lng){ if(curLot&&curLot.geom&&inPoly([lng,lat],curLot.geom)) return; const now=Date.now(); if(bqBusy||now-lastBQ<6000) return; lastBQ=now; bqBusy=true;
+  try{ const j=await lotAt(lat,lng); const f=j.features?.[0]; const first=!curLot;
+    if(!f){ if(curLot?.no!==null){ curLot={no:null,geom:null}; $('walkLot').textContent='Hors cadastre — terre publique ou non cadastrée'; if(!first){ navigator.vibrate?.([80,60,80]); toast('Tu sors des lots cadastrés'); log('boundary',{to:null}); } } return; }
+    const no=f.properties.NO_LOT; if(curLot?.no===no){ curLot.geom=f.geometry; return; }
+    curLot={no,geom:f.geometry}; const ha=polyArea(f.geometry)/10000; const saved=carnet.find(x=>x.lot===no);
+    $('walkLot').textContent=`Lot ${no} · ${fmt(acres(ha),1)} acres${saved?' · ♥ journal'+(saved.owner?' · '+saved.owner:''):''}`;
+    if(!first){ navigator.vibrate?.([80,60,80]); toast(`Tu entres dans le lot ${no}`); log('boundary',{to:'lot'}); }
+  }catch{ $('walkLot').textContent='Lot inconnu (réseau)'; } finally{ bqBusy=false; } }
+function stopWalk(){ if(!walk) return; const rec={id:walk.id,start:walk.start,end:Date.now(),secs:walkElapsed(),dist:Math.round(walk.dist),pts:walk.pts.map(qq=>[+qq.lat.toFixed(6),+qq.lng.toFixed(6)]),photos:walk.photos};
+  walks.unshift(rec); store.set('terrain.walks',walks); log('walk_stop',{dist:rec.dist,pts:rec.pts.length,photos:rec.photos.length}); toast(`Marche enregistrée dans le journal · ${fmtDist(rec.dist)} · ${rec.photos.length} photo(s)`); walk=null; curLot=null; walkUI(); renderWalks(); }
+$('btnWalk').onclick=()=>{ navigator.vibrate?.(12); if(!walk) return startWalk();
+  walk.paused=!walk.paused; if(walk.paused){ walk.pausedAt=Date.now(); walk.lastStep=null; } else { walk.pausedMs+=Date.now()-walk.pausedAt; walk.pausedAt=null; }
+  walkUI(); log('walk_pause',{p:walk.paused}); };
+$('btnWalkStop').onclick=()=>{ if(walk&&confirm('Terminer la marche ? Elle sera rangée dans le journal.')) stopWalk(); };
+function renderWalks(){ walkLayer.clearLayers(); stepsLayer.clearLayers(); walks.forEach(w=>{ if(w.pts?.length) L.polyline(w.pts,{color:'#2E7D4F',weight:3,opacity:.35,dashArray:'2 8',interactive:false}).addTo(walkLayer); }); if(walk?.line) walk.line.addTo(walkLayer); renderPov(); }
+function renderWalkList(){ renderJournalChrome(); const ul=$('walkList'); ul.innerHTML=''; if(!walks.length){ ul.innerHTML='<li class="empty">Aucune marche. Touche « Marcher » en bas de l\'écran pour tracer tes pas.</li>'; return; }
+  walks.forEach(w=>{ const li=document.createElement('li'); const d=new Date(w.start); const nl=carnet.filter(r=>r.geom&&w.pts.some(([la,ln])=>inPoly([ln,la],r.geom))).length; li.innerHTML=`<div class="t"><b>${d.toLocaleDateString('fr-CA',{weekday:'short',day:'numeric',month:'short'})} · ${fmtDist(w.dist)}</b><span>${fmtTime(w.secs??Math.round((w.end-w.start)/1000))} · ${w.photos.length} photo${w.photos.length>1?'s':''}${nl?` · ${nl} lot${nl>1?'s':''} de ton journal`:''} · voir sur la carte ›</span></div><button class="close" aria-label="Supprimer cette marche">×</button>`;
+    li.querySelector('.t').onclick=()=>{ hide(sheets.carnet,true); if(w.pts.length) map.fitBounds(L.latLngBounds(w.pts).pad(.3)); };
+    li.querySelector('button').onclick=()=>{ if(!confirm('Supprimer cette marche ?')) return; walks=walks.filter(x=>x.id!==w.id); store.set('terrain.walks',walks); renderWalks(); renderWalkList(); }; ul.appendChild(li); }); }
+
+/* ============================ Photo orientée : viser à plat, puis cadrer ============================ */
+function openAim(target){ povTarget=target||null; if(!compassOn) enableCompass(true); aimHeading=null; $('aim').hidden=false; $('peek').hidden=true; log('aim_open',{walking:!!walk,target:!!target}); if(!me) locate().then(showMe).catch(()=>{}); }
+$('btnPov').onclick=()=>openAim(null);
+$('btnPhotoLot').onclick=()=>{ if(selected) openAim(selected.lot); };
+$('aimCancel').onclick=()=>{ $('aim').hidden=true; povTarget=null; updatePeek(); };
+$('aimGallery').onclick=()=>{ $('aim').hidden=true; pendingSrc='marche'; $('photoInput').click(); };
+$('aimFix').onclick=()=>{ aimHeading=heading; $('aim').hidden=true; navigator.vibrate?.(15); log('aim_fix',{h:heading!=null?Math.round(heading):null,flat:tiltFlat}); openSnap(); };
+let snapStream=null, snapTrack=null, snapFacing='environment', snapZoom=1, snapCaps=null, pinchD=null;
+async function openSnap(){ $('snap').hidden=false; $('snapHeading').textContent=aimHeading!=null?Math.round(aimHeading)+'°':'—°'; setZoom(1);
+  try{ await startCam(); $('snapFake').hidden=true; }catch(err){ log('cam_error',{msg:String(err.message).slice(0,80)}); $('snap').hidden=true; pendingSrc='marche'; $('photoInput').setAttribute('capture','environment'); $('photoInput').click(); setTimeout(()=>$('photoInput').removeAttribute('capture'),2000); toast('Caméra intégrée indisponible — appareil photo du téléphone'); } }
+async function startCam(){ stopCam(); if(!navigator.mediaDevices?.getUserMedia) throw new Error('pas de caméra'); snapStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:snapFacing},width:{ideal:1920},height:{ideal:1080}},audio:false}); $('snapVideo').srcObject=snapStream; snapTrack=snapStream.getVideoTracks()[0]; snapCaps=snapTrack.getCapabilities?.()||{};
+  const r=$('snapRange'); if(snapCaps.zoom){ r.min=snapCaps.zoom.min||1; r.max=Math.min(snapCaps.zoom.max||4,8); r.step=snapCaps.zoom.step||0.1; } else { r.min=1; r.max=4; r.step=0.1; } $('snapTorch').hidden=!snapCaps.torch; }
+function stopCam(){ if(snapStream){ snapStream.getTracks().forEach(t=>t.stop()); snapStream=null; snapTrack=null; } }
+function setZoom(z){ const r=$('snapRange'); z=Math.max(+r.min,Math.min(+r.max,z)); snapZoom=z; r.value=z; document.querySelectorAll('.snapZoom button').forEach(b=>b.setAttribute('aria-pressed',Math.abs(+b.dataset.z-z)<.05));
+  if(snapTrack&&snapCaps?.zoom){ snapTrack.applyConstraints({advanced:[{zoom:z}]}).catch(()=>{}); $('snapVideo').style.transform=''; } else { $('snapVideo').style.transform=`scale(${z})`; $('snapFake').style.transform=`scale(${z})`; } }
+$('snapRange').addEventListener('input',e=>setZoom(+e.target.value));
+document.querySelectorAll('.snapZoom button').forEach(b=>b.onclick=()=>setZoom(+b.dataset.z));
+$('snap').addEventListener('touchstart',e=>{ if(e.touches.length===2) pinchD=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY); },{passive:true});
+$('snap').addEventListener('touchmove',e=>{ if(e.touches.length===2&&pinchD){ const d=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY); setZoom(snapZoom*(d/pinchD)); pinchD=d; } },{passive:true});
+$('snapTorch').onclick=async()=>{ if(!snapTrack||!snapCaps?.torch) return; const on=$('snapTorch').getAttribute('aria-pressed')!=='true'; try{ await snapTrack.applyConstraints({advanced:[{torch:on}]}); $('snapTorch').setAttribute('aria-pressed',on); }catch{} };
+$('snapFlip').onclick=async()=>{ snapFacing=snapFacing==='environment'?'user':'environment'; try{ await startCam(); setZoom(1); }catch{} };
+$('snapCancel').onclick=()=>{ stopCam(); $('snap').hidden=true; povTarget=null; updatePeek(); };
+$('snapShutter').onclick=async()=>{ navigator.vibrate?.(20); const v=$('snapVideo'), c=$('snapCanvas'); let blob;
+  if(snapTrack&&v.videoWidth){ const digital=!(snapCaps?.zoom); const z=digital?snapZoom:1; const sw=v.videoWidth/z, sh=v.videoHeight/z; c.width=Math.min(1600,Math.round(sw)); c.height=Math.round(c.width*sh/sw); c.getContext('2d').drawImage(v,(v.videoWidth-sw)/2,(v.videoHeight-sh)/2,sw,sh,0,0,c.width,c.height); blob=await new Promise(res=>c.toBlob(res,'image/jpeg',.85)); }
+  if(!blob) return toast('Capture impossible — réessaie');
+  stopCam(); $('snap').hidden=true; updatePeek();
+  const pos=me?[me[0],me[1]]:null, h=aimHeading; let lotNo=povTarget; if(!lotNo&&pos){ try{ const j=await lotAt(pos[0],pos[1]); lotNo=j.features?.[0]?.properties?.NO_LOT||null; }catch{} }
+  const id=Date.now()+'-'+Math.random().toString(36).slice(2,7); await dbTx('readwrite',st=>st.put({id,lot:lotNo,src:'marche',t:Date.now(),blob,lat:pos?.[0]??null,lng:pos?.[1]??null,heading:h,walk:walk?.id||null,zoom:snapZoom})); if(walk) walk.photos.push(id);
+  log('snap',{h:h!=null?Math.round(h):null,zoom:+snapZoom.toFixed(1),lot:!!lotNo,gps:!!pos}); toast(`Photo enregistrée${h!=null?' · regard '+Math.round(h)+'°':''}${lotNo?' · lot '+lotNo:''}${pos?'':' · sans position GPS'}`);
+  renderPov(); if(selected&&selected.lot===lotNo) renderThumbs(lotNo); povTarget=null; };
+function aimTick(){ if($('aim').hidden) return; const h=heading; $('aimDeg').textContent=h==null?'—°':Math.round(h)+'°'; $('aimRose').style.transform=`rotate(${h==null?0:-h}deg)`; const f=$('aimFlat'); f.classList.toggle('ok',tiltFlat); f.textContent=tiltFlat?'à plat ✓':'tiens-le à plat'; }
+setInterval(aimTick,150);
+function povIcon(h){ return L.divIcon({className:'',html:`<div class="pov"><div class="cone" style="transform:rotate(${(h??0)+180}deg)"></div><div class="dot"></div></div>`,iconSize:[30,30],iconAnchor:[15,15]}); }
+async function renderPov(){ povLayer.clearLayers(); let ph=[]; try{ ph=(await dbAll('photos')).filter(x=>x.lat!=null); }catch{}
+  ph.forEach(p=>{ const mk=L.marker([p.lat,p.lng],{icon:povIcon(p.heading)}).addTo(povLayer); if(p.title) mk.bindTooltip(esc(p.title)); mk.on('click',ev=>{ L.DomEvent.stopPropagation(ev); if(measuring) return addMeasurePoint(ev.latlng); openViewer(p,URL.createObjectURL(p.blob)); }); }); }
+
+/* ============================ Mesure ============================ */
+let measuring=false, mPts=[], mClosed=false;
+function startMeasure(){ map.removeLayer(bauxGroup); measuring=true; mPts=[]; mClosed=false; $('measureBar').hidden=false; $('strip').hidden=true; $('peek').hidden=true; $('btnMeasure').setAttribute('aria-pressed','true'); drawMeasure(); log('measure_start'); }
+function stopMeasure(){ bauxGroup.addTo(map); measuring=false; measureGroup.clearLayers(); $('measureBar').hidden=true; $('btnMeasure').setAttribute('aria-pressed','false'); if(scanMeta) $('strip').hidden=false; updatePeek(); log('measure_stop',{pts:mPts.length,closed:mClosed}); }
+function addMeasurePoint(ll){ if(mClosed){ mClosed=false; } mPts.push([ll.lat,ll.lng]); navigator.vibrate?.(8); drawMeasure(); }
+function drawMeasure(){ measureGroup.clearLayers(); const n=mPts.length;
+  if(n>=2){ (mClosed?L.polygon(mPts,{color:'#FF5A1F',weight:3,fillColor:'#FF5A1F',fillOpacity:.15,interactive:false}):L.polyline(mPts,{color:'#FF5A1F',weight:3,dashArray:'6 6',interactive:false})).addTo(measureGroup); }
+  mPts.forEach(p=>L.marker(p,{icon:L.divIcon({className:'',html:'<div class="mvx"></div>',iconSize:[14,14],iconAnchor:[7,7]}),interactive:false}).addTo(measureGroup));
+  let d=0; for(let i=1;i<n;i++) d+=map.distance(mPts[i-1],mPts[i]); if(mClosed&&n>=3) d+=map.distance(mPts[n-1],mPts[0]);
+  let txt=n?`Distance <b>${fmtDist(d)}</b> · ${fmt(d*3.28084,0)} pi`:'Touche la carte pour poser des points.';
+  if(mClosed&&n>=3){ const a=ringArea([...mPts.map(p=>[p[1],p[0]]),[mPts[0][1],mPts[0][0]]]); txt=`Surface <b>${fmt(a*10.7639,0)} pi²</b> · ${fmt(a/4046.856,2)} acres · ${fmt(a/10000,2)} ha<br>Périmètre ${fmtDist(d)}`; }
+  else if(n===1) txt='Touche un deuxième point.';
+  $('measureRead').innerHTML=txt; $('mUndo').disabled=!n; $('mClose').disabled=n<3||mClosed; $('mClear').disabled=!n; }
+$('btnMeasure').onclick=()=>{ measuring?stopMeasure():startMeasure(); };
+$('mUndo').onclick=()=>{ mPts.pop(); mClosed=false; drawMeasure(); };
+$('mClose').onclick=()=>{ if(mPts.length>=3){ mClosed=true; drawMeasure(); log('measure_area'); } };
+$('mClear').onclick=()=>{ mPts=[]; mClosed=false; drawMeasure(); };
+$('mDone').onclick=stopMeasure;
+
+/* ============================ Commentaires vocaux ============================ */
+const SR=window.SpeechRecognition||window.webkitSpeechRecognition; let rec=null, recOn=false;
+$('btnMic').onclick=()=>{ const micBtn=$('btnMic');
+  if(!SR){ const t=prompt('Reconnaissance vocale indisponible — écris ton commentaire :'); if(t){ log('voice',{text:t,typed:true}); toast('Commentaire noté'); renderLogCount(); } return; }
+  if(recOn){ rec.stop(); return; }
+  rec=new SR(); rec.lang='fr-CA'; rec.continuous=true; rec.interimResults=false;
+  rec.onstart=()=>{ recOn=true; micBtn.textContent='■ Arrêter'; toast('Je t\'écoute — retouche pour arrêter'); log('voice_start'); };
+  rec.onresult=ev=>{ for(let i=ev.resultIndex;i<ev.results.length;i++){ if(ev.results[i].isFinal){ const text=ev.results[i][0].transcript.trim(); if(text){ log('voice',{text}); toast('« '+text.slice(0,70)+(text.length>70?'…':'')+' »'); } } } };
+  rec.onerror=ev=>{ log('voice_error',{msg:ev.error}); if(ev.error==='not-allowed') toast('Micro refusé — autorise-le dans les réglages du site'); };
+  rec.onend=()=>{ recOn=false; micBtn.textContent='Commentaire vocal'; log('voice_stop'); renderLogCount(); };
+  rec.start(); };
+
+/* ============================ Rapport d'usage ============================ */
+function renderLogCount(){ const v=LOG.filter(e=>e.type==='voice').length; $('logCount').textContent=`· ${LOG.length} événements, ${v} commentaire${v>1?'s':''}`; }
+function report(){ const sessions=[...new Set(LOG.map(e=>e.s))];
+  const lines=['# Rapport d\'usage — lots '+APP_VERSION,`Généré le ${new Date().toLocaleString('fr-CA')} · ${LOG.length} événements · ${sessions.length} session(s)`,''];
+  const count=t=>LOG.filter(e=>e.type===t).length, avg=(t,k)=>{ const a=LOG.filter(e=>e.type===t&&e[k]!=null); return a.length?Math.round(a.reduce((s,e)=>s+e[k],0)/a.length):null; };
+  lines.push('## Résumé',`- Scans : ${count('scan')} (${count('scan_error')} échecs) · durée moyenne ${avg('scan','ms')||'—'} ms · lots/scan ${avg('scan','lots')||'—'}`,
+    `- Filtres appliqués : ${count('filter_apply')} · aperçus ouverts : ${count('peek_open')} · fiches : ${count('lot_open')} · enregistrements : ${count('save')}`,
+    `- Marches : ${count('walk_start')} · changements de lot : ${count('boundary')} · mesures : ${count('measure_start')}`,
+    `- Localisations : ${count('locate')} (${count('locate_error')} échecs) · recherches : ${count('search')} · erreurs JS : ${count('js_error')}`,
+    `- Commentaires vocaux : ${count('voice')}`,'');
+  const b={}; LOG.filter(e=>e.type==='btn').forEach(e=>b[e.id]=(b[e.id]||0)+1);
+  lines.push('## Boutons',...Object.entries(b).sort((x,y)=>y[1]-x[1]).map(([k,v])=>`- ${k} : ${v}`),'');
+  lines.push('## Commentaires vocaux (avec contexte)',...LOG.filter(e=>e.type==='voice').map(e=>`- ${e.t.slice(0,16).replace('T',' ')} · écran ${e.screen}${e.lot?' · lot '+e.lot:''} · juste avant : ${LOG[LOG.indexOf(e)-1]?.type||'—'}\n  > ${e.text}`),'');
+  lines.push('## Chronologie (compacte)',...LOG.map(e=>{ const {t,s,type,screen,lot,text,ua,...rest}=e; const extra=Object.entries(rest).filter(([k,v])=>v!==null&&v!==undefined).map(([k,v])=>`${k}=${v}`).join(' '); return `${t.slice(11,19)} ${s} ${type}${screen!=='carte'?' @'+screen:''}${lot?' lot'+lot:''}${extra?' '+extra:''}${text?' "'+text+'"':''}`; }));
+  return lines.join('\n'); }
+$('shareLog').onclick=async()=>{ const txt=report(); const file=new File([txt],`lots-rapport-${new Date().toISOString().slice(0,10)}.md`,{type:'text/markdown'});
+  if(navigator.canShare?.({files:[file]})){ try{ await navigator.share({files:[file],title:'Rapport lots'}); }catch{} } else { const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([txt],{type:'text/markdown'})); a.download=file.name; a.click(); } };
+$('copyLog').onclick=()=>copy(report(),'Rapport copié — colle-le dans la conversation');
+$('clearLog').onclick=()=>{ if(confirm('Effacer tout le rapport d\'usage ?')){ LOG=[]; try{ localStorage.removeItem('terrain.log'); }catch{} renderLogCount(); toast('Rapport effacé'); } };
+
+/* ============================ Partage reçu depuis Centris ============================ */
+(function(){ const qs=new URLSearchParams(location.search); const txt=[qs.get('title'),qs.get('text'),qs.get('url')].filter(Boolean).join('\n'); if(!/centris\.ca/i.test(txt)) return; history.replaceState(null,'',location.pathname);
+  const info=parseCentris(txt); if(!info) return; log('share_received',{id:!!info.id});
+  const pick=async()=>{ if(info.address||info.city){ const ok=await goToCentris(info); if(ok) return; } if(!carnet.length) return toast('Journal vide — ouvre d\'abord un lot, puis repartage');
+    const sorted=me?[...carnet].sort((a,b)=>map.distance(me,[a.lat,a.lng])-map.distance(me,[b.lat,b.lng])):carnet;
+    const list=sorted.slice(0,6).map((r,i)=>`${i+1}. Lot ${r.lot}${r.owner?' · '+r.owner:''}${me?' · '+Math.round(map.distance(me,[r.lat,r.lng]))+' m':''}`).join('\n');
+    const ans=prompt(`Annonce ${info.id||''} reçue.\nAttacher à quel lot ?\n\n${list}`,'1'); const r=sorted[(+ans)-1]; if(!r) return toast('Annonce non attachée');
+    r.centris=info.url; r.centrisInfo=info; persist(); restyleScan(); renderSaved(); toast(`Annonce attachée au lot ${r.lot}`); map.setView([r.lat,r.lng],16); identify(r.lat,r.lng); };
+  setTimeout(pick,800); })();
+
+/* ============================ Accueil : préparation (au besoin) et guide (bouton ?) ============================ */
+let deferredInstall=null; window.addEventListener('beforeinstallprompt',e=>{ e.preventDefault(); deferredInstall=e; });
+window.addEventListener('appinstalled',()=>{ markPerm('install','ok'); log('installed'); });
+const isStandalone=()=>!!((window.matchMedia&&matchMedia('(display-mode: standalone)').matches)||navigator.standalone===true);
+function markPerm(k,st){ const b=document.querySelector(`#permList button[data-p="${k}"]`); if(!b) return; b.classList.remove('ok','no','na'); if(st) b.classList.add(st); }
+async function permState(name){ try{ if(!navigator.permissions?.query) return 'unknown'; return (await navigator.permissions.query({name})).state; }catch{ return 'unknown'; } }
+async function refreshPerms(){ if(isStandalone()) markPerm('install','ok');
+  for(const [k,n] of [['geo','geolocation'],['cam','camera'],['mic','microphone']]){ const st=await permState(n); markPerm(k,st==='granted'?'ok':st==='denied'?'no':null); }
+  if(compassOn) markPerm('compass','ok'); if(!navigator.mediaDevices?.getUserMedia){ markPerm('cam','na'); markPerm('mic','na'); } }
+async function askPerm(k){ log('perm_ask',{k});
+  try{ if(k==='install'){ if(deferredInstall){ deferredInstall.prompt(); const c=await deferredInstall.userChoice; deferredInstall=null; if(c.outcome==='accepted') markPerm('install','ok'); }
+      else toast(/iphone|ipad/i.test(navigator.userAgent)?'Safari : Partager → Sur l\'écran d\'accueil':'Chrome : ⋮ → Installer l\'application'); return; }
+    if(k==='geo'){ const c=await locate(); showMe(c); markPerm('geo','ok'); return; }
+    if(k==='cam'||k==='mic'){ const st=await navigator.mediaDevices.getUserMedia(k==='cam'?{video:true}:{audio:true}); st.getTracks().forEach(t=>t.stop()); markPerm(k,'ok'); return; }
+    if(k==='compass'){ await enableCompass(); markPerm('compass',compassOn?'ok':'no'); return; }
+  }catch(e){ markPerm(k,'no'); toast('Accès refusé — la note sous la liste explique comment le réactiver'); } }
+document.querySelectorAll('#permList button').forEach(b=>b.onclick=()=>askPerm(b.dataset.p));
+(function(){ const el=$('intro'), sl=$('slides'), n=sl.children.length, dots=$('dots'); dots.innerHTML=Array.from({length:n},(_,i)=>`<i class="${i?'':'on'}"></i>`).join('');
+  const idx=()=>Math.round(sl.scrollLeft/(sl.clientWidth||1)); const go=i=>{ const x=i*sl.clientWidth; if(sl.scrollTo) sl.scrollTo({left:x,behavior:'smooth'}); else sl.scrollLeft=x; };
+  const upd=()=>{ const i=idx(); [...dots.children].forEach((d,k)=>d.classList.toggle('on',k===i)); $('introNext').textContent=i===n-1?'Commencer':'Suivant'; $('introSkip').textContent=i===n-1?'':'Passer'; };
+  sl.addEventListener('scroll',()=>{ clearTimeout(window._inT); window._inT=setTimeout(upd,80); });
+  const off=store.get('terrain.introOff',null)==='1'||store.get('terrain.introOff',null)===1; $('introOff').checked=!!off;
+  $('introOff').onchange=e=>{ try{ localStorage.setItem('terrain.introOff',e.target.checked?'1':'0'); }catch{} log('intro_off',{v:e.target.checked}); };
+  $('introVersion').textContent=`lots ${APP_VERSION}`;
+  const close=()=>{ el.hidden=true; log('intro_close',{slide:idx()}); setTimeout(updatePeek,100); };
+  $('introNext').onclick=()=>{ const i=idx(); if(i>=n-1) return close(); go(i+1); };
+  $('introSkip').onclick=()=>{ const i=idx(); if(i>=n-1) return close(); go(n-1); };
+  window.openIntro=(atSetup)=>{ el.hidden=false; try{ renderLogCount(); }catch{} sl.scrollLeft=atSetup?(n-1)*(sl.clientWidth||0):0; upd(); refreshPerms(); log('intro_open',{setup:!!atSetup}); };
+  $('btnHelp').onclick=()=>openIntro(false);
+  // Au démarrage : seulement si quelque chose d'important manque (installation ou position), sauf si désactivé.
+  (async()=>{ if(off) return; const geo=await permState('geolocation'); const firstTime=!store.get('terrain.seenGuide',false);
+    if(firstTime){ store.set('terrain.seenGuide',true); try{ openIntro(false); }catch{} return; }
+    if(!isStandalone()||geo!=='granted'){ try{ openIntro(true); }catch{} } })(); })();
+
+/* ============================ Démarrage ============================ */
+renderCount(); renderSaved(); renderWalks(); applyBase(); walkUI(); setTimeout(loadBaux,500); setTimeout(updatePeek,800);
+if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{});
+
+</script>
+</body>
+</html>

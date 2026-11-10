@@ -1,12 +1,20 @@
 {
-  "name": "lots — à qui appartient cette terre ?",
-  "short_name": "lots",
-  "lang": "fr",
+  "id": "/",
+  "name": "LOTS — Terre de rang",
+  "short_name": "LOTS",
+  "description": "Repère des lots, documente tes visites et organise ta prospection au Québec.",
+  "lang": "fr-CA",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
-  "background_color": "#E9EDE4",
-  "theme_color": "#1F3D2B",
+  "orientation": "portrait",
+  "background_color": "#F2ECDF",
+  "theme_color": "#1F3328",
+  "categories": [
+    "navigation",
+    "utilities",
+    "productivity"
+  ],
   "icons": [
     {
       "src": "icon-192.png",
@@ -25,12 +33,6 @@
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
-    },
-    {
-      "src": "icon.svg",
-      "sizes": "any",
-      "type": "image/svg+xml",
-      "purpose": "any"
     }
   ],
   "share_target": {
@@ -41,12 +43,5 @@
       "text": "text",
       "url": "url"
     }
-  },
-  "id": "/",
-  "description": "Repérer les lots du cadastre québécois, lire le rôle d'évaluation et trouver le propriétaire.",
-  "categories": [
-    "navigation",
-    "utilities",
-    "productivity"
-  ]
+  }
 }

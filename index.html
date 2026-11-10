@@ -3,31 +3,31 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
-<meta name="theme-color" content="#1F3D2B">
+<meta name="theme-color" content="#1F3328">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="lots">
-<title>lots — à qui appartient cette terre ?</title>
+<meta name="apple-mobile-web-app-title" content="LOTS">
+<title>LOTS — Terre de rang</title>
 <link rel="manifest" href="manifest.webmanifest">
-<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="icon" href="favicon-32.png" sizes="32x32" type="image/png"><link rel="icon" href="favicon-48.png" sizes="48x48" type="image/png"><link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="canonical" href="https://lots.quebec/">
 <meta name="description" content="Dans le bois, devant une terre qui dort : touche la carte et vois le lot, sa superficie, son évaluation et comment joindre son propriétaire. Partout au Québec.">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="lots">
 <meta property="og:locale" content="fr_CA">
 <meta property="og:url" content="https://lots.quebec/">
-<meta property="og:title" content="lots — à qui appartient cette terre ?">
+<meta property="og:title" content="LOTS — Trouve ta terre. Fais ton chemin.">
 <meta property="og:description" content="Lots du cadastre, rôle d'évaluation, propriétaire, annonces : partout au Québec, dans ton téléphone. Gratuit, rien n'est envoyé.">
 <meta property="og:image" content="https://lots.quebec/og.png">
 <meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
-<link rel="icon" href="icon.svg" type="image/svg+xml">
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@500;700&display=swap">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 <style>
 :root{
-  --bark:#1F3D2B; --moss:#4C6B4A; --field:#E9EDE4; --paper:#FFFFFF; --boot:#E0A422;
+  --bark:#1F3D2B; --moss:#4C6B4A; --field:#E9EDE4; --paper:#FFFFFF; --boot:#C9A15A;
   --ink:#17201A; --ink-2:#5A665C; --line:#C9D1C4; --ok:#2E7D4F; --warn:#B4541E; --gps:#1E6FD9;
   --sat:env(safe-area-inset-top,0px); --sab:env(safe-area-inset-bottom,0px);
   font-family:"Atkinson Hyperlegible",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
@@ -191,7 +191,7 @@ button{font:inherit;cursor:pointer;border:0;background:none;color:inherit}
 .role .use{font-size:18px;font-weight:700;line-height:1.2}
 .role .tags{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 10px}
 .role .tags span{font-size:12px;font-weight:700;padding:4px 8px;border-radius:999px;background:var(--paper);border:1px solid var(--line)}
-.role .tags span.hot{background:#FFF1CF;border-color:#E0A422;color:#7A5300}
+.role .tags span.hot{background:#FFF1CF;border-color:#C9A15A;color:#7A5300}
 .role .src{font-size:11px;color:var(--ink-2);margin-top:6px}
 /* Feuilles */
 .sheet{position:fixed;left:0;right:0;bottom:0;z-index:1100;background:var(--paper);border-radius:18px 18px 0 0;box-shadow:0 -10px 40px rgba(23,32,26,.22);max-height:78vh;display:flex;flex-direction:column;transform:translateY(105%);transition:transform .22s ease;padding-bottom:var(--sab)}
@@ -390,7 +390,7 @@ body.walking .peek{bottom:calc(var(--sab) + 150px)}
 .sum .units b{color:var(--ink);font-size:15px}
 .sum .tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
 .sum .tags span{font-size:12px;font-weight:700;padding:4px 9px;border-radius:999px;background:var(--paper,#fff);border:1px solid var(--line)}
-.sum .tags span.hot{background:#FFF1CF;border-color:#E0A422;color:#7A5300}
+.sum .tags span.hot{background:#FFF1CF;border-color:#C9A15A;color:#7A5300}
 .sum .tags span.good{background:#E2F1E7;border-color:#9CCBAA;color:#1F5C36}
 .sum .tags span.bad{background:#F8E3E0;border-color:#E4A79F;color:#8E1E14}
 .keep{min-height:44px;padding:0 14px;border-radius:12px;font-weight:700;font-size:15px;background:var(--field);color:var(--ink);flex:none;display:flex;align-items:center;gap:6px}
@@ -447,11 +447,11 @@ body.walking .mectl{bottom:calc(var(--sab) + 224px)}
 .modal h2{margin:0 0 6px;font-size:21px}
 .modal .prem{display:flex;align-items:center;gap:10px;margin-top:14px}
 .modal .prem button{flex:1;min-height:50px;border-radius:12px;background:var(--field);color:var(--ink-2);font-weight:700;font-size:15px;opacity:.8}
-.badge-p{flex:none;font-size:12px;font-weight:700;padding:5px 10px;border-radius:999px;background:#FFF1CF;color:#7A5300;border:1px solid #E0A422}
+.badge-p{flex:none;font-size:12px;font-weight:700;padding:5px 10px;border-radius:999px;background:#FFF1CF;color:#7A5300;border:1px solid #C9A15A}
 .modal .cancel{width:100%;min-height:46px;margin-top:6px;font-weight:700;color:var(--ink-2)}
 #btnShare{margin-right:6px}
 /* v41 : Journal */
-.jbackup{display:flex;align-items:center;gap:10px;background:#FFF1CF;border:1px solid #E0A422;color:#5C3D00;border-radius:12px;padding:8px 8px 8px 12px;margin:0 0 10px;font-size:14px}
+.jbackup{display:flex;align-items:center;gap:10px;background:#FFF1CF;border:1px solid #C9A15A;color:#5C3D00;border-radius:12px;padding:8px 8px 8px 12px;margin:0 0 10px;font-size:14px}
 .jbackup[hidden]{display:none} .jbackup span{flex:1} .jbackup button{min-height:40px;padding:0 12px;border-radius:10px;background:#7A5300;color:#fff;font-weight:700}
 .jtabs{margin:0 0 10px} .jtabs button{flex:1} .jtabs b{font-family:"JetBrains Mono",ui-monospace,monospace;font-size:12px;opacity:.75;margin-left:4px}
 #jSearch{margin-bottom:8px}
@@ -482,6 +482,171 @@ body.walking .mectl{bottom:calc(var(--sab) + 224px)}
 .viewer .vdocb a+a{background:rgba(255,255,255,.16);color:#fff}
 .src .st .att{display:inline-flex;align-items:center;gap:6px;max-width:100%;min-height:44px;padding:0 12px;border-radius:10px;background:var(--field);border:1.5px solid var(--line);font-size:13px;font-weight:700;color:var(--ink)}
 .src .st .att span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:170px}
+
+/* =================== LOTS — Terre de rang (R1) =================== */
+:root{--bark:#1F3328;--moss:#5E7A84;--field:#E9E1CF;--paper:#FBF7EE;--boot:#FF5A1F;--ink:#16140F;--ink-2:#4B4A42;--line:#D8CCB4;--ok:#3F7A4F;--warn:#B8321F;--bg:#F2ECDF;--act:#FF5A1F;--act-ink:#16140F}
+html[data-theme="night"]{--bark:#0E2A1E;--moss:#7E9AA3;--field:#1C4433;--paper:#143628;--ink:#F2ECDF;--ink-2:#C5CFC6;--line:#2E5644;--bg:#0B1F16;color-scheme:dark}
+body{background:var(--bg);color:var(--ink)}
+.sheet,.intro,.peek,.strip,.ctl,.mapctl .compass,.modal .mbox,.tip{color:var(--ink)}
+.intro,.sheet{background:var(--paper)}
+input,textarea,select,.f{background:var(--paper);color:var(--ink);border-color:var(--line)}
+.topbar{background:var(--bark)}
+.brand img.logo{height:36px;width:auto;flex:none;display:block;filter:drop-shadow(0 1px 1px rgba(0,0,0,.35))}
+/* Une seule couleur d'action : orange de chasse, texte charbon */
+.primary,.peek .go,.aim .fix,.introBar .main,.tip button,.measure .b button.main,#selDelete{background:var(--act)!important;color:var(--act-ink)!important}
+.primary:active,.peek .go:active{filter:brightness(.92)}
+.seg button[aria-pressed="true"]{background:var(--bark);color:#F2ECDF;border-color:var(--bark)}
+html[data-theme="night"] .seg button[aria-pressed="true"]{background:#F2ECDF;color:#0B1F16;border-color:#F2ECDF}
+.nav{color:#E7E1D3}.nav[aria-pressed="true"]{color:#FFFFFF;box-shadow:inset 0 -3px 0 var(--act)}.nav.walking{color:#BFE6C9}
+.navbar{background:var(--bark)}
+.navscan .scan .face{color:var(--act-ink)}
+.ctl[aria-pressed="true"]{background:var(--act);color:var(--act-ink)}
+.walkstrip{background:#2F5A3E}.walkstrip button{color:#16140F}
+#walkAcc.bad,#vfPos.bad{color:#FFB3A0}
+.sum{background:var(--field)}
+.sum .tags span{background:var(--paper)}
+.leaflet-popup-content-wrapper,.leaflet-popup-tip{background:var(--paper);color:var(--ink)}
+html[data-theme="night"] .nightable{filter:invert(.92) hue-rotate(180deg) brightness(.92) contrast(.92)}
+html[data-theme="night"] .leaflet-container{background:#0B1F16}
+html[data-theme="night"] .lot-label{background:rgba(11,31,22,.82);color:#F2ECDF;border-color:#2E5644}
+html[data-theme="night"] .offline{background:#8E2A1A}
+/* Accueil */
+.slides article.welcome{justify-content:flex-start;padding:22px 0 10px;gap:6px;overflow-y:auto}
+.welcome .wsign{width:min(78%,340px);height:auto;display:block;margin:6px auto 0;filter:drop-shadow(0 3px 6px rgba(0,0,0,.25))}
+.welcome .wtag{font-weight:700;letter-spacing:.42em;font-size:13px;color:var(--ink);opacity:.85;margin:2px 0 6px}
+.welcome .wland{width:100%;height:auto;display:block;margin:6px 0 10px}
+.welcome h2{font-size:30px;line-height:1.12;margin:4px 22px}
+.welcome p{margin:4px 22px}
+/* Visée et vérification */
+.aimstep{font-family:"JetBrains Mono",ui-monospace,monospace;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--ok);font-weight:700}
+.aimhelp{max-width:320px;text-align:center;font-size:15px;line-height:1.4;margin:0 auto}
+.verify{position:fixed;inset:0;z-index:1470;background:var(--paper);color:var(--ink);display:flex;flex-direction:column}
+.verify[hidden]{display:none}
+.verify header{display:flex;align-items:center;gap:10px;background:var(--bark);color:#F2ECDF;padding:calc(var(--sat) + 10px) 12px 10px}
+.verify header h2{flex:1;margin:0;font-size:18px} .verify .vstep{font-size:12px;opacity:.8}
+.verify .vbtn{min-height:44px;padding:0 10px;color:#F2ECDF;font-weight:700}
+.verify .vbody{flex:1;overflow-y:auto;padding:14px 16px}
+.verify img{width:100%;max-height:42vh;object-fit:cover;border-radius:14px;display:block}
+.vgrid{display:grid;grid-template-columns:1fr 1fr;border:1px solid var(--line);border-radius:14px;overflow:hidden;margin:12px 0}
+.vgrid>div{padding:10px 12px;border-bottom:1px solid var(--line);border-right:1px solid var(--line);display:flex;flex-direction:column;gap:3px}
+.vgrid>div.wide{grid-column:1/-1}
+.vgrid small{font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-2);font-weight:700}
+.vgrid b{font-family:"JetBrains Mono",ui-monospace,monospace;font-size:15px}
+.vgrid select{min-height:44px;border-radius:10px;font-size:15px;padding:0 8px}
+.vwarn{font-size:13px;color:var(--ink-2);background:var(--field);border-left:3px solid #A68A64;padding:10px 12px;border-radius:8px}
+.verify .vfoot{padding:10px 16px calc(var(--sab) + 12px);border-top:1px solid var(--line)}
+.wslots{margin:6px 0 10px;padding-left:18px;font-size:14px;line-height:1.6}
+
+
+/* ---- R2 : navigation à 4 onglets, puces de carte, outils ---- */
+.navbar.tabs4{grid-template-columns:repeat(4,minmax(0,1fr));align-items:stretch;padding-top:4px}
+.navbar.tabs4 .nav{min-height:60px}
+.chips{position:fixed;left:0;right:0;top:calc(var(--sat) + 60px);z-index:1001;display:flex;gap:8px;padding:8px 10px;overflow-x:auto;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chips button{flex:none;min-height:44px;padding:0 14px;border-radius:999px;font-weight:700;font-size:14px;display:flex;align-items:center;gap:6px;box-shadow:0 2px 8px rgba(0,0,0,.18);position:relative}
+.chips .chip-a{background:var(--act);color:var(--act-ink)} .chips .chip-a svg{width:20px;height:20px}
+.chips .chip-a.busy{opacity:.7}
+.chips .chip-b{background:var(--paper);color:var(--ink);border:1.5px solid var(--line)}
+.chips .chip-b[aria-pressed="true"]{background:var(--bark);color:#F2ECDF;border-color:var(--bark)}
+html[data-theme="night"] .chips .chip-b[aria-pressed="true"]{background:#F2ECDF;color:#0B1F16}
+.chips .badge{position:static;margin-left:4px;min-width:20px;height:20px;line-height:20px;border-radius:999px;background:var(--act);color:var(--act-ink);font-size:11px;text-align:center;padding:0 5px}
+.strip,.measure{top:calc(var(--sat) + 116px)}
+.mapctl{top:calc(var(--sat) + 176px)}
+body.isoff .chips{top:calc(var(--sat) + 100px)} body.isoff .strip,body.isoff .measure{top:calc(var(--sat) + 156px)} body.isoff .mapctl{top:calc(var(--sat) + 216px)}
+.walkstrip{flex-wrap:wrap;row-gap:6px}
+.walkstrip .wphoto{background:var(--act);color:var(--act-ink);min-height:48px;padding:0 16px;font-size:15px}
+.walkstrip #btnWalkPause{background:rgba(255,255,255,.18);color:#fff}
+body.walking .peek{bottom:calc(var(--sab) + 170px)}
+.trows{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:14px;overflow:hidden;margin:6px 0 10px}
+.trowb{display:flex;flex-direction:column;align-items:flex-start;text-align:left;gap:2px;padding:12px 14px;min-height:58px;background:var(--paper);color:var(--ink);border-bottom:1px solid var(--line)}
+.trowb:last-child{border-bottom:0} .trowb b{font-size:15.5px} .trowb span{font-size:13px;color:var(--ink-2)}
+.srclist{list-style:none;padding:0;margin:6px 0 10px;border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.srclist li{padding:10px 14px;border-bottom:1px solid var(--line);display:flex;flex-direction:column;gap:2px} .srclist li:last-child{border-bottom:0}
+.srclist b{font-size:15px} .srclist span{font-size:13px;color:var(--ink-2)}
+.sum .prov{font-size:12px;color:var(--ink-2);margin:8px 0 0;line-height:1.35}
+.incl{list-style:none;padding:0;margin:10px 0;border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.incl li{padding:9px 12px 9px 36px;font-size:14px;border-bottom:1px solid var(--line);position:relative} .incl li:last-child{border-bottom:0}
+.incl li::before{position:absolute;left:12px;font-weight:700} .incl li.y::before{content:"✓";color:#3F7A4F} .incl li.n::before{content:"✕";color:#B8321F}
+.wptips{margin:6px 0 12px;padding-left:18px;font-size:14px;line-height:1.5;color:var(--ink-2)}
+#wpGps.bad{color:#B8321F}
+
+
+/* ---- R3 : fiche résumé et fiche propriétaire ---- */
+.hero{margin:-6px -16px 0;height:150px;overflow:hidden;background:#C9BFA9}
+.hero img{width:100%;height:100%;object-fit:cover;display:block}
+.sum2{padding:14px 0 4px}
+.eyebrow{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ok);min-height:14px}
+.lotbig{font-family:"JetBrains Mono",ui-monospace,monospace;font-weight:700;font-size:28px;letter-spacing:.02em;margin:4px 0 12px}
+.idgrid{display:grid;grid-template-columns:1fr 1fr;border:1px solid var(--line);border-radius:16px;overflow:hidden;background:var(--paper)}
+.idgrid>div,.idgrid>button{padding:12px 14px;min-height:74px;display:flex;flex-direction:column;gap:3px;text-align:left;border-bottom:1px solid var(--line);color:var(--ink)}
+.idgrid>*:nth-child(odd){border-right:1px solid var(--line)}
+.idgrid>*:nth-child(n+3){border-bottom:0}
+.idgrid small{font-size:11.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-2)}
+.idgrid b{font-size:17px;line-height:1.25}
+.idgrid .units{font-size:11.5px;color:var(--ink-2);line-height:1.35}
+.idgrid .units b{font-size:11.5px}
+.gown{position:relative;background:var(--paper)}
+.gown b.unk{color:var(--ink-2)}
+.gown .chev{position:absolute;right:12px;top:50%;transform:translateY(-50%)}
+.gown:active{background:var(--field)}
+.sum2 .tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.sum2 .tags span{font-size:12px;font-weight:700;padding:4px 9px;border-radius:999px;background:var(--paper);border:1px solid var(--line)}
+.sum2 .tags span.hot{background:#F6E7C8;border-color:#C9A15A;color:#6B4B12}
+.sum2 .tags span.good{background:#E1EDE3;border-color:#9CC0A6;color:#1F4A2C}
+.sum2 .tags span.bad{background:#F5DED8;border-color:#D9A090;color:#7E2414}
+.sum2 .prov{font-size:12px;color:var(--ink-2);margin:10px 0 0;line-height:1.35;border-left:3px solid #A68A64;padding-left:8px}
+.chkh{font-size:16px;margin:18px 0 8px;padding-bottom:8px;border-bottom:1px solid var(--line)}
+.prows{display:flex;flex-direction:column;gap:8px}
+.prow{display:flex;align-items:center;gap:12px;padding:12px;min-height:64px;border:1px solid var(--line);border-radius:14px;background:var(--paper);color:var(--ink);text-decoration:none;text-align:left;width:100%}
+.prow:active{background:var(--field)}
+.prow .pic{width:40px;height:40px;border-radius:10px;background:var(--field);display:flex;align-items:center;justify-content:center;flex:none;color:var(--ink)}
+.prow .pt{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.prow .pt b{font-size:15.5px} .prow .pt span{font-size:13px;color:var(--ink-2)}
+.chev{font-size:24px;font-weight:700;color:var(--ink);flex:none;line-height:1}
+#chkBauxWrap{display:block}
+.ownerpage .vbody{padding:18px 16px 24px}
+.opbig{font-size:26px;line-height:1.15;margin:0 0 6px}
+.oplead{font-size:15px;color:var(--ink-2);margin:0 0 14px;line-height:1.45}
+.opcard{border:1px solid var(--line);border-radius:14px;background:var(--paper);padding:12px 14px;display:flex;flex-direction:column;gap:6px}
+.opcard label{font-size:11.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-2)}
+.opcard input,.opcard select{border:0;border-bottom:1.5px solid var(--line);border-radius:0;padding:6px 0;font-size:17px;font-weight:700;min-height:44px;background:transparent}
+.oprole{font-size:14px;margin-top:4px} .oprole button{margin-left:6px;min-height:36px;padding:0 12px;border-radius:999px;background:var(--bark);color:#F2ECDF;font-weight:700}
+#opWeb{margin-top:10px} #opWeb .links{margin-top:0}
+.ownerpage .primary{margin-top:14px}
+.opics{display:block;text-align:center;margin:8px 0 2px;font-weight:700;color:var(--ink)}
+.peek .pkeep{flex:none;width:46px;min-height:46px;border-radius:12px;background:var(--field);color:var(--ink-2);font-size:20px}
+.peek .pkeep[aria-pressed="true"]{background:#F5DED8;color:#B8321F}
+
+
+/* ---- R4 : fiche épurée ---- */
+.hero{position:relative}
+.heroedit{position:absolute;right:10px;bottom:10px;min-height:40px;padding:0 14px;border-radius:999px;background:rgba(22,20,15,.72);color:#F2ECDF;font-weight:700;font-size:14px;backdrop-filter:blur(4px)}
+.eyebrow[hidden]{display:none}
+.idgrid.two>*{border-bottom:0}
+.grole[hidden]{display:none}
+.idgrid .grole b{font-size:15.5px}
+.prowwrap{display:flex;gap:8px;align-items:stretch}
+.prowwrap .prow{flex:1;min-width:0}
+.clip{flex:none;width:52px;border:1px solid var(--line);border-radius:14px;background:var(--paper);color:var(--ink);display:flex;align-items:center;justify-content:center}
+.clip:active{background:var(--field)}
+#secExplore .src>a,#secExplore .src>.doc{display:none}
+#secExplore .src{display:block;padding:8px 0;border-bottom:1px solid var(--line)}
+#secExplore .src:has(.st:empty){display:none}
+#secExplore .slab{display:block;font-weight:700;font-size:14px;margin-bottom:6px}
+.hmpick{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;margin:6px 0 10px}
+.hmthumb{aspect-ratio:1;border-radius:10px;overflow:hidden;padding:0;border:2px solid transparent}
+.hmthumb[aria-pressed="true"]{border-color:var(--act)}
+.hmthumb img{width:100%;height:100%;object-fit:cover;display:block}
+
+
+/* ---- R5 : coordonnées dans la fiche propriétaire, écriture dans la fiche du lot ---- */
+.ctsum{border:1px solid var(--line);border-radius:14px;background:var(--paper);padding:12px 14px;display:flex;flex-direction:column;gap:3px;font-size:15px;margin-bottom:8px}
+.ctsum b{font-size:16px} .ctsum .empty{color:var(--ink-2);font-size:14px;line-height:1.4}
+.ctedit{display:block;width:100%;min-height:48px;border-radius:12px;background:var(--field);color:var(--ink);font-weight:700;font-size:15px;margin:4px 0 10px;text-align:center}
+.opcoords textarea,.opcoords input{border:0;border-bottom:1.5px solid var(--line);border-radius:0;padding:6px 0;font-size:16px;min-height:44px;background:transparent;width:100%}
+.opcoords .row{display:flex;flex-direction:column;gap:6px}
+.ownerpage .ctedit{margin-top:10px}
+
 /* Éléments retirés de l'ancienne interface */
 .bottom,.mode,.mapbtn,.walkpill,.clearbtn,.legend{display:none !important}
 
@@ -493,7 +658,7 @@ body.walking .mectl{bottom:calc(var(--sab) + 224px)}
 <div id="map" role="application" aria-label="Carte"></div>
 
 <header class="topbar">
-  <h1 class="brand" aria-label="LOTS"><svg xmlns="http://www.w3.org/2000/svg" class="logo" viewBox="-60 -60 3546 1246" role="img" aria-label="LOTS"><rect x="47.5" y="47.5" width="3361" height="1061" fill="#F3EBD7" stroke="#141A16" stroke-width="95"/><g fill="#141A16" transform="translate(190 967) scale(1 -1)"><path transform="translate(0 0)" d="M20 0V164H70V614H20V778H442V614H350V164H440V256H639V0Z"/><path transform="translate(708 0)" d="M14 389Q14 600 113.5 696.0Q213 792 396 792Q579 792 678.5 696.0Q778 600 778 389Q778 178 678.5 82.0Q579 -14 396 -14Q213 -14 113.5 82.0Q14 178 14 389ZM464 238V540Q464 578 447.0 596.0Q430 614 396 614Q362 614 345.0 596.0Q328 578 328 540V238Q328 199 345.0 181.5Q362 164 396 164Q430 164 447.0 182.0Q464 200 464 238Z"/><path transform="translate(1555 0)" d="M766 536H594V614H530V164H600V0H180V164H250V614H186V536H14V778H766Z"/><path transform="translate(2390 0)" d="M17 40V238H237Q237 207 251.0 193.0Q265 179 302 179Q333 179 346.5 188.5Q360 198 360 217Q360 233 347.0 244.5Q334 256 302 268L216 298Q105 340 56.5 397.0Q8 454 8 551Q8 669 85.5 730.5Q163 792 344 792Q431 792 507.5 774.5Q584 757 631 728V549H431Q431 599 369 599Q339 599 326.5 591.5Q314 584 314 565Q314 548 328.5 538.0Q343 528 376 517L463 487Q569 451 617.5 393.5Q666 336 666 243Q666 116 580.5 51.0Q495 -14 330 -14Q234 -14 148.5 2.5Q63 19 17 40Z"/></g><rect x="-30" y="-30" width="230" height="230" fill="#FF5A1F" stroke="#141A16" stroke-width="40"/></svg></h1>
+  <h1 class="brand"><img class="logo" src="brand/enseigne-360.png" alt="LOTS" width="108" height="36"></h1>
   <button class="searchbtn" id="btnSearch" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg><span>N° de lot, adresse, lien Centris</span></button>
   <button class="chip icon" id="btnHelp" aria-label="Guide et réglages">?</button>
 </header>
@@ -512,9 +677,15 @@ body.walking .mectl{bottom:calc(var(--sab) + 224px)}
   <div class="b"><button id="mUndo">↶ Retirer le point</button><button id="mClose">Fermer la forme</button><button id="mClear">Effacer</button><button id="mDone" class="main">Terminer</button></div>
 </div>
 
+<div class="chips" id="chips" role="toolbar" aria-label="Actions de la carte">
+  <button class="chip-a" id="btnScan" aria-label="Scanner les lots dans l'anneau"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8" stroke-dasharray="3 3"/><circle cx="12" cy="12" r="3"/></svg><span>Scanner la zone</span></button>
+  <button class="chip-b" id="chipVacant" aria-pressed="false">Sans adresse ?</button>
+  <button class="chip-b" id="btnFilters" aria-pressed="false">Filtres<b class="badge" id="filterCount" hidden>0</b></button>
+</div>
 <div class="mapctl">
   <button class="ctl dark" id="btnLayers" aria-label="Couches et légende"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l9 5-9 5-9-5 9-5z"/><path d="M3 13l9 5 9-5"/></svg></button>
   <button class="ctl dark" id="btnMeasure" aria-pressed="false" aria-label="Mesurer une distance ou une surface"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17L17 3l4 4L7 21z"/><path d="M7 13l2 2M10 10l2 2M13 7l2 2"/></svg></button>
+  <button class="ctl dark" id="btnPov" aria-label="Photo orientée"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg></button>
   <button class="compass off" id="compass" aria-label="Boussole">
     <svg viewBox="0 0 44 44"><circle cx="22" cy="22" r="20" fill="none" stroke="#C9D1C4" stroke-width="2"/><path d="M22 5 L27 22 L22 20 L17 22 Z" fill="#B4541E"/><path d="M22 39 L27 22 L22 24 L17 22 Z" fill="#C9D1C4"/><text x="22" y="14" text-anchor="middle" font-size="9" font-weight="700" fill="#1F3D2B">N</text></svg>
     <span class="deg" id="deg">boussole</span>
@@ -525,18 +696,17 @@ body.walking .mectl{bottom:calc(var(--sab) + 224px)}
 <div class="pin" aria-hidden="true"><svg viewBox="0 0 34 44"><path d="M17 1C8 1 1 8 1 17c0 11 16 26 16 26s16-15 16-26C33 8 26 1 17 1z" fill="#1E6FD9" stroke="#fff" stroke-width="2"/><circle cx="17" cy="17" r="6" fill="#fff"/></svg></div>
 <div class="ring" id="ring" aria-hidden="true"><span id="ringLabel">250 m</span></div>
 
-<div class="peek" id="peek" hidden><div class="t"><b id="peekTitle">—</b><span id="peekSub"></span></div><button class="go" id="peekGo">Voir la fiche</button></div>
+<div class="peek" id="peek" hidden><div class="t"><b id="peekTitle">—</b><span id="peekSub"></span></div><button class="pkeep" id="peekKeep" aria-label="Garder dans mon journal" aria-pressed="false">♥</button><button class="go" id="peekGo">Voir la fiche</button></div>
 
-<div class="walkstrip" id="walkStrip" hidden><span class="dot" aria-hidden="true"></span><div class="t"><b id="walkStat">0 m</b> <span id="walkState">· en marche</span><br><span id="walkLot">Recherche du lot…</span></div><button id="btnWalkStop">Terminer</button></div>
+<div class="walkstrip" id="walkStrip" hidden><span class="dot" aria-hidden="true"></span><div class="t"><b id="walkStat">0 m</b> <span id="walkState">· en marche</span><br><span id="walkLot">Recherche du lot…</span><span id="walkAcc"></span></div><button id="btnWalkPhoto" class="wphoto" aria-label="Photo orientée">📷 Photo</button><button id="btnWalkPause">Pause</button><button id="btnWalkStop">Terminer</button></div>
 
 <div class="tip" id="tip" role="status" hidden><span id="tipText"></span><button id="tipOk">OK</button></div>
 
-<nav class="navbar" aria-label="Actions">
+<nav class="navbar tabs4" aria-label="Navigation">
+  <button class="nav" id="btnTabMap" aria-pressed="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6l6-2 6 2 6-2v14l-6 2-6-2-6 2z"/><path d="M9 4v14M15 6v14"/></svg><span>Carte</span></button>
   <button class="nav" id="btnWalk" aria-pressed="false"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 3.5c1.9 0 3 1.6 3 3.6 0 2.1-.7 4.4-2 5.3-.6.4-1.5.4-2.1 0-1.2-.9-1.9-3.2-1.9-5.3 0-2 1.1-3.6 3-3.6z"/><rect x="5.2" y="14" width="3.8" height="2.6" rx="1.3"/><path d="M17 8.5c1.9 0 3 1.6 3 3.6 0 2.1-.7 4.4-2 5.3-.6.4-1.5.4-2.1 0-1.2-.9-1.9-3.2-1.9-5.3 0-2 1.1-3.6 3-3.6z"/><rect x="15.2" y="19" width="3.8" height="2.6" rx="1.3"/></svg><span id="walkLabel">Marcher</span></button>
-  <button class="nav" id="btnPov"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg><span>Photo</span></button>
-  <div class="navscan"><button class="scan" id="btnScan" aria-label="Scanner les lots dans l'anneau"><span class="face"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8" stroke-dasharray="3 3"/><circle cx="12" cy="12" r="3"/></svg></span></button><span aria-hidden="true">Scanner</span></div>
-  <button class="nav" id="btnFilters" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h16M7 12h10M10 18h4"/></svg><span>Filtres</span><b class="badge" id="filterCount" hidden>0</b></button>
   <button class="nav" id="btnCarnet" aria-label="Journal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 3h11l3 3v15H5z"/><path d="M8 8h8M8 12h8M8 16h5"/></svg><span>Journal</span><b class="badge" id="carnetCount" hidden>0</b></button>
+  <button class="nav" id="btnTools" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.6 2.6-2.4-.6-.6-2.4z"/></svg><span>Outils</span></button>
 </nav>
 
 <section class="aim" id="aim" hidden>
@@ -544,7 +714,7 @@ body.walking .mectl{bottom:calc(var(--sab) + 224px)}
     <svg viewBox="0 0 200 200" class="phone"><g class="ph"><rect x="70" y="40" width="60" height="110" rx="10" fill="none" stroke="currentColor" stroke-width="5"/><rect x="92" y="138" width="16" height="4" rx="2" fill="currentColor"/></g></svg>
     <svg viewBox="0 0 200 200" class="arrow"><path d="M100 185 V45" stroke="#FF5A1F" stroke-width="18" stroke-linecap="round"/><path d="M48 92 L100 22 L152 92" fill="none" stroke="#FF5A1F" stroke-width="18" stroke-linecap="round" stroke-linejoin="round"/></svg>
   </div>
-  <h2>Pointe vers ta photo</h2>
+  <div class="aimstep">Photo orientée · étape 1 sur 3</div><h2>Où regardes-tu ?</h2><p class="aimhelp">Tiens le téléphone à plat, pointe la direction, puis fixe le cap. Tu pourras ensuite le redresser pour photographier.</p>
   <span class="flat" id="aimFlat">à plat</span>
   <div class="dial"><svg viewBox="0 0 120 120"><circle cx="60" cy="60" r="54" fill="none" stroke="currentColor" stroke-width="2"/><g id="aimRose"><path d="M60 10 L66 60 L60 54 L54 60 Z" fill="#FF5A1F"/><path d="M60 110 L66 60 L60 66 L54 60 Z" fill="currentColor" opacity=".35"/><text x="60" y="26" text-anchor="middle" font-size="11" font-weight="700" fill="currentColor">N</text></g><path d="M60 2 L66 12 L54 12 Z" fill="currentColor"/></svg><b id="aimDeg">—°</b></div>
   <button class="fix" id="aimFix">Fixer le point de vue</button>
@@ -562,13 +732,21 @@ body.walking .mectl{bottom:calc(var(--sab) + 224px)}
 
 <section class="intro" id="intro" hidden>
   <div class="slides" id="slides">
+    <article class="welcome">
+      <img class="wsign" src="brand/enseigne-800.png" alt="LOTS" width="800" height="267">
+      <div class="wtag">TERRE DE RANG</div>
+      <img class="wland" src="brand/paysage.jpg" alt="" width="1491" height="143">
+      <h2>Trouve ta terre.<br>Fais ton chemin.</h2>
+      <p>Repère des lots, documente tes visites et organise ta prospection au Québec.</p>
+      <p class="fine">Données sourcées. Ton journal t'appartient.</p>
+    </article>
     <article>
       <div class="ill"><svg viewBox="0 0 120 120"><rect x="10" y="14" width="100" height="70" rx="10" fill="#DDE3D6"/><path d="M30 14 L40 84 M70 14 L75 84" stroke="#1F3D2B" stroke-width="2" fill="none"/><path d="M60 28c-8 0-14 6-14 14 0 10 14 24 14 24s14-14 14-24c0-8-6-14-14-14z" fill="#1E6FD9" stroke="#fff" stroke-width="2"/><circle cx="60" cy="42" r="5" fill="#fff"/><rect x="14" y="90" width="92" height="22" rx="8" fill="#fff" stroke="#C9D1C4" stroke-width="2"/><rect x="20" y="96" width="46" height="5" rx="2" fill="#1F3D2B"/><rect x="76" y="95" width="24" height="12" rx="4" fill="#1F3D2B"/></svg></div>
       <h2>Le lot sous la pin s'affiche en bas</h2>
       <p>Bouge la carte : la carte du bas te dit quel lot est sous la pin bleue. <b>Voir la fiche</b> pour tout savoir. Tu peux aussi toucher n'importe quel lot.</p>
     </article>
     <article>
-      <div class="ill"><svg viewBox="0 0 120 120"><circle cx="60" cy="56" r="40" fill="none" stroke="#E0A422" stroke-width="3" stroke-dasharray="6 6"/><rect x="30" y="34" width="26" height="40" fill="#FF5A1F" opacity=".5" stroke="#FF5A1F" stroke-width="2"/><rect x="60" y="30" width="28" height="44" fill="#8A948C" opacity=".15" stroke="#8A948C"/><path d="M20 104h80M32 98v12M60 98v12" stroke="#1F3D2B" stroke-width="3"/></svg></div>
+      <div class="ill"><svg viewBox="0 0 120 120"><circle cx="60" cy="56" r="40" fill="none" stroke="#C9A15A" stroke-width="3" stroke-dasharray="6 6"/><rect x="30" y="34" width="26" height="40" fill="#FF5A1F" opacity=".5" stroke="#FF5A1F" stroke-width="2"/><rect x="60" y="30" width="28" height="44" fill="#8A948C" opacity=".15" stroke="#8A948C"/><path d="M20 104h80M32 98v12M60 98v12" stroke="#1F3D2B" stroke-width="3"/></svg></div>
       <h2>Scanner, puis filtrer</h2>
       <p><b>Scanner</b> lit tous les lots de l'anneau (pince la carte pour l'agrandir). <b>Filtres</b> allume en orange ceux qui comptent : sans bâtiment, grands, propriétaire depuis longtemps, plusieurs héritiers.</p>
     </article>
@@ -584,7 +762,7 @@ body.walking .mectl{bottom:calc(var(--sab) + 224px)}
     </article>
     <article class="setup">
       <h2>Avant de partir</h2>
-      <p>lots fonctionne mieux installé et avec ces accès. Touche chaque ligne :</p>
+      <p>LOTS fonctionne mieux installé et avec ces accès. Touche chaque ligne :</p>
       <div class="perm" id="permList">
         <button type="button" data-p="install"><b>📲 Installer l'application</b><span>Plein écran, icône sur ton téléphone, partage depuis Centris.</span><i></i></button>
         <button type="button" data-p="geo"><b>📍 Position</b><span>Indispensable : le lot sous tes pieds, le scan autour de toi, ta marche.</span><i></i></button>
@@ -607,33 +785,31 @@ body.walking .mectl{bottom:calc(var(--sab) + 224px)}
   <div class="grip"></div>
   <header><div class="t"><h2 id="lotNo">—</h2><p id="lotWhere">—</p></div><button class="keep" id="btnFav" aria-pressed="false"><span class="h" aria-hidden="true">♥</span><span id="favLabel">Garder</span></button><button class="close" id="btnShare" aria-label="Partager ce lot"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="M7.5 7.5L12 3l4.5 4.5"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></svg></button><button class="close" id="closeLot" aria-label="Fermer">×</button></header>
   <div class="body">
-    <div class="sum">
-      <div class="own unk" id="sumOwner">Propriétaire inconnu</div>
-      <div class="units" id="sumUnits"></div>
+    <div class="hero"><img id="heroImg" src="brand/paysage.jpg" alt="Photo du lot"><button class="heroedit" id="heroEdit" aria-label="Changer la photo du lot">✎ Photo</button></div>
+    <div class="sum2">
+      <div class="eyebrow" id="sumEyebrow"></div>
+      
+      <div class="idgrid">
+        <div><small>Superficie</small><b id="gArea">—</b><span id="sumUnits" class="units"></span></div>
+        <button class="gown" id="gOwner" aria-label="Fiche propriétaire"><small>Propriétaire</small><b id="sumOwner" class="unk">À rechercher</b><span class="chev" aria-hidden="true">›</span></button>
+        <div class="grole" id="gValueCell" hidden><small>Valeur au rôle</small><b id="gValue">—</b></div>
+        <div class="grole" id="gUseCell" hidden><small>Usage au rôle</small><b id="gUse">—</b></div>
+      </div>
       <div class="tags" id="sumTags"></div>
+      <p class="prov" id="sumProv"></p>
+    </div>
+    <h3 class="chkh">À vérifier avant d'aller plus loin</h3>
+    <div class="prows" id="chkList">
+      <a class="prow" id="chkAccess" target="_blank" rel="noopener"><span class="pic" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 21V4M5 4h11l-2 4 2 4H5"/></svg></span><span class="pt"><b>Accès routier</b><span id="chkAccessSub">Non confirmé</span></span><span class="chev" aria-hidden="true">›</span></a>
+      <div class="prowwrap"><a class="prow" id="chkZoning" target="_blank" rel="noopener"><span class="pic" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 7h14l-2 10H4z"/></svg></span><span class="pt"><b>Zonage et usages</b><span id="chkZoningSub">Ouvrir la source municipale</span></span><span class="chev" aria-hidden="true">›</span></a><button class="clip" data-src="muni" aria-label="Joindre une capture ou un document (municipalité)"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.5 11.5l-8.2 8.2a5 5 0 0 1-7.1-7.1l8.6-8.6a3.4 3.4 0 0 1 4.8 4.8l-8.5 8.5a1.7 1.7 0 0 1-2.4-2.4l7.8-7.8"/></svg></button></div>
+      <div class="prowwrap"><a class="prow" id="chkCadastre" target="_blank" rel="noopener"><span class="pic" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="4" width="14" height="16" rx="1"/><path d="M8 8h8M8 12h8M8 16h5"/></svg></span><span class="pt"><b>Cadastre et superficie</b><span id="chkCadastreSub">Ouvrir Infolot</span></span><span class="chev" aria-hidden="true">›</span></a><button class="clip" data-src="infolot" aria-label="Joindre une capture ou un document (Infolot)"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.5 11.5l-8.2 8.2a5 5 0 0 1-7.1-7.1l8.6-8.6a3.4 3.4 0 0 1 4.8 4.8l-8.5 8.5a1.7 1.7 0 0 1-2.4-2.4l7.8-7.8"/></svg></button></div>
+      <a class="prow" id="chkCall" href="#"><span class="pic" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/></svg></span><span class="pt"><b>Appeler la municipalité</b><span id="chkCallSub">Confirmer le zonage, l'accès, un permis</span></span><span class="chev" aria-hidden="true">›</span></a>
+      <span id="chkBauxWrap" hidden><button class="prow" id="chkBaux"><span class="pic" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 20h18L12 4z"/></svg></span><span class="pt"><b>Terre publique louée</b><span id="chkBauxSub">Un bail public touche ce lot : à vérifier</span></span><span class="chev" aria-hidden="true">›</span></button></span>
     </div>
 
-    <details class="sec" id="secExplore" open>
-      <summary>Explorer ce lot <span class="c">rôle · registre · cadastre</span></summary>
-      <div class="in">
-        <div class="role" id="roleBox" hidden></div>
-        <div class="role" id="openBox" hidden></div>
-        <h3>Ouvrir les sources officielles</h3>
-        <p class="fine">Le trombone joint à chaque source une capture d'écran ou un document (PDF du Registre, fiche du rôle…), gardé dans ton téléphone.</p>
-        <div class="sources">
-          <div class="src" data-src="registre"><a id="lnkRegistre" target="_blank" rel="noopener">Registre foncier (acte de vente, adresse)</a><button class="doc" data-src="registre" aria-label="Joindre une capture ou un document"><svg viewBox="0 0 24 24"><path d="M20.5 11.5l-8.2 8.2a5 5 0 0 1-7.1-7.1l8.6-8.6a3.4 3.4 0 0 1 4.8 4.8l-8.5 8.5a1.7 1.7 0 0 1-2.4-2.4l7.8-7.8"/></svg><b class="n" hidden></b></button><div class="st" data-thumbs="registre"></div></div>
-          <div class="src" data-src="role"><a id="lnkRole" target="_blank" rel="noopener">Rôle d'évaluation de la MRC</a><button class="doc" data-src="role" aria-label="Joindre une capture ou un document"><svg viewBox="0 0 24 24"><path d="M20.5 11.5l-8.2 8.2a5 5 0 0 1-7.1-7.1l8.6-8.6a3.4 3.4 0 0 1 4.8 4.8l-8.5 8.5a1.7 1.7 0 0 1-2.4-2.4l7.8-7.8"/></svg><b class="n" hidden></b></button><div class="st" data-thumbs="role"></div></div>
-          <div class="src" data-src="infolot"><a id="lnkInfolot" target="_blank" rel="noopener">Infolot (plan du cadastre)</a><button class="doc" data-src="infolot" aria-label="Joindre une capture ou un document"><svg viewBox="0 0 24 24"><path d="M20.5 11.5l-8.2 8.2a5 5 0 0 1-7.1-7.1l8.6-8.6a3.4 3.4 0 0 1 4.8 4.8l-8.5 8.5a1.7 1.7 0 0 1-2.4-2.4l7.8-7.8"/></svg><b class="n" hidden></b></button><div class="st" data-thumbs="infolot"></div></div>
-          <div class="src muni" data-src="muni"><a id="lnkCall" href="#">Appeler la municipalité</a><a id="lnkMuni" target="_blank" rel="noopener">Site web</a><button class="doc" data-src="muni" aria-label="Joindre une capture ou un document"><svg viewBox="0 0 24 24"><path d="M20.5 11.5l-8.2 8.2a5 5 0 0 1-7.1-7.1l8.6-8.6a3.4 3.4 0 0 1 4.8 4.8l-8.5 8.5a1.7 1.7 0 0 1-2.4-2.4l7.8-7.8"/></svg><b class="n" hidden></b></button><div class="st" data-thumbs="muni"></div></div>
-        </div>
-        <div class="links"><button id="copyLot" class="wide">Copier le n° de lot</button></div>
-      </div>
-    </details>
+    
 
-    <details class="sec" id="secOwner">
-      <summary>Trouver le propriétaire <span class="c" id="secOwnerC"></span></summary>
-      <div class="in">
-        <label class="fine" for="lotOwner">Nom du propriétaire (tel qu'au rôle ou au Registre)</label>
+    <details class="sec" id="secOwner" hidden><summary><span class="c" id="secOwnerC"></span></summary><div id="ownerStash"><label class="fine" for="lotOwner">Nom du propriétaire (tel qu'au rôle ou au Registre)</label>
         <input class="f" id="lotOwner" placeholder="Prénom Nom ou nom de l'entreprise" autocomplete="off">
         <div class="links" id="ownerLinks">
           <a id="lnkC411" target="_blank" rel="noopener">Canada411</a>
@@ -644,19 +820,13 @@ body.walking .mectl{bottom:calc(var(--sab) + 224px)}
           <a id="lnkDeces" target="_blank" rel="noopener" hidden>Avis de décès</a>
           <a id="lnkNoms" target="_blank" rel="noopener" class="wide">Registre foncier : autres terres de ce nom</a>
         </div>
-        <p class="fine" id="ownerHint">Inscris le nom pour activer les recherches. Elles s'ouvrent préremplies ; l'app ne collecte rien elle-même.</p>
-      </div>
-    </details>
+        <p class="fine" id="ownerHint">Inscris le nom pour activer les recherches. Elles s'ouvrent préremplies ; l'app ne collecte rien elle-même.</p></div></details>
 
     <details class="sec" id="secContact">
       <summary>Contacter <span class="c" id="secContactC"></span></summary>
       <div class="in">
-        <label class="fine" for="lotAddrPost">Adresse postale (du Registre ou du rôle)</label>
-        <textarea id="lotAddrPost" rows="2" placeholder="123, chemin du Lac, Ville (Québec) J0T 1A0"></textarea>
-        <div class="row" style="margin-top:8px">
-          <input class="f" id="lotEmail" type="email" placeholder="Courriel" autocomplete="off" aria-label="Courriel du propriétaire">
-          <input class="f" id="lotPhone" type="tel" placeholder="Cellulaire" autocomplete="off" aria-label="Cellulaire du propriétaire">
-        </div>
+        <div class="ctsum" id="ctSum"></div>
+        <button class="ctedit" id="ctToOwner">Ajouter les coordonnées du propriétaire →</button>
         <button class="primary" id="btnPrint">Imprimer la lettre (ou PDF)</button>
         <div class="links">
           <a id="btnMail" href="#" class="off">Courriel</a>
@@ -677,12 +847,29 @@ body.walking .mectl{bottom:calc(var(--sab) + 224px)}
       </div>
     </details>
 
+    <details class="sec" id="secExplore">
+      <summary>Rôle et pièces jointes <span class="c" id="secExploreC"></span></summary>
+      <div class="in">
+        <div class="role" id="roleBox" hidden></div>
+        <div class="role" id="openBox" hidden></div>
+        <h3>Pièces jointes</h3>
+        <p class="fine" id="attHint">Joins une capture ou un PDF avec le trombone, à côté de chaque source : Infolot et municipalité ici, Registre foncier et rôle dans la fiche propriétaire. Tout reste dans ton téléphone.</p>
+        <div class="sources">
+          <div class="src" data-src="registre"><span class="slab">Registre foncier</span><a id="lnkRegistre" target="_blank" rel="noopener">Registre foncier (acte de vente, adresse)</a><button class="doc" data-src="registre" aria-label="Joindre une capture ou un document"><svg viewBox="0 0 24 24"><path d="M20.5 11.5l-8.2 8.2a5 5 0 0 1-7.1-7.1l8.6-8.6a3.4 3.4 0 0 1 4.8 4.8l-8.5 8.5a1.7 1.7 0 0 1-2.4-2.4l7.8-7.8"/></svg><b class="n" hidden></b></button><div class="st" data-thumbs="registre"></div></div>
+          <div class="src" data-src="role"><span class="slab">Rôle d'évaluation</span><a id="lnkRole" target="_blank" rel="noopener">Rôle d'évaluation de la MRC</a><button class="doc" data-src="role" aria-label="Joindre une capture ou un document"><svg viewBox="0 0 24 24"><path d="M20.5 11.5l-8.2 8.2a5 5 0 0 1-7.1-7.1l8.6-8.6a3.4 3.4 0 0 1 4.8 4.8l-8.5 8.5a1.7 1.7 0 0 1-2.4-2.4l7.8-7.8"/></svg><b class="n" hidden></b></button><div class="st" data-thumbs="role"></div></div>
+          <div class="src" data-src="infolot"><span class="slab">Infolot</span><a id="lnkInfolot" target="_blank" rel="noopener">Infolot (plan du cadastre)</a><button class="doc" data-src="infolot" aria-label="Joindre une capture ou un document"><svg viewBox="0 0 24 24"><path d="M20.5 11.5l-8.2 8.2a5 5 0 0 1-7.1-7.1l8.6-8.6a3.4 3.4 0 0 1 4.8 4.8l-8.5 8.5a1.7 1.7 0 0 1-2.4-2.4l7.8-7.8"/></svg><b class="n" hidden></b></button><div class="st" data-thumbs="infolot"></div></div>
+          <div class="src muni" data-src="muni"><span class="slab">Municipalité</span><a id="lnkCall" href="#">Appeler la municipalité</a><a id="lnkMuni" target="_blank" rel="noopener">Site web</a><button class="doc" data-src="muni" aria-label="Joindre une capture ou un document"><svg viewBox="0 0 24 24"><path d="M20.5 11.5l-8.2 8.2a5 5 0 0 1-7.1-7.1l8.6-8.6a3.4 3.4 0 0 1 4.8 4.8l-8.5 8.5a1.7 1.7 0 0 1-2.4-2.4l7.8-7.8"/></svg><b class="n" hidden></b></button><div class="st" data-thumbs="muni"></div></div>
+        </div>
+        <div class="links"><button id="copyLot" class="wide">Copier le n° de lot</button></div>
+      </div>
+    </details>
+
     <details class="sec" id="secSale">
       <summary>En vente ? <span class="c" id="secSaleC"></span></summary>
       <div class="in">
         <div class="src centris" id="srcCentris"><a id="lnkCentris" target="_blank" rel="noopener">Centris — annonces de la municipalité</a><button class="doc link" id="btnCentrisPaste" aria-label="Coller le lien d'une annonce Centris"><svg viewBox="0 0 24 24"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1.5 1.5"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1.5-1.5"/></svg><span>Coller</span></button><div class="st centris-url" id="centrisUrl"></div>
           <div class="centrisData" id="centrisData" hidden><div class="row"><input class="f" id="cPrice" inputmode="numeric" placeholder="Prix ($)" aria-label="Prix demandé"><input class="f" id="cBroker" placeholder="Courtier" aria-label="Courtier"></div></div></div>
-        <p class="fine">Trouvé une annonce ? Dans Centris : Partager → lots. Ou copie son lien, reviens ici et touche « Coller ».</p>
+        <p class="fine">Trouvé une annonce ? Dans Centris : Partager → LOTS. Ou copie son lien, reviens ici et touche « Coller ».</p>
         <h3>Chercher une annonce autour de ce lot</h3>
         <div class="links" id="adsLot"></div>
       </div>
@@ -706,7 +893,7 @@ body.walking .mectl{bottom:calc(var(--sab) + 224px)}
   <div class="grip"></div>
   <header><div class="t"><h2>Filtres</h2><p>Les lots du scan qui passent tous les filtres s'allument en orange</p></div><button class="close" id="closeFilters" aria-label="Fermer">×</button></header>
   <div class="body">
-    <div class="trow"><div class="t">Probablement vacant<small>Aucune adresse civique sur le lot</small></div><label class="switch"><input type="checkbox" id="fVacant"><span class="track"></span></label></div>
+    <div class="trow"><div class="t">Sans adresse civique<small>Indice seulement, pas une preuve de vacance</small></div><label class="switch"><input type="checkbox" id="fVacant"><span class="track"></span></label></div>
     <h3>Superficie minimale</h3>
     <div class="seg" id="fMinAc" role="group" aria-label="Superficie minimale"><button data-v="0">Toutes</button><button data-v="2">2 acres</button><button data-v="5">5</button><button data-v="10">10</button><button data-v="25">25</button><button data-v="50">50</button><button data-v="100">100+</button></div>
     <h3>Propriétaire inscrit depuis</h3>
@@ -723,6 +910,7 @@ body.walking .mectl{bottom:calc(var(--sab) + 224px)}
   <div class="grip"></div>
   <header><div class="t"><h2>Couches</h2><p>Ce qui s'affiche sur la carte</p></div><button class="close" id="closeLayers" aria-label="Fermer">×</button></header>
   <div class="body">
+    
     <div class="trow"><div class="t">Photo aérienne</div><label class="switch"><input type="checkbox" id="lyrSat"><span class="track"></span></label></div>
     <div class="trow"><div class="t">Terres publiques louées<small>Baux de villégiature et abris sommaires (zoom rapproché)</small></div><label class="switch"><input type="checkbox" id="lyrBauxT" checked><span class="track"></span></label></div>
     <div class="trow"><div class="t">Seulement mes favoris<small>Masque les autres lots du journal</small></div><label class="switch"><input type="checkbox" id="lyrFavOnly"><span class="track"></span></label></div>
@@ -731,7 +919,7 @@ body.walking .mectl{bottom:calc(var(--sab) + 224px)}
     <div class="links" id="adsMap"></div>
     <h3>Légende</h3>
     <p class="hint">Lots du scan</p>
-    <div class="lg"><span><i style="background:#E0A422"></i><span class="lgk" style="color:#A86F00" id="lgLeaf"></span>sans adresse, probablement vacant</span><span><i style="background:#B8BFB5"></i><span class="lgk" style="color:#5C6B62" id="lgHouse"></span>bâti</span><span><i style="background:#FF5A1F"></i>passe tes filtres</span></div>
+    <div class="lg"><span><i style="background:#C9A15A"></i><span class="lgk" style="color:#A86F00" id="lgLeaf"></span>sans adresse civique connue</span><span><i style="background:#B8BFB5"></i><span class="lgk" style="color:#5C6B62" id="lgHouse"></span>bâti</span><span><i style="background:#FF5A1F"></i>passe tes filtres</span></div>
     <p class="hint">Ton journal</p>
     <div class="lg" id="legendSaved"></div>
     <p class="hint">Terres publiques louées</p>
@@ -739,6 +927,35 @@ body.walking .mectl{bottom:calc(var(--sab) + 224px)}
   </div>
 </section>
 
+<section class="sheet" id="sheetTools" aria-hidden="true" aria-labelledby="toolsTitle">
+  <div class="grip"></div>
+  <header><div class="t"><h2 id="toolsTitle">Outils</h2><p>Réglages, données, aide</p></div><button class="close" id="closeTools" aria-label="Fermer">×</button></header>
+  <div class="body">
+    <h3>Apparence</h3>
+    <div class="seg" id="themeSeg" role="group" aria-label="Apparence"><button data-v="auto">Auto</button><button data-v="jour">Jour</button><button data-v="nuit">Nuit</button></div>
+    <h3>Unité de superficie</h3>
+    <div class="seg" id="unitSeg" role="group" aria-label="Unité de superficie"><button data-v="pi2">pi²</button><button data-v="ac">acres</button><button data-v="ha">hectares</button></div>
+    <h3>Carte</h3>
+    <div class="trows"><button class="trowb" id="tLayers"><b>Couches et légende</b><span>Photo aérienne, terres publiques louées, favoris, annonces</span></button><button class="trowb" id="tMeasure"><b>Mesurer</b><span>Distance ou surface au doigt</span></button></div>
+    <h3>Mes données</h3>
+    <div class="trows"><button class="trowb" id="tBackup"><b>Sauvegarder le journal</b><span id="tBackupSub">Lots, notes et marches dans un fichier</span></button><button class="trowb" id="tRestore"><b>Restaurer une sauvegarde</b><span>Les lots déjà présents sont conservés</span></button>
+      <button class="trowb" id="tCsv"><b>Journal (.csv)</b><span>Lots, statuts et notes, pour un tableur</span></button><button class="trowb" id="tKml"><b>Journal (KML / GeoJSON)</b><span>Contours des lots gardés et marches, pour Google Earth</span></button></div>
+    <p class="fine">Les exports de journal contiennent ce que tu as noté, y compris les noms de propriétaires. Ne les partage qu'avec des personnes de confiance.</p>
+    <h3>Sources et provenance</h3>
+    <ul class="srclist">
+      <li><b>Cadastre du Québec</b><span>Contours et numéros de lot · Gouvernement du Québec · lu en direct</span></li>
+      <li><b>Rôle d'évaluation 2026</b><span>Usage, valeurs, ancienneté · MAMH, données ouvertes CC-BY 4.0 · mis à jour chaque mois</span></li>
+      <li><b>Rôle de la MRC d'Argenteuil</b><span>Propriétaire et valeurs, un lot à la fois · lu en direct</span></li>
+      <li><b>Adresses Québec, découpage municipal, baux</b><span>Gouvernement du Québec · lus en direct</span></li>
+      <li><b>Fonds de carte</b><span>© contributeurs OpenStreetMap · imagerie © Esri</span></li>
+    </ul>
+    <p class="vwarn">Aucune hypothèse de constructibilité ne remplace une confirmation municipale. Superficies et limites sont à vérifier auprès d'un arpenteur-géomètre.</p>
+    <h3>Aide</h3>
+    <div class="trows"><button class="trowb" id="tGuide"><b>Guide et préparation du téléphone</b><span>Installation, autorisations, premiers pas</span></button><button class="trowb" id="tVoice"><b>Commentaire vocal</b><span>Dis ce qui t'a mêlé, ça m'aide à améliorer LOTS</span></button><button class="trowb" id="tReport"><b>Partager le rapport d'usage</b><span>Seulement si tu le choisis</span></button></div>
+    <p class="version"><a href="confidentialite.html" target="_blank" rel="noopener">Confidentialité et conditions</a> · <a href="mailto:bonjour@lots.quebec?subject=LOTS">Nous écrire</a></p>
+    <p class="version" id="toolsVersion"></p>
+  </div>
+</section>
 <section class="sheet" id="sheetCarnet" aria-hidden="true" aria-labelledby="jTitle">
   <div class="grip"></div>
   <header><div class="t"><h2 id="jTitle">Journal</h2><p id="jSub">Dans ce téléphone seulement</p></div><button class="close" id="closeCarnet" aria-label="Fermer">×</button></header>
@@ -767,12 +984,80 @@ body.walking .mectl{bottom:calc(var(--sab) + 224px)}
 
 <div class="modal" id="shareModal" hidden role="dialog" aria-modal="true" aria-labelledby="shareTitle">
   <div class="mbox">
-    <h2 id="shareTitle">Partager le lot</h2>
+    <div class="aimstep">Ton dossier, tes données</div><h2 id="shareTitle">Partager le lot</h2>
     <button class="primary" id="shareZip">Exporter photos + GPS (.zip)</button>
     <p class="fine">Photos, position et direction de chaque prise, contour du lot et marches qui le traversent (GeoJSON et KML pour Google Earth), avec une fiche résumé. Fabriqué dans ton téléphone, rien n'est envoyé à un serveur. Le nom du propriétaire, ses coordonnées et tes notes ne sont pas inclus.</p>
+    <ul class="incl"><li class="y">Photos de terrain, positions et orientations</li><li class="y">Contour du lot et marches qui le traversent</li><li class="n">Noms et coordonnées de propriétaires : exclus</li><li class="n">Captures et documents des sources : exclus</li></ul>
     <div class="prem"><button id="shareLink" disabled>Lien de fiche partageable</button><span class="badge-p">Premium · bientôt</span></div>
     <p class="fine">Envoie la fiche complète par un simple lien, à jour, à un conjoint, un courtier ou un notaire. <a href="#" id="premiumNotify">Me prévenir au lancement</a></p>
     <button class="cancel" id="shareClose">Fermer</button>
+  </div>
+</div>
+<div class="modal" id="heroModal" hidden role="dialog" aria-modal="true" aria-labelledby="hmTitle">
+  <div class="mbox">
+    <h2 id="hmTitle">Photo du lot</h2>
+    <div class="trows"><button class="trowb" id="hmTake"><b>Prendre une photo orientée</b><span>Position et direction enregistrées</span></button><button class="trowb" id="hmGallery"><b>Choisir dans la galerie</b><span>Sans position ni direction</span></button><button class="trowb" id="hmReset"><b>Remettre l'illustration</b><span>Paysage Terre de rang</span></button></div>
+    <div id="hmPickWrap" hidden><h3>Parmi les photos du lot</h3><div class="hmpick" id="hmPick"></div></div>
+    <input type="file" id="heroInput" accept="image/*" hidden>
+    <button class="cancel" id="hmClose">Fermer</button>
+  </div>
+</div>
+<div class="modal" id="walkPrep" hidden role="dialog" aria-modal="true" aria-labelledby="wpTitle">
+  <div class="mbox">
+    <div class="aimstep">Préparer la sortie</div><h2 id="wpTitle">Prêt à marcher ?</h2>
+    <div class="vgrid"><div><small>Précision GPS</small><b id="wpGps">—</b></div><div><small>Réseau</small><b id="wpNet">—</b></div><div class="wide"><small>Lot sous la pin</small><b id="wpLot">—</b></div><div class="wide"><small>Boussole</small><b id="wpCompass">—</b></div></div>
+    <ul class="wptips"><li>Préviens quelqu'un de ton trajet : le réseau peut manquer.</li><li>En saison de chasse, porte du orange.</li><li>Ne marche jamais sur une terre privée sans permission.</li></ul>
+    <button class="primary" id="wpStart">Démarrer la marche</button><button class="cancel" id="wpClose">Annuler</button>
+  </div>
+</div>
+<section class="verify ownerpage" id="ownerPage" hidden role="dialog" aria-modal="true" aria-labelledby="opTitle">
+  <header><button id="opBack" class="vbtn" aria-label="Retour à la fiche">‹</button><h2 id="opTitle">Trouver le propriétaire</h2><span class="vstep" id="opLot"></span></header>
+  <div class="vbody">
+    <h2 class="opbig">Approcher avec respect.</h2>
+    <p class="oplead">Le nom se consulte d'abord à la source officielle. LOTS t'aide ensuite à organiser tes démarches.</p>
+    <div class="opcard"><label for="lotOwner">Nom relevé au rôle / registre</label><div id="opNameHost"></div><div class="oprole" id="opRole" hidden></div></div>
+    <h3 class="chkh">Pistes de recherche</h3>
+    <div class="prows">
+      <div class="prowwrap"><a class="prow" id="opRegistre" target="_blank" rel="noopener"><span class="pic" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="4" width="14" height="16" rx="1"/><path d="M8 8h8M8 12h8M8 16h5"/></svg></span><span class="pt"><b>Registre foncier</b><span id="opRegistreSub">Consulter le titre · n° de lot copié</span></span><span class="chev" aria-hidden="true">›</span></a><button class="clip" data-src="registre" aria-label="Joindre une capture ou un document (Registre foncier)"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.5 11.5l-8.2 8.2a5 5 0 0 1-7.1-7.1l8.6-8.6a3.4 3.4 0 0 1 4.8 4.8l-8.5 8.5a1.7 1.7 0 0 1-2.4-2.4l7.8-7.8"/></svg></button></div>
+      <div class="prowwrap"><a class="prow" id="opRoleLink" target="_blank" rel="noopener"><span class="pic" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11l8-7 8 7v9H4z"/></svg></span><span class="pt"><b>Rôle municipal</b><span id="opRoleLinkSub">Selon la disponibilité</span></span><span class="chev" aria-hidden="true">›</span></a><button class="clip" data-src="role" aria-label="Joindre une capture ou un document (rôle)"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.5 11.5l-8.2 8.2a5 5 0 0 1-7.1-7.1l8.6-8.6a3.4 3.4 0 0 1 4.8 4.8l-8.5 8.5a1.7 1.7 0 0 1-2.4-2.4l7.8-7.8"/></svg></button></div>
+      <button class="prow" id="opWebBtn" aria-expanded="false"><span class="pic" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="6"/><path d="M20 20l-4-4"/></svg></span><span class="pt"><b>Recherche Web</b><span id="opWebBtnSub">À partir du nom saisi</span></span><span class="chev" aria-hidden="true">›</span></button>
+    </div>
+    <div id="opWeb" hidden></div>
+    <h3 class="chkh" id="opCoordsH">Coordonnées</h3>
+    <div class="opcard opcoords"><label for="lotAddrPost">Adresse postale</label>
+        <textarea id="lotAddrPost" rows="2" placeholder="123, chemin du Lac, Ville (Québec) J0T 1A0"></textarea>
+        <label for="lotEmail" style="margin-top:10px">Courriel et cellulaire, s'ils sont publics</label><div class="row">
+          <input class="f" id="lotEmail" type="email" placeholder="Courriel" autocomplete="off" aria-label="Courriel du propriétaire">
+          <input class="f" id="lotPhone" type="tel" placeholder="Cellulaire" autocomplete="off" aria-label="Cellulaire du propriétaire">
+        </div>
+        <p class="fine">L'adresse postale vient en général de l'acte au Registre foncier ou du rôle. Ne note que ce qui est public.</p></div>
+    <h3 class="chkh">Prochaine action</h3>
+    <div class="opcard"><label for="lotOStatus">Statut</label>
+      <select id="lotOStatus"><option value="">À rechercher</option><option value="nom">Nom trouvé</option><option value="coord">Adresse ou coordonnées trouvées</option><option value="lettre">Lettre envoyée</option><option value="contacte">Contacté</option><option value="reponse">Réponse reçue</option><option value="refus">Pas intéressé</option></select>
+      <label for="lotNextDate" style="margin-top:10px">Relancer ou faire le suivi le</label><input type="date" id="lotNextDate"></div>
+    <button class="primary" id="opTask">Ajouter une tâche de suivi →</button>
+    <button class="ctedit" id="opWrite">Écrire au propriétaire → (lettre, courriel, texto)</button>
+    <a class="opics" id="opIcs" href="#" hidden>Ajouter aussi à mon agenda (.ics)</a>
+    <p class="fine" style="text-align:center">Aucune prise de contact automatique.</p>
+  </div>
+</section>
+<section class="verify" id="verify" hidden role="dialog" aria-modal="true" aria-labelledby="vfTitle">
+  <header><button id="vfRetake" class="vbtn">‹ Reprendre</button><h2 id="vfTitle">Vérifier la photo</h2><span class="vstep">étape 3 sur 3</span></header>
+  <div class="vbody">
+    <img id="vfImg" alt="Photo à vérifier">
+    <div class="vgrid"><div><small>Position GPS</small><b id="vfPos">—</b></div><div><small>Direction</small><b id="vfDir">—</b></div><div class="wide"><small>Lot associé</small><select id="vfLot" aria-label="Lot associé"></select><span class="fine" id="vfLotNote"></span></div><div><small>Heure</small><b id="vfTime">—</b></div></div>
+    <label class="fine" for="vfNote">Note facultative</label><textarea id="vfNote" rows="2" placeholder="Vue sur le versant nord. Accès à confirmer."></textarea>
+    <p class="vwarn">Ces métadonnées décrivent une mesure de terrain, pas une preuve cadastrale.</p>
+  </div>
+  <div class="vfoot"><button class="primary" id="vfSave">Enregistrer la photo</button></div>
+</section>
+<div class="modal" id="walkSummary" hidden role="dialog" aria-modal="true" aria-labelledby="wsTitle">
+  <div class="mbox">
+    <div class="aimstep">Marche terminée</div><h2 id="wsTitle">Bien marché !</h2>
+    <div class="vgrid"><div><small>Distance</small><b id="wsDist"></b></div><div><small>Durée</small><b id="wsTime"></b></div><div><small>Lots traversés</small><b id="wsLots"></b></div><div><small>Photos</small><b id="wsPhotos"></b></div></div>
+    <ul class="wslots" id="wsLotList"></ul>
+    <p class="fine">Parcours enregistré dans ton journal, sur cet appareil. Pense à faire une sauvegarde.</p>
+    <button class="primary" id="wsJournal">Ouvrir le journal</button><button class="cancel" id="wsClose">Fermer</button>
   </div>
 </div>
 <div class="toast" id="toast" role="status"></div>
@@ -780,7 +1065,7 @@ body.walking .mectl{bottom:calc(var(--sab) + 224px)}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script>
 /* ============================ CONFIG ============================ */
-const APP_VERSION='v43';
+const APP_VERSION='5.0';
 const CONFIG = {
   ringFraction: 0.70, maxRadius: 1500, coneLength: 150, coneHalfAngle: 25,
   cadastre: 'https://geo.environnement.gouv.qc.ca/donnees/rest/services/Reference/Cadastre_allege/MapServer',
@@ -816,8 +1101,8 @@ window.addEventListener('unhandledrejection',e=>log('js_error',{msg:String(e.rea
 document.addEventListener('visibilitychange',()=>log(document.hidden?'app_hide':'app_show'));
 
 /* ============================ Statuts du journal ============================ */
-const TAGS={c:['Contacté','#6A3FB5']};
-const STATUS={...TAGS,i:['Favori','#E0A422'],e:['En vente','#C62828'],s:['Visité','#2E7D4F'],v:['À voir','#8A948C']};
+const TAGS={c:['Contacté','#5E7A84']};
+const STATUS={...TAGS,i:['Favori','#C9A15A'],e:['En vente','#B8321F'],s:['Visité','#3F7A4F'],v:['À voir','#8A8577']};
 function keyOf(r){ const t=r.tags||[]; return r.centris?'e':t.includes('c')?'c':r.fav?'i':r.visited?'s':'v'; }
 const stColor=k=>(STATUS[k]||STATUS.v)[1];
 const ICO={
@@ -848,11 +1133,18 @@ async function netFetch(url,opts){
   try{ const r=await fetch(url,opts); if(netFails.length){ netFails=[]; if(navigator.onLine) setOffline(false); } return r; }
   catch(e){ const now=Date.now(); netFails=netFails.filter(t=>now-t<20000); netFails.push(now); if(!navigator.onLine) setOffline(true); else if(netFails.length>=2) setOffline(true,true); throw e; } }
 
+/* ============================ Apparence (jour / nuit) ============================ */
+const darkQ=window.matchMedia?matchMedia('(prefers-color-scheme: dark)'):{matches:false,addEventListener(){}};
+function applyTheme(){ const t=store.get('lots.theme','auto'); const night=t==='nuit'||(t==='auto'&&darkQ.matches);
+  document.documentElement.dataset.theme=night?'night':'day'; document.querySelector('meta[name="theme-color"]')?.setAttribute('content',night?'#0B1F16':'#1F3328');
+  document.querySelectorAll('#themeSeg button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.v===t)); }
+darkQ.addEventListener?.('change',applyTheme); applyTheme();
+document.querySelectorAll('#themeSeg button').forEach(b=>b.onclick=()=>{ store.set('lots.theme',b.dataset.v); applyTheme(); log('theme',{v:b.dataset.v}); });
 /* ============================ Carte ============================ */
 const lastView=store.get('terrain.view',null);
 const map = L.map('map',{zoomControl:false}).setView(lastView?[lastView.lat,lastView.lng]:[46.05,-74.15], lastView?lastView.z:10);
 map.on('moveend',()=>{ const c=map.getCenter(); store.set('terrain.view',{lat:+c.lat.toFixed(5),lng:+c.lng.toFixed(5),z:map.getZoom()}); });
-const baseOSM = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© OpenStreetMap'});
+const baseOSM = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© OpenStreetMap',className:'nightable'});
 const baseSat = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{maxZoom:19,attribution:'Imagerie © Esri, Maxar, Earthstar'});
 baseOSM.addTo(map);
 let tileErr=0; [baseOSM,baseSat].forEach(l=>{ l.on('tileerror',()=>{ if(++tileErr>=6 && navigator.onLine) setOffline(true,true); }); l.on('tileload',()=>{ if(tileErr){ tileErr=0; if(navigator.onLine && !netFails.length) setOffline(false); } }); });
@@ -862,8 +1154,8 @@ const ArcGISExport = L.TileLayer.extend({
     const minx=-half+c.x*res, maxx=minx+res, maxy=half-c.y*res, miny=maxy-res;
     return `${this._base}/export?bbox=${minx},${miny},${maxx},${maxy}&bboxSR=3857&imageSR=3857&size=256,256&format=png32&transparent=true&dpi=96&layers=show:${this._layers}&f=image`; }
 });
-const lyrCadastre = new ArcGISExport(CONFIG.cadastre,'0',{maxZoom:19,minZoom:13,opacity:.9,attribution:'Cadastre © Gouv. du Québec'}).addTo(map);
-const lyrMuni = new ArcGISExport(CONFIG.sda,'2',{maxZoom:19,minZoom:9,opacity:.6}).addTo(map);
+const lyrCadastre = new ArcGISExport(CONFIG.cadastre,'0',{maxZoom:19,minZoom:13,opacity:.9,attribution:'Cadastre © Gouv. du Québec',className:'nightable'}).addTo(map);
+const lyrMuni = new ArcGISExport(CONFIG.sda,'2',{maxZoom:19,minZoom:9,opacity:.6,className:'nightable'}).addTo(map);
 const bauxGroup=L.layerGroup().addTo(map), scanGroup=L.layerGroup().addTo(map), coneGroup=L.layerGroup().addTo(map), savedGroup=L.layerGroup().addTo(map), measureGroup=L.layerGroup().addTo(map);
 let bauxOn=store.get('terrain.baux',true);
 map.on('moveend zoomend',()=>{ clearTimeout(window._bauxT); window._bauxT=setTimeout(loadBaux,300); });
@@ -902,7 +1194,10 @@ function destination(lat,lng,bearing,dist){const R=6371000,b=rad(bearing),la=rad
 const fmt=(n,d=2)=>Number(n||0).toLocaleString('fr-CA',{maximumFractionDigits:d,minimumFractionDigits:d});
 const ft2=ha=>fmt(ha*107639.1,0)+' pi²';
 const acres=ha=>ha*2.471054;
-const unitsLine=ha=>`<b>${fmt(ha*107639.1,0)} pi²</b> · ${fmt(ha*10000,0)} m² · ${fmt(acres(ha),2)} acres · ${fmt(ha,2)} ha`;
+const UNIT=()=>store.get('lots.unit','pi2');
+const areaFmt=(ha,short)=>{ const u=UNIT(); return u==='ac'?`${fmt(acres(ha),short?1:2)} acres`:u==='ha'?`${fmt(ha,2)} ha`:`${fmt(ha*107639.1,0)} pi²`; };
+const unitsOthers=ha=>{ const u=UNIT(); return [['pi2',`${fmt(ha*107639.1,0)} pi²`],['m2',`${fmt(ha*10000,0)} m²`],['ac',`${fmt(acres(ha),2)} acres`],['ha',`${fmt(ha,2)} ha`]].filter(x=>x[0]!==u).map(x=>x[1]).join(' · '); };
+const unitsLine=ha=>{ const all=[['pi2',`${fmt(ha*107639.1,0)} pi²`],['m2',`${fmt(ha*10000,0)} m²`],['ac',`${fmt(acres(ha),2)} acres`],['ha',`${fmt(ha,2)} ha`]]; const u=UNIT(); const first=all.find(x=>x[0]===u)||all[0]; return `<b>${first[1]}</b> · `+all.filter(x=>x!==first).map(x=>x[1]).join(' · '); };
 function addrLabel(p){const k=Object.keys(p);const civ=k.find(x=>/CIV/i.test(x)),odo=k.find(x=>/ODON|RUE|VOIE/i.test(x));return [civ&&p[civ],odo&&p[odo]].filter(Boolean).join(' ');}
 const fmtDist=m=>m>=1000?fmt(m/1000,2)+' km':Math.round(m)+' m';
 const fmtTime=s=>`${String(Math.floor(s/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`;
@@ -920,10 +1215,61 @@ map.on('zoom move resize',drawRing); window.addEventListener('resize',drawRing);
 let mvT; map.on('moveend',()=>{ clearTimeout(mvT); mvT=setTimeout(()=>log('map_move',{z:+map.getZoom().toFixed(1),r:Math.round(ringMeters())}),800); });
 
 /* ============================ Feuilles ============================ */
-const sheets={lot:$('sheetLot'),carnet:$('sheetCarnet'),filters:$('sheetFilters'),layers:$('sheetLayers')};
+const sheets={lot:$('sheetLot'),carnet:$('sheetCarnet'),filters:$('sheetFilters'),layers:$('sheetLayers'),tools:$('sheetTools')};
 function anySheetOpen(){ return Object.values(sheets).some(s=>s.classList.contains('open')); }
 function show(s){ Object.values(sheets).forEach(x=>{ if(x!==s) hide(x,true); }); s.classList.add('open'); s.setAttribute('aria-hidden','false'); ctx.screen=Object.keys(sheets).find(k=>sheets[k]===s)||'?'; $('peek').hidden=true; }
 function hide(s,silent){ if(!s.classList.contains('open')) return; s.classList.remove('open'); s.setAttribute('aria-hidden','true'); if(!silent) log('close_'+ctx.screen); if(s===sheets.lot){ flushSave(); ctx.lot=null; } ctx.screen='carte'; if(!silent) setTimeout(updatePeek,50); }
+function syncTabs(){ const open=k=>sheets[k]?.classList.contains('open'); $('btnTabMap').setAttribute('aria-pressed',!open('carnet')&&!open('tools')); $('btnCarnet').setAttribute('aria-pressed',!!open('carnet')); $('btnTools').setAttribute('aria-pressed',!!open('tools')); }
+{ const _show=show, _hide=hide; show=function(x){ _show(x); syncTabs(); }; hide=function(x,silent){ _hide(x,silent); syncTabs(); }; }
+$('btnTabMap').onclick=()=>{ Object.values(sheets).forEach(x=>hide(x,true)); closeSearch?.(); syncTabs(); setTimeout(updatePeek,50); log('btn',{id:'btnTabMap'}); };
+/* ---- Fiche propriétaire ---- */
+$('opNameHost').appendChild($('lotOwner')); $('opWeb').appendChild($('ownerLinks')); $('opWeb').appendChild($('ownerHint'));
+function openOwnerPage(){ if(!selected) return; const ro=selected.roleOwner, cur=$('lotOwner').value.trim();
+  $('opRole').hidden=!ro||ro===cur; if(ro&&ro!==cur) $('opRole').innerHTML=`Nom au rôle de la MRC : <b>${esc(ro)}</b> <button type="button" id="opUseRole">Utiliser</button>`;
+  const u=$('opUseRole'); if(u) u.onclick=()=>{ $('lotOwner').value=ro; $('lotOwner').dispatchEvent(new Event('input')); $('opRole').hidden=true; if(!$('lotOStatus').value){ $('lotOStatus').value='nom'; } saveNow(); };
+  $('opWeb').hidden=!cur; $('opWebBtn').setAttribute('aria-expanded',!!cur); $('opWebBtnSub').textContent=cur?'Google, Canada411, Facebook, LinkedIn, registres…':'Inscris d\'abord le nom ci-dessus';
+  $('ownerPage').hidden=false; log('owner_page'); }
+function renderContactSummary(){ if(!selected) return; const n=$('lotOwner').value.trim(), a=$('lotAddrPost').value.trim(), e=$('lotEmail').value.trim(), t=$('lotPhone').value.trim();
+  const box=$('ctSum'); const any=a||e||t;
+  box.innerHTML=any?`<b>${esc(n||'Propriétaire')}</b>${a?`<span>${esc(a).replace(/\n/g,'<br>')}</span>`:''}${e?`<span>${esc(e)}</span>`:''}${t?`<span>${esc(t)}</span>`:''}`:`<span class="empty">${n?`Aucune coordonnée pour ${esc(n)}.`:'Propriétaire et coordonnées pas encore trouvés.'} La lettre peut tout de même être préparée, sans adresse.</span>`;
+  $('ctToOwner').textContent=any?'Modifier dans la fiche propriétaire →':(n?'Ajouter ses coordonnées →':'Trouver le propriétaire et ses coordonnées →'); }
+$('ctToOwner').onclick=()=>{ openOwnerPage(); setTimeout(()=>{ const h=$('opCoordsH'); h.scrollIntoView?.({block:'start'}); if(!$('lotAddrPost').value.trim()) $('lotAddrPost').focus(); },120); log('btn',{id:'ctToOwner'}); };
+$('opWrite').onclick=()=>{ $('ownerPage').hidden=true; flushSave(); renderSummary(); renderContactSummary(); const sec=$('secContact'); sec.open=true; setTimeout(()=>sec.scrollIntoView?.({behavior:'smooth',block:'start'}),150); log('btn',{id:'opWrite'}); };
+['lotAddrPost','lotEmail','lotPhone','lotOwner'].forEach(id=>$(id).addEventListener('input',()=>{ renderContactSummary(); if(id!=='lotOwner'&&$(id).value.trim()&&['','nom'].includes($('lotOStatus').value)) $('lotOStatus').value='coord'; }));
+$('opBack').onclick=()=>{ $('ownerPage').hidden=true; flushSave(); renderSummary(); renderContactSummary(); };
+$('gOwner').onclick=openOwnerPage;
+$('opWebBtn').onclick=()=>{ const open=$('opWeb').hidden; $('opWeb').hidden=!open; $('opWebBtn').setAttribute('aria-expanded',open); if(open&&!$('lotOwner').value.trim()) $('lotOwner').focus(); };
+$('lotOwner').addEventListener('input',()=>{ const has=!!$('lotOwner').value.trim(); $('opWebBtnSub').textContent=has?'Google, Canada411, Facebook, LinkedIn, registres…':'Inscris d\'abord le nom ci-dessus'; if(has&&!$('lotOStatus').value){ $('lotOStatus').value='nom'; } });
+$('opRegistre').addEventListener('click',()=>{ if(selected) copy(selected.lot,'N° de lot copié — Registre foncier'); log('btn',{id:'opRegistre'}); });
+$('opRoleLink').addEventListener('click',()=>{ if(selected) copy(selected.lot,'N° de lot copié'); log('btn',{id:'opRoleLink'}); });
+$('lotOStatus').addEventListener('change',e=>{ const v=e.target.value; if(v==='lettre'||v==='contacte'||v==='reponse') $('lotContacted').checked=true; log('owner_status',{v}); saveNow(); renderSummary(); });
+$('lotNextDate').addEventListener('change',()=>{ saveNow(); $('opIcs').hidden=!$('lotNextDate').value; });
+$('opTask').onclick=()=>{ if(!selected) return; if(!$('lotNextDate').value){ const d=new Date(Date.now()+14*864e5); $('lotNextDate').value=d.toISOString().slice(0,10); }
+  saveNow(); $('opIcs').hidden=false; const d=new Date($('lotNextDate').value+'T12:00'); toast(`Suivi ajouté au journal pour le ${d.toLocaleDateString('fr-CA',{day:'numeric',month:'long'})}`); log('owner_task'); };
+$('opIcs').onclick=e=>{ e.preventDefault(); if(!selected||!$('lotNextDate').value) return; const d=$('lotNextDate').value.replace(/-/g,''), d2=new Date(new Date($('lotNextDate').value+'T12:00').getTime()+864e5).toISOString().slice(0,10).replace(/-/g,'');
+  const who=$('lotOwner').value.trim(), st=$('lotOStatus').selectedOptions[0]?.textContent||'';
+  const ics=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//LOTS//Terre de rang//FR','BEGIN:VEVENT',`UID:${Date.now()}@lots.quebec`,`DTSTAMP:${new Date().toISOString().replace(/[-:]/g,'').slice(0,15)}Z`,`DTSTART;VALUE=DATE:${d}`,`DTEND;VALUE=DATE:${d2}`,`SUMMARY:Suivi — lot ${selected.lot}${selected.muni?' ('+selected.muni+')':''}`,`DESCRIPTION:${[who,st].filter(Boolean).join(' · ').replace(/[,;]/g,' ')}`,'END:VEVENT','END:VCALENDAR'].join('\r\n');
+  const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([ics],{type:'text/calendar'})); a.download=`suivi-lot-${selected.lot.replace(/\s/g,'')}.ics`; a.click(); log('owner_ics'); };
+$('chkBaux').onclick=()=>toast('Un bail sur terre publique touche ce lot : vérifie ses limites avant toute démarche (Couches → Terres publiques louées).');
+let heroId=null, heroNext=false, heroUrl=null;
+const isField=p=>p.kind!=='doc'&&(!p.src||p.src==='terrain'||p.src==='marche'||p.src==='import');
+async function heroFor(no){ const img=$('heroImg'); let ph=[]; try{ ph=(await listPhotos(no)).filter(isField); }catch{}
+  if(selected?.lot!==no) return; const pick=(heroId&&ph.find(p=>p.id===heroId))||(heroId===''?null:ph[ph.length-1]);
+  if(heroUrl){ URL.revokeObjectURL(heroUrl); heroUrl=null; } if(pick){ heroUrl=URL.createObjectURL(pick.blob); img.src=heroUrl; } else img.src='brand/paysage.jpg'; }
+$('heroEdit').onclick=async()=>{ if(!selected) return; let ph=[]; try{ ph=(await listPhotos(selected.lot)).filter(isField); }catch{}
+  const box=$('hmPick'); box.innerHTML=''; ph.slice(-12).reverse().forEach(p=>{ const u=URL.createObjectURL(p.blob); const b=document.createElement('button'); b.className='hmthumb'; b.setAttribute('aria-pressed',p.id===heroId); b.innerHTML=`<img src="${u}" alt="${esc(p.title||'Photo')}">`; b.onclick=()=>{ heroId=p.id; saveNow(); heroFor(selected.lot); $('heroModal').hidden=true; log('hero',{via:'pick'}); }; box.appendChild(b); });
+  $('hmPickWrap').hidden=!ph.length; $('heroModal').hidden=false; log('hero_open',{n:ph.length}); };
+$('hmClose').onclick=()=>{ $('heroModal').hidden=true; };
+$('hmReset').onclick=()=>{ heroId=''; saveNow(); heroFor(selected.lot); $('heroModal').hidden=true; log('hero',{via:'reset'}); };
+$('hmTake').onclick=()=>{ $('heroModal').hidden=true; heroNext=true; openAim(selected.lot); };
+$('hmGallery').onclick=()=>$('heroInput').click();
+$('heroInput').addEventListener('change',async e=>{ const f=e.target.files[0]; e.target.value=''; if(!f||!selected) return; const lot=selected.lot;
+  try{ const blob=await shrink(f); const id=Date.now()+'-'+Math.random().toString(36).slice(2,7); await dbTx('readwrite',st=>st.put({id,lot,src:'import',t:Date.now(),taken:f.lastModified||null,blob,lat:null,lng:null,heading:null,title:'Photo du lot'})); heroId=id; saveNow(); heroFor(lot); renderThumbs(lot); toast('Photo du lot changée'); log('hero',{via:'gallery'}); }
+  catch{ toast('Photo non enregistrée : stockage indisponible'); } $('heroModal').hidden=true; });
+/* ---- Aperçu : garder dans le journal sans ouvrir la fiche ---- */
+$('peekKeep').onclick=()=>{ if(!peek.f) return; const f=peek.f, no=f.properties.NO_LOT; const i=carnet.findIndex(x=>x.lot===no);
+  if(i>=0){ carnet[i].fav=!carnet[i].fav; } else { const b=L.geoJSON(f).getBounds(), c=b.getCenter(), today=new Date().toISOString().slice(0,10); carnet.unshift({lot:no,muni:peek.m?.MUS_NM_MUN||'',mrc:peek.m?.MUS_NM_MRC||'',lat:c.lat,lng:c.lng,ha:polyArea(f.geometry)/10000,geom:f.geometry,tags:[],fav:true,date:today,updated:today}); }
+  persist(); renderSaved(); restyleScan(); const on=!!carnet.find(x=>x.lot===no)?.fav; $('peekKeep').setAttribute('aria-pressed',on); navigator.vibrate?.(10); toast(on?`Lot ${no} gardé dans ton journal`:'Retiré des favoris'); log('peek_keep',{on}); };
 $('closeLot').onclick=()=>hide(sheets.lot); $('closeCarnet').onclick=()=>hide(sheets.carnet); $('closeFilters').onclick=()=>{ hide(sheets.filters); if(filtersActive()&&!scanLots.length) toast('Filtres prêts — touche Scanner pour les appliquer aux lots autour de la pin'); }; $('closeLayers').onclick=()=>hide(sheets.layers);
 
 /* ============================ Conseils contextuels (une fois chacun) ============================ */
@@ -936,7 +1282,8 @@ $('tipOk').onclick=()=>{ clearTimeout(window._tipT); nextTip(); };
 let me=null, meMarker=null, meCircle=null;
 function locate(){return new Promise((res,rej)=>{if(!navigator.geolocation)return rej(new Error('Pas de GPS dans ce navigateur'));
   navigator.geolocation.getCurrentPosition(p=>res(p.coords),e=>rej(new Error(e.code===1?'Accès à la position refusé. Autorise-le dans les réglages du navigateur.':'Position introuvable — attends un signal GPS et réessaie.')),{enableHighAccuracy:true,timeout:15000,maximumAge:5000});});}
-function showMe(c){ me=[c.latitude,c.longitude];
+let meAcc=null;
+function showMe(c){ me=[c.latitude,c.longitude]; meAcc=Math.round(c.accuracy||0)||null;
   if(meMarker){meMarker.setLatLng(me);meCircle.setLatLng(me).setRadius(c.accuracy||10);}
   else{meMarker=L.marker(me,{icon:L.divIcon({className:'',html:'<div class="me"></div>',iconSize:[16,16],iconAnchor:[8,8]}),zIndexOffset:1000,interactive:false}).addTo(map);
        meCircle=L.circle(me,{radius:c.accuracy||10,color:'#1E6FD9',weight:1,fillOpacity:.08,interactive:false}).addTo(map);} }
@@ -1001,7 +1348,7 @@ let F={...F0,...store.get('terrain.filters',{})};
 const filtersActive=()=>F.vacant||F.minAc>0||F.since>0||F.multi||F.type!=='all';
 const filtersNeedRole=()=>F.since>0||F.multi||F.type!=='all';
 function filterCount(){ return [F.vacant,F.minAc>0,F.since>0,F.multi,F.type!=='all'].filter(Boolean).length; }
-function renderFilterUI(){ $('fVacant').checked=F.vacant; $('fMulti').checked=F.multi;
+function renderFilterUI(){ $('fVacant').checked=F.vacant; $('chipVacant').setAttribute('aria-pressed',!!F.vacant); $('fMulti').checked=F.multi;
   [['fMinAc','minAc'],['fSince','since'],['fType','type']].forEach(([id,k])=>$(id).querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.v)===String(F[k]))));
   const n=filterCount(); $('filterCount').textContent=n; $('filterCount').hidden=!n; $('btnFilters').setAttribute('aria-pressed',n>0); }
 function setFilter(k,v){ F[k]=v; store.set('terrain.filters',F); renderFilterUI(); log('filter',{k,v}); applyFilters(); }
@@ -1009,6 +1356,7 @@ $('fVacant').onchange=e=>setFilter('vacant',e.target.checked); $('fMulti').oncha
 [['fMinAc','minAc',Number],['fSince','since',Number],['fType','type',String]].forEach(([id,k,cast])=>$(id).querySelectorAll('button').forEach(b=>b.onclick=()=>setFilter(k,cast(b.dataset.v))));
 $('fReset').onclick=()=>{ F={...F0}; store.set('terrain.filters',F); renderFilterUI(); applyFilters(); toast('Filtres réinitialisés'); };
 $('btnFilters').onclick=()=>{ renderFilterUI(); show(sheets.filters); log('btn',{id:'btnFilters'}); if(!scanLots.length) tip('filtres','Règle tes filtres, puis touche Scanner : les lots qui passent s\'allumeront en orange.'); };
+$('chipVacant').onclick=()=>{ setFilter('vacant',!F.vacant); if(!scanLots.length) toast(F.vacant?'Filtre « sans adresse civique » prêt — touche Scanner la zone':'Filtre retiré'); };
 $('stripFilters').onclick=()=>$('btnFilters').click();
 renderFilterUI();
 function lotMatches(s){ if(F.vacant&&s.built) return false; if(F.minAc>0&&acres(s.ha)<F.minAc) return false;
@@ -1024,7 +1372,7 @@ function lotStyle(no,built,state){ const saved=carnet.find(x=>x.lot===no);
   if(saved) return {color:stColor(keyOf(saved)),weight:4,fillColor:stColor(keyOf(saved)),fillOpacity:.3};
   if(state==='ok') return {color:'#C2410C',weight:3,fillColor:'#FF5A1F',fillOpacity:.38};
   if(state==='no') return {color:'#8A948C',weight:1,fillColor:'#8A948C',fillOpacity:.05};
-  return {color:'#1F3D2B',weight:2,fillColor:built?'#B8BFB5':'#E0A422',fillOpacity:built?.25:.28}; }
+  return {color:'#1F3D2B',weight:2,fillColor:built?'#B8BFB5':'#C9A15A',fillOpacity:built?.25:.28}; }
 function restyleScan(){ scanLots.forEach(s=>s.layer.setStyle(lotStyle(s.no,s.built,s.state))); }
 btnScan.onclick=async()=>{ if(measuring) return toast('Termine d\'abord la mesure'); if(map.getZoom()<12) return toast('Rapproche-toi un peu : le scan lit les lots d\'un secteur, pas d\'une région');
   const c=map.getCenter(), r=ringMeters(), t0=Date.now(); btnScan.disabled=true; btnScan.classList.add('busy'); navigator.vibrate?.(12);
@@ -1035,20 +1383,20 @@ async function scanAt(lat,lng,radius){
   clearScan(true);
   const [lots,addrs,muni]=await Promise.all([ around(CONFIG.cadastre,0,lat,lng,radius), around(CONFIG.adresses,0,lat,lng,radius+60).catch(()=>({features:[]})), muniAt(lat,lng).catch(()=>null) ]);
   lastMuni=muni?.features?.[0]?.properties||null;
-  L.circle([lat,lng],{radius,color:'#E0A422',weight:1,dashArray:'4 4',fill:false,interactive:false}).addTo(scanGroup);
+  L.circle([lat,lng],{radius,color:'#C9A15A',weight:1,dashArray:'4 4',fill:false,interactive:false}).addTo(scanGroup);
   if(!lots.features.length){ scanMeta={n:0,vacant:0,radius}; showStrip(`<b>Aucun lot cadastré</b> dans ${Math.round(radius)} m${lastMuni?' · '+esc(lastMuni.MUS_NM_MUN):''}. Probablement une terre publique.`); return {lots:0,vacant:0,muni:lastMuni?.MUS_NM_MUN}; }
   const pts=addrs.features.map(f=>f.geometry.coordinates); let vacant=0;
   lots.features.forEach(f=>{ const built=pts.some(p=>inPoly(p,f.geometry)); if(!built) vacant++;
     const no=f.properties.NO_LOT, ha=polyArea(f.geometry)/10000;
     const layer=L.geoJSON(f,{style:lotStyle(no,built)});
-    layer.bindTooltip(`${built?'<span style="color:#5C6B62">'+icoSvg('house',13)+'</span> ':'<span style="color:#A86F00">'+icoSvg('leaf',13)+'</span> '}${no}<br>${ft2(ha)}`,{permanent:true,direction:'center',className:'lot-label'});
+    layer.bindTooltip(`${built?'<span style="color:#5C6B62">'+icoSvg('house',13)+'</span> ':'<span style="color:#A86F00">'+icoSvg('leaf',13)+'</span> '}${no}<br>${areaFmt(ha,true)}`,{permanent:true,direction:'center',className:'lot-label'});
     layer.on('click',ev=>{ L.DomEvent.stopPropagation(ev); if(measuring) return addMeasurePoint(ev.latlng); log('lot_tap',{from:'scan',built}); openLot(f,lastMuni); });
     layer.addTo(scanGroup); scanLots.push({f,no,ha,built,layer,role:undefined,state:null}); });
   scanMeta={n:lots.features.length,vacant,radius};
   await applyFilters();
-  tip('scan','Jaune : aucune adresse, probablement vacant. Orange : passe tes filtres. Touche un lot pour sa fiche.');
+  tip('scan','Ocre : aucune adresse civique connue (ça ne prouve pas que le lot est vacant). Orange : passe tes filtres. Touche un lot pour sa fiche.');
   return {lots:lots.features.length,vacant,muni:lastMuni?.MUS_NM_MUN}; }
-async function applyFilters(){ if(!scanLots.length) return;
+async function applyFilters(){ if(!scanLots.length||!scanMeta) return;
   if(filtersNeedRole()) await Promise.all(scanLots.map(async s=>{ if(s.role===undefined) s.role=await roleFor(s.no); }));
   const on=filtersActive(); let ok=0, unknown=0;
   scanLots.forEach(s=>{ const m=on?lotMatches(s):null; s.state=on?(m?'ok':'no'):null; if(m) ok++; if(on&&filtersNeedRole()&&!s.role) unknown++;
@@ -1081,8 +1429,8 @@ async function updatePeek(){ const el=$('peek');
   try{ const [lots,muni]=await Promise.all([lotAt(c.lat,c.lng),muniAt(c.lat,c.lng).catch(()=>null)]); const f=lots.features[0], m=muni?.features?.[0]?.properties||null;
     if(!f){ peek={no:null,geom:null,f:null,m}; $('peekTitle').textContent='Aucun lot cadastré sous la pin'; $('peekSub').textContent=m?`${m.MUS_NM_MUN} · probablement une terre publique`:'Probablement une terre publique'; $('peekGo').hidden=true; }
     else { const no=f.properties.NO_LOT, ha=polyArea(f.geometry)/10000; peek={no,geom:f.geometry,f,m};
-      const saved=carnet.find(x=>x.lot===no);
-      $('peekTitle').textContent=`Lot ${no} · ${fmt(acres(ha),1)} acres`; $('peekSub').textContent=[m?.MUS_NM_MUN,saved?'♥ dans ton journal'+(saved.owner?' · '+saved.owner:''):null].filter(Boolean).join(' · ')||'—'; $('peekGo').hidden=false;
+      const saved=carnet.find(x=>x.lot===no); $('peekKeep').setAttribute('aria-pressed',!!saved?.fav);
+      $('peekTitle').textContent=`Lot ${no} · ${areaFmt(ha,true)}`; $('peekSub').textContent=[m?.MUS_NM_MUN,saved?'♥ dans ton journal'+(saved.owner?' · '+saved.owner:''):null].filter(Boolean).join(' · ')||'—'; $('peekGo').hidden=false;
       roleFor(no).then(async r=>{ if(peek.no!==no||!r) return; const D=await domains(); const use=(D.CODE_UTILISATION_CUBF_3||{})[r[1]]; const y=roleSince(r);
         $('peekSub').textContent=[m?.MUS_NM_MUN,use,y?'inscrit depuis '+y:null,saved?'♥':null].filter(Boolean).join(' · '); }); }
     el.hidden=anySheetOpen()||measuring; if(!el.hidden&&peek.no) tip('peek','Le lot sous la pin bleue s\'affiche ici. Bouge la carte, puis « Voir la fiche ».');
@@ -1111,17 +1459,19 @@ async function openLot(f,m){
   selected={lot:no,muni:m?.MUS_NM_MUN||'',mrc:m?.MUS_NM_MRC||'',lat:c.lat,lng:c.lng,ha:area/10000,geom:f.geometry}; ctx.lot=no; loading=true;
   selected.role=null; selected.built=null;
   log('lot_open',{lot:no,ha:+(area/10000).toFixed(2),muni:selected.muni});
-  $('lotNo').textContent=`Lot ${no}`; $('lotWhere').textContent=m?`${m.MUS_NM_MUN} · MRC ${m.MUS_NM_MRC}`:'Municipalité inconnue';
-  $('sumUnits').innerHTML=unitsLine(area/10000);
-  $('lnkInfolot').href=CONFIG.infolot; $('lnkRegistre').href=CONFIG.registre; $('lnkRole').href=roleUrl(m,no,b);
-  const tel=(m?.TELEPHONE||'').replace(/[^+\d]/g,''); $('lnkCall').href=tel?'tel:'+tel:'#'; $('lnkCall').textContent=m?.TELEPHONE?'Appeler · '+m.TELEPHONE:'Appeler la municipalité'; $('lnkCall').classList.toggle('disabled',!tel);
-  const site=m?.SITE_WEB?(m.SITE_WEB.startsWith('http')?m.SITE_WEB:'https://'+m.SITE_WEB):null; $('lnkMuni').href=site||CONFIG.infolot; $('lnkMuni').textContent=site?`Site de ${m.MUS_NM_MUN}`:'Site web';
+  $('lotNo').textContent=`Lot ${no}`; $('lotWhere').textContent=m?(m.MUS_NM_MRC&&m.MUS_NM_MRC!==m.MUS_NM_MUN?`${m.MUS_NM_MUN} · MRC ${m.MUS_NM_MRC}`:m.MUS_NM_MUN):'Municipalité inconnue';
+  $('sumProv').textContent=`Superficie calculée sur le contour du cadastre (Gouv. du Québec), consulté le ${new Date().toLocaleDateString('fr-CA',{day:'numeric',month:'long',year:'numeric'})} · à vérifier sur place`;
+  $('lnkInfolot').href=CONFIG.infolot; $('chkCadastre').href=CONFIG.infolot; $('opRoleLink').href=roleUrl(m,no,b); $('opRegistre').href=CONFIG.registre;
+  $('chkAccess').href=`https://www.google.com/maps/search/?api=1&query=${c.lat.toFixed(6)},${c.lng.toFixed(6)}`; $('opLot').textContent=`Lot ${no}`;
+  heroFor(no); $('lnkRegistre').href=CONFIG.registre; $('lnkRole').href=roleUrl(m,no,b);
+  const tel=(m?.TELEPHONE||'').replace(/[^+\d]/g,''); $('lnkCall').href=tel?'tel:'+tel:'#'; $('chkCall').href=tel?'tel:'+tel:'#'; $('chkCallSub').textContent=tel?`${m.MUS_NM_MUN} · ${m.TELEPHONE}`:'Numéro inconnu — voir le site de la municipalité'; $('lnkCall').textContent=m?.TELEPHONE?'Appeler · '+m.TELEPHONE:'Appeler la municipalité'; $('lnkCall').classList.toggle('disabled',!tel);
+  const site=m?.SITE_WEB?(m.SITE_WEB.startsWith('http')?m.SITE_WEB:'https://'+m.SITE_WEB):null; $('lnkMuni').href=site||CONFIG.infolot; $('chkZoning').href=site||CONFIG.infolot; $('chkZoningSub').textContent=site?`Règlement de zonage de ${m.MUS_NM_MUN}`:'Municipalité inconnue — ouvre Infolot'; $('lnkMuni').textContent=site?`Site de ${m.MUS_NM_MUN}`:'Site web';
   const saved=carnet.find(x=>x.lot===no);
   $('lotOwner').value=saved?.owner||''; $('lotEmail').value=saved?.email||''; $('lotPhone').value=saved?.phone||''; $('lotAddrPost').value=saved?.addrPost||''; $('lotNote').value=saved?.note||'';
-  $('lotVisited').checked=!!saved?.visited; $('lotContacted').checked=!!(saved?.tags||[]).includes('c'); setFav(!!saved?.fav);
+  heroId=saved?.heroId||null; heroNext=false; $('lotOStatus').value=saved?.ownerStatus||''; $('lotNextDate').value=saved?.nextDate||''; $('opIcs').hidden=!saved?.nextDate; $('lotVisited').checked=!!saved?.visited; $('lotContacted').checked=!!(saved?.tags||[]).includes('c'); setFav(!!saved?.fav);
   syncCentris(saved?.centris||'',saved?.centrisInfo||null); loading=false;
-  renderSummary(); ownerLinks(); contactLinks(); updateFicheState(); renderThumbs(no); renderAdsLot();
-  $('secExplore').open=true; $('secOwner').open=false; $('secContact').open=!!saved?.owner&&!(saved?.tags||[]).includes('c');
+  renderSummary(); ownerLinks(); contactLinks(); renderContactSummary(); updateFicheState(); renderThumbs(no); renderAdsLot();
+  $('secExplore').open=false; $('secOwner').open=false; $('secContact').open=!!saved?.owner&&!(saved?.tags||[]).includes('c');
   loadRole(no,f.geometry,m); loadOpenRole(no,m);
   show(sheets.lot); tip('fiche','♥ Garder ajoute ce lot au journal. Tout ce que tu écris ici s\'enregistre tout seul.');
   addrInEnvelope(b).then(r=>{ if(selected?.lot!==no) return; const inside=r.features.filter(x=>inPoly(x.geometry.coordinates,f.geometry)); selected.built=inside.length>0; selected.builtAddr=inside.slice(0,2).map(x=>addrLabel(x.properties)).filter(Boolean).join(', '); renderSummary(); })
@@ -1129,10 +1479,17 @@ async function openLot(f,m){
   bauxAt(c.lat,c.lng).then(bx=>{ if(selected?.lot!==no) return; selected.baux=bx.features?.length||0; renderSummary(); }).catch(e=>log('tenure_error',{msg:String(e.message).slice(0,120)}));
 }
 function renderSummary(){ if(!selected) return; const s=selected, r=s.role, own=$('lotOwner').value.trim()||s.roleOwner||'';
-  const o=$('sumOwner'); o.textContent=own||'Propriétaire inconnu'; o.classList.toggle('unk',!own);
+  const o=$('sumOwner'); o.textContent=own||'À rechercher'; o.classList.toggle('unk',!own);
+  const st={nom:'Nom trouvé',coord:'Coordonnées trouvées',lettre:'Lettre envoyée',contacte:'Contacté',reponse:'Réponse reçue',refus:'Pas intéressé'}[$('lotOStatus').value]; if(own&&st) o.textContent=own+' · '+st;
+  $('gArea').textContent=areaFmt(s.ha); $('sumUnits').textContent=unitsOthers(s.ha);
+  const adr=r&&r[9]&&roleDomains?adrLabel(r[9],roleDomains):''; $('sumEyebrow').textContent=adr||''; $('sumEyebrow').hidden=!adr;
+  const use=r?(roleDomains?.CODE_UTILISATION_CUBF_3||{})[r[1]]:null; $('gValueCell').hidden=$('gUseCell').hidden=!r; document.querySelector('.idgrid').classList.toggle('two',!r); if(r){ $('gValue').textContent=r[5]!=null?money(r[5]):'—'; $('gUse').textContent=use||'—'; }
+  $('chkAccessSub').textContent=s.built===true?`Adresse civique sur le lot${s.builtAddr?' : '+s.builtAddr:''} · accès probable`:s.built===false?'Non confirmé · aucune adresse civique':'Vérification en cours…';
+  $('chkBauxWrap').hidden=!s.baux;
+  if(r){ const use=(roleDomains?.CODE_UTILISATION_CUBF_3||{})[r[1]];  }
   const tags=[];
-  if(r){ const use=(roleDomains?.CODE_UTILISATION_CUBF_3||{})[r[1]]; if(use) tags.push(`<span>${esc(use)}</span>`); }
-  if(s.built===true) tags.push(`<span class="bad">Bâti${s.builtAddr?' · '+esc(s.builtAddr):''}</span>`); else if(s.built===false) tags.push('<span class="good">Aucune adresse · probablement vacant</span>');
+  
+  if(s.built===true) tags.push(`<span class="bad">Bâti${s.builtAddr?' · '+esc(s.builtAddr):''}</span>`); else if(s.built===false) tags.push('<span class="good">Sans adresse civique connue</span>');
   if(r){ const y=roleSince(r), yrs=y?new Date().getFullYear()-y:null; if(y) tags.push(`<span class="${yrs>=25?'hot':''}">Inscrit depuis ${y}</span>`); const nb=roleNb(r); if(nb) tags.push(`<span class="${nb>=3?'hot':''}">${nb} propriétaire${nb>1?'s':''}</span>`); const t=roleType(r); if(t) tags.push(`<span>${t}</span>`); if(r[7]&&r[7]!=='0') tags.push(`<span>Zone agricole ${r[7]==='2'?'100 %':'partielle'}</span>`); }
   if(s.baux) tags.push(`<span class="bad">Bail sur terre publique</span>`);
   if(centrisUrl) tags.push(`<span class="bad">En vente${centrisInfo?.price?' · '+money(centrisInfo.price):''}</span>`);
@@ -1146,10 +1503,10 @@ function updateFicheState(){ if(!selected) return; const saved=carnet.find(x=>x.
 function setFav(on){ $('btnFav').setAttribute('aria-pressed',on); $('favLabel').textContent=on?'Gardé':'Garder'; }
 $('btnFav').onclick=()=>{ if(!selected) return; const on=$('btnFav').getAttribute('aria-pressed')!=='true'; setFav(on); navigator.vibrate?.(10); log('fav',{on}); saveNow(); toast(on?'Gardé dans ton journal':'Retiré des favoris'); };
 function collect(){ const s=selected; const tags=$('lotContacted').checked?['c']:[];
-  return {lot:s.lot,muni:s.muni,mrc:s.mrc,lat:s.lat,lng:s.lng,ha:s.ha,geom:s.geom,owner:$('lotOwner').value.trim(),email:$('lotEmail').value.trim(),phone:$('lotPhone').value.trim(),addrPost:$('lotAddrPost').value.trim(),note:$('lotNote').value.trim(),tags,visited:$('lotVisited').checked,fav:$('btnFav').getAttribute('aria-pressed')==='true',centris:centrisUrl,centrisInfo}; }
+  return {lot:s.lot,muni:s.muni,mrc:s.mrc,lat:s.lat,lng:s.lng,ha:s.ha,geom:s.geom,owner:$('lotOwner').value.trim(),email:$('lotEmail').value.trim(),phone:$('lotPhone').value.trim(),addrPost:$('lotAddrPost').value.trim(),note:$('lotNote').value.trim(),tags,visited:$('lotVisited').checked,fav:$('btnFav').getAttribute('aria-pressed')==='true',centris:centrisUrl,centrisInfo,heroId:heroId||undefined,ownerStatus:$('lotOStatus').value,nextDate:$('lotNextDate').value}; }
 let saveT=null;
 function saveNow(){ clearTimeout(saveT); saveT=null; if(!selected||loading) return; const rec=collect(); const i=carnet.findIndex(x=>x.lot===rec.lot);
-  const has=rec.fav||rec.owner||rec.email||rec.phone||rec.addrPost||rec.note||rec.visited||rec.tags.length||rec.centris;
+  const has=rec.heroId||rec.ownerStatus||rec.nextDate||rec.fav||rec.owner||rec.email||rec.phone||rec.addrPost||rec.note||rec.visited||rec.tags.length||rec.centris;
   if(i<0&&!has){ updateFicheState(); return; }
   const today=new Date().toISOString().slice(0,10);
   if(i<0){ carnet.unshift({...rec,date:today,updated:today}); toast('Ajouté à ton journal'); log('save',{new:true}); }
@@ -1207,7 +1564,7 @@ async function loadRole(no,geom,m){ const box=$('roleBox'); box.hidden=true; box
     btn.onclick=()=>{ $('lotOwner').value=owner; ownerLinks(); contactLinks(); btn.hidden=true; saveNow(); log('role_use'); }; } }
 async function loadOpenRole(no,m){ const box=$('openBox'); box.hidden=true; box.innerHTML='';
   const [r,D]=await Promise.all([roleFor(no),domains()]); if(selected?.lot!==no) return; if(!r){ log('open_role',{found:false}); return; }
-  selected.role=r; ownerLinks(); renderSummary();
+  selected.role=r; ownerLinks(); renderSummary(); if(!/Rôle 2026/.test($('sumProv').textContent)) $('sumProv').textContent+=' · Rôle d\'évaluation 2026 (MAMH)';
   const [mat,cubf,sup,vt,vb,vi,an,agri,foret,adr]=r; const isArg=/argenteuil/i.test(m?.MUS_NM_MRC||'');
   box.innerHTML=`<h4>Rôle 2026 · données ouvertes</h4>${adr?`<div class="sub">${esc(adrLabel(adr,D))}</div>`:''}
     ${isArg?'':`<dl>${sup?`<dt>Superficie au rôle</dt><dd>${fmt(sup*10.7639,0)} pi²</dd>`:''}<dt>Terrain</dt><dd>${money(vt)}</dd><dt>Bâtiment</dt><dd>${money(vb)}</dd><dt>Immeuble</dt><dd><b>${money(vi)}</b></dd>${an&&an!=='0000'?`<dt>Construction</dt><dd>${esc(an)}</dd>`:''}${foret?`<dt>Forêt au rôle</dt><dd>${fmt(foret*10.7639,0)} pi²</dd>`:''}<dt>Matricule (n° au rôle)</dt><dd>${esc(mat||'—')}</dd></dl>`}
@@ -1231,7 +1588,7 @@ async function goToCentris(info){ const qq=[info.address,info.city].filter(Boole
   pendingCentris=info; toast('Touche le lot visé : l\'annonce y sera attachée'); return true; }
 async function attachCentris(text){ const info=parseCentris(text); if(!info) return toast('Pas une annonce Centris'); if(!selected){ return goToCentris(info); } syncCentris(info.url,info); saveNow(); log('centris_link',{id:!!info.id,price:!!info.price}); toast(`Annonce ${info.id||''} attachée`); }
 $('btnCentrisPaste').onclick=async()=>{ let t=''; try{ t=(await navigator.clipboard.readText()).trim(); }catch{} if(!/centris\.ca/i.test(t)) t=(prompt('Colle le lien ou le texte partagé de l\'annonce Centris :',t&&/^https?:/.test(t)?t:'')||'').trim(); if(t) attachCentris(t); };
-$('lnkCentris').addEventListener('click',()=>{ if(selected&&!centrisUrl) toast('Pour revenir : le X en haut à gauche. Trouvé ? Partager → lots'); log('btn',{id:'lnkCentris',has:!!centrisUrl}); });
+$('lnkCentris').addEventListener('click',()=>{ if(selected&&!centrisUrl) toast('Pour revenir : le X en haut à gauche. Trouvé ? Partager → LOTS'); log('btn',{id:'lnkCentris',has:!!centrisUrl}); });
 /* ---- Sources d'annonces : chacune reçoit le maximum qu'elle accepte dans son adresse ---- */
 const MRC_REGION={'argenteuil':'laurentides',"les pays-d'en-haut":'laurentides',"pays-d'en-haut":'laurentides','les laurentides':'laurentides','antoine-labelle':'laurentides','la rivière-du-nord':'laurentides','rivière-du-nord':'laurentides','thérèse-de blainville':'laurentides','deux-montagnes':'laurentides','mirabel':'laurentides',
   'matawinie':'lanaudiere',"d'autray":'lanaudiere','joliette':'lanaudiere','montcalm':'lanaudiere',"l'assomption":'lanaudiere','les moulins':'lanaudiere',
@@ -1258,7 +1615,7 @@ function listingSources(o){ // o: {lat,lng,zoom,bounds,muni,mrc}
     {k:'marketplace',label:'Facebook Marketplace',url:`https://www.facebook.com/marketplace/search/?query=${enc('terrain '+(o.muni||''))}`}
   ]; }
 function renderAds(boxId,o){ const box=$(boxId); if(!box) return; box.innerHTML='';
-  listingSources(o).forEach(sr=>{ const a=document.createElement('a'); a.href=sr.url; a.target='_blank'; a.rel='noopener'; a.textContent=sr.label; a.onclick=()=>{ log('ads',{src:sr.k,where:boxId}); if(sr.k.startsWith('centris')) toast('Pour revenir : le X en haut à gauche. Trouvé ? Partager → lots'); }; box.appendChild(a); }); }
+  listingSources(o).forEach(sr=>{ const a=document.createElement('a'); a.href=sr.url; a.target='_blank'; a.rel='noopener'; a.textContent=sr.label; a.onclick=()=>{ log('ads',{src:sr.k,where:boxId}); if(sr.k.startsWith('centris')) toast('Pour revenir : le X en haut à gauche. Trouvé ? Partager → LOTS'); }; box.appendChild(a); }); }
 async function renderAdsMap(){ const c=map.getCenter(); let m=lastMuni; try{ const j=await muniAt(c.lat,c.lng); m=j.features?.[0]?.properties||m; }catch{}
   renderAds('adsMap',{lat:c.lat,lng:c.lng,zoom:map.getZoom(),bounds:map.getBounds(),muni:m?.MUS_NM_MUN||'',mrc:m?.MUS_NM_MRC||''}); }
 function renderAdsLot(){ if(!selected) return; const g=L.geoJSON({type:'Feature',geometry:selected.geom}).getBounds().pad(2.5);
@@ -1280,7 +1637,7 @@ $('btnPrint').onclick=()=>{ if(!selected) return; const to=[$('lotOwner').value.
   let w=null; try{ w=window.open('','_blank'); }catch{}
   if(w){ w.document.open(); w.document.write(html); w.document.close(); }
   else { const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([html],{type:'text/html'})); a.download=`lettre-lot-${selected.lot.replace(/\s/g,'')}.html`; a.click(); toast('Lettre téléchargée — ouvre-la pour l\'imprimer'); }
-  log('btn',{id:'print'}); if(!$('lotContacted').checked) setTimeout(()=>{ if(selected&&confirm('Marquer ce propriétaire comme contacté ?')){ $('lotContacted').checked=true; saveNow(); } },1500); };
+  log('btn',{id:'print'}); if(!['lettre','contacte','reponse','refus'].includes($('lotOStatus').value)) setTimeout(()=>{ if(selected&&confirm('Lettre envoyée ? Le statut passera à « Lettre envoyée » et une relance sera prévue dans 21 jours.')){ $('lotOStatus').value='lettre'; $('lotContacted').checked=true; if(!$('lotNextDate').value) $('lotNextDate').value=new Date(Date.now()+21*864e5).toISOString().slice(0,10); saveNow(); renderSummary(); } },1500); };
 
 /* ============================ Carnet ============================ */
 let favOnly=store.get('terrain.favOnly',false);
@@ -1299,7 +1656,7 @@ function renderSaved(){ savedGroup.clearLayers(); const zoomed=map.getZoom()>=14
   $('lgLeaf').innerHTML=icoSvg('leaf',16); $('lgHouse').innerHTML=icoSvg('house',16);
   const missing=carnet.filter(r=>!r.geom&&!r._tried); missing.slice(0,10).forEach(async r=>{ r._tried=true; try{ const j=await lotAt(r.lat,r.lng); const f=j.features?.[0]; if(f){ r.geom=f.geometry; persist(); renderSaved(); } }catch{} }); }
 map.on('zoomend',()=>renderSaved());
-$('btnCarnet').onclick=()=>{ log('btn',{id:'btnCarnet'}); renderWalkList(); renderCarnet(); $('carnetVersion').textContent=`lots ${APP_VERSION} · tes données restent dans ce téléphone`; show(sheets.carnet); };
+$('btnCarnet').onclick=()=>{ log('btn',{id:'btnCarnet'}); renderWalkList(); renderCarnet(); $('carnetVersion').textContent=`LOTS ${APP_VERSION} · tes données restent dans ce téléphone`; show(sheets.carnet); };
 async function photoCounts(){ try{ const all=await dbAll('photos'); const m={}; all.forEach(p=>{ if(p.lot) m[p.lot]=(m[p.lot]||0)+1; }); return m; }catch{ return {}; } }
 let selMode=false, selSet=new Set();
 $('selMode').onclick=()=>{ selMode=!selMode; selSet.clear(); $('selMode').textContent=selMode?'Annuler la sélection':'Sélectionner pour supprimer'; if(selMode){ J.tab='lots'; $('jTools').open=false; $('carnetList').scrollIntoView?.({block:'start'}); } $('selActions').hidden=!selMode; renderCarnet(); };
@@ -1307,6 +1664,8 @@ $('selDelete').onclick=()=>{ if(!selSet.size) return toast('Rien de sélectionn�
 let J={tab:'lots',filter:'todo',q:'',sort:'next',...store.get('terrain.journal',{})}; J.q='';
 const daysSince=d=>d?Math.floor((Date.now()-new Date(d).getTime())/864e5):null;
 function nextAction(r){ const t=r.tags||[];
+  if(r.ownerStatus==='refus') return {rank:9,label:'Pas intéressé',sec:'secOwner',todo:false};
+  if(r.nextDate){ const d=Math.round((new Date(r.nextDate+'T12:00')-Date.now())/864e5); if(d<=0) return {rank:0,label:d<0?`Suivi en retard · ${-d} j`:'Suivi prévu aujourd\'hui',sec:'secOwner',todo:true}; if(d<=7) return {rank:1,label:`Suivi dans ${d} j`,sec:'secOwner',todo:true}; }
   if(t.includes('c')){ const d=daysSince(r.updated||r.date); return d>=21?{rank:1,label:`Relancer · ${d} j`,sec:'secContact',todo:true}:{rank:7,label:'En attente de réponse',sec:'secFollow',todo:false}; }
   if(r.centris&&!r.owner) return {rank:5,label:'Voir l\'annonce',sec:'secSale',todo:true};
   if(!r.owner) return {rank:4,label:'Trouver le propriétaire',sec:'secOwner',todo:true};
@@ -1335,6 +1694,7 @@ $('jSort').onchange=e=>{ J.sort=e.target.value; saveJ(); if(J.sort==='near'&&!me
 $('jSearch').addEventListener('input',e=>{ J.q=e.target.value; renderCarnet(); });
 $('jBackupGo').onclick=()=>{ $('btnBackup').click(); renderJournalChrome(); };
 async function openFromJournal(r,sec){ hide(sheets.carnet,true); map.setView([r.lat,r.lng],16); await identify(r.lat,r.lng);
+  if(sec==='secOwner'&&selected?.lot===r.lot) return openOwnerPage();
   if(sec&&selected?.lot===r.lot){ const el=$(sec); el.open=true; setTimeout(()=>el.scrollIntoView?.({behavior:'smooth',block:'start'}),250); } }
 async function renderCarnet(){ renderJournalChrome(); const ul=$('carnetList'); const pc=await photoCounts(); ul.innerHTML='';
   if(!carnet.length){ ul.innerHTML='<li class="jempty"><b>Ton journal est vide</b>Ouvre la fiche d\'un lot et touche <b>♥ Garder</b> — ou écris simplement une note : le lot s\'ajoute ici avec sa prochaine étape.</li>'; return; }
@@ -1382,7 +1742,7 @@ function makeZip(files){ // [{name, data:Uint8Array}] — ZIP sans compression, 
 const xmlEsc=t=>String(t??'').replace(/[<>&'"]/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;',"'":'&apos;','"':'&quot;'}[c]));
 async function blobBytes(b){ if(b.arrayBuffer) return new Uint8Array(await b.arrayBuffer()); return new Uint8Array(await new Response(b).arrayBuffer()); }
 async function buildLotZip(){ const s=selected, d=s.lot.replace(/\s/g,''), base=`lot-${d}`, enc=new TextEncoder(), out=[];
-  let ph=[]; try{ ph=(await listPhotos(s.lot)).filter(p=>p.kind!=='doc'&&(!p.src||p.src==='terrain'||p.src==='marche')); }catch{}
+  let ph=[]; try{ ph=(await listPhotos(s.lot)).filter(p=>p.kind!=='doc'&&(!p.src||p.src==='terrain'||p.src==='marche'||p.src==='import')); }catch{}
   const rows=[['fichier','titre','source','date','latitude','longitude','direction_deg']];
   const feats=[{type:'Feature',properties:{type:'lot',no_lot:s.lot,municipalite:s.muni,mrc:s.mrc,superficie_pi2:Math.round(s.ha*107639.1),superficie_m2:Math.round(s.ha*10000),superficie_acres:+acres(s.ha).toFixed(2),superficie_ha:+s.ha.toFixed(3)},geometry:s.geom}];
   const kmlP=[]; const ring=(s.geom.type==='Polygon'?s.geom.coordinates[0]:s.geom.coordinates[0][0]).map(c=>c.join(',')).join(' ');
@@ -1408,7 +1768,32 @@ $('shareZip').onclick=async()=>{ if(!selected) return; const b=$('shareZip'); b.
     $('shareModal').hidden=true; }
   catch(e){ toast('Export impossible : '+e.message); log('share_error',{msg:String(e.message).slice(0,80)}); }
   finally{ b.disabled=false; b.textContent='Exporter photos + GPS (.zip)'; } };
+$('wsClose').onclick=()=>{ $('walkSummary').hidden=true; };
+$('wsJournal').onclick=()=>{ $('walkSummary').hidden=true; $('btnCarnet').click(); setTimeout(()=>$('jTabWalks')?.click(),50); };
 $('premiumNotify').onclick=e=>{ e.preventDefault(); log('premium_interest',{feature:'share_link'}); location.href='mailto:bonjour@lots.quebec?subject='+encodeURIComponent('Prévenez-moi : lots Premium (partage de fiche)'); };
+
+/* ============================ Outils ============================ */
+function renderTools(){ document.querySelectorAll('#unitSeg button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.v===UNIT())); applyTheme();
+  const lb=store.get('terrain.lastBackup',null); $('tBackupSub').textContent=lb?`Dernière sauvegarde : ${new Date(lb).toLocaleDateString('fr-CA')}`:'Jamais sauvegardé — fais-le avant de changer de téléphone';
+  $('toolsVersion').textContent=`LOTS ${APP_VERSION} · Terre de rang · tes données restent dans ce téléphone`; }
+$('btnTools').onclick=()=>{ renderTools(); show(sheets.tools); log('btn',{id:'btnTools'}); };
+$('closeTools').onclick=()=>hide(sheets.tools);
+document.querySelectorAll('#unitSeg button').forEach(b=>b.onclick=()=>{ store.set('lots.unit',b.dataset.v); renderTools(); restyleScan(); scanLots.forEach(x=>x.layer.setTooltipContent?.(`${x.built?'<span style="color:#5C6B62">'+icoSvg('house',13)+'</span> ':'<span style="color:#A86F00">'+icoSvg('leaf',13)+'</span> '}${x.no}<br>${areaFmt(x.ha,true)}`)); peek.no=null; peek.geom=null; log('unit',{v:b.dataset.v}); });
+$('tLayers').onclick=()=>{ hide(sheets.tools,true); $('btnLayers').click(); };
+$('tMeasure').onclick=()=>{ hide(sheets.tools,true); syncTabs(); if(!measuring) $('btnMeasure').click(); };
+$('tBackup').onclick=()=>{ $('btnBackup').click(); renderTools(); };
+$('tRestore').onclick=()=>$('btnRestore').click();
+$('tCsv').onclick=()=>$('exportCsv').click();
+$('tKml').onclick=()=>{ if(!carnet.length&&!walks.length) return toast('Journal vide'); const pl=[]; const feats=[];
+  carnet.forEach(r=>{ const desc=[labelOf(r),r.muni,r.owner,r.note].filter(Boolean).join(' · '); if(r.geom){ const ring=(r.geom.type==='Polygon'?r.geom.coordinates[0]:r.geom.coordinates[0][0]); pl.push(`<Placemark><name>Lot ${xmlEsc(r.lot)}</name><description>${xmlEsc(desc)}</description><Style><LineStyle><color>ff1f5aff</color><width>3</width></LineStyle><PolyStyle><color>401f5aff</color></PolyStyle></Style><Polygon><outerBoundaryIs><LinearRing><coordinates>${ring.map(c=>c.join(',')).join(' ')}</coordinates></LinearRing></outerBoundaryIs></Polygon></Placemark>`); feats.push({type:'Feature',properties:{lot:r.lot,municipalite:r.muni,statut:labelOf(r),proprietaire:r.owner||'',note:r.note||''},geometry:r.geom}); }
+    else { pl.push(`<Placemark><name>Lot ${xmlEsc(r.lot)}</name><description>${xmlEsc(desc)}</description><Point><coordinates>${r.lng},${r.lat}</coordinates></Point></Placemark>`); feats.push({type:'Feature',properties:{lot:r.lot,municipalite:r.muni,statut:labelOf(r)},geometry:{type:'Point',coordinates:[r.lng,r.lat]}}); } });
+  walks.forEach(w=>{ if(!w.pts?.length) return; pl.push(`<Placemark><name>Marche du ${new Date(w.start).toLocaleDateString('fr-CA')}</name><Style><LineStyle><color>ff4f7a3f</color><width>3</width></LineStyle></Style><LineString><coordinates>${w.pts.map(([la,ln])=>ln+','+la).join(' ')}</coordinates></LineString></Placemark>`); feats.push({type:'Feature',properties:{type:'marche',date:new Date(w.start).toISOString(),distance_m:w.dist},geometry:{type:'LineString',coordinates:w.pts.map(([la,ln])=>[ln,la])}}); });
+  const enc=new TextEncoder(), d=new Date().toISOString().slice(0,10);
+  const z=makeZip([{name:`journal-lots-${d}.kml`,data:enc.encode(`<?xml version="1.0" encoding="UTF-8"?>\n<kml xmlns="http://www.opengis.net/kml/2.2"><Document><name>Journal LOTS — ${d}</name>${pl.join('')}</Document></kml>`)},{name:`journal-lots-${d}.geojson`,data:enc.encode(JSON.stringify({type:'FeatureCollection',features:feats}))}]);
+  const a=document.createElement('a'); a.href=URL.createObjectURL(z); a.download=`journal-lots-${d}.zip`; a.click(); log('export_kml',{lots:carnet.length,walks:walks.length}); toast('Journal exporté (KML et GeoJSON)'); };
+$('tGuide').onclick=()=>{ hide(sheets.tools,true); syncTabs(); $('btnHelp').click(); };
+$('tVoice').onclick=()=>$('btnMic').click();
+$('tReport').onclick=()=>$('shareLog').click();
 
 /* ============================ Couches ============================ */
 let sat=store.get('terrain.sat',false);
@@ -1425,9 +1810,10 @@ async function dbTx(mode,fn,storeName='photos'){ const db=await DB; return new P
 async function dbAll(storeName){ const db=await DB; return new Promise(res=>{ const qq=db.transaction(storeName).objectStore(storeName).getAll(); qq.onsuccess=()=>res(qq.result); qq.onerror=()=>res([]); }); }
 async function listPhotos(lot){ const db=await DB; return new Promise((res,rej)=>{ const qq=db.transaction('photos').objectStore('photos').index('lot').getAll(lot); qq.onsuccess=()=>res(qq.result.sort((a,b)=>a.t-b.t)); qq.onerror=()=>rej(qq.error); }); }
 function shrink(file,max=1280){ return new Promise(res=>{ const img=new Image(); img.onload=()=>{ const k=Math.min(1,max/Math.max(img.width,img.height)); const c=document.createElement('canvas'); c.width=Math.round(img.width*k); c.height=Math.round(img.height*k); c.getContext('2d').drawImage(img,0,0,c.width,c.height); c.toBlob(b=>{ URL.revokeObjectURL(img.src); res(b); },'image/jpeg',.82); }; img.onerror=()=>res(file); img.src=URL.createObjectURL(file); }); }
-const SRC_LABEL={infolot:'Infolot',registre:'Registre foncier',role:'Rôle',muni:'Municipalité',centris:'Centris',terrain:'Photo',marche:'Photo orientée'};
+const SRC_LABEL={infolot:'Infolot',registre:'Registre foncier',role:'Rôle',muni:'Municipalité',centris:'Centris',terrain:'Photo',marche:'Photo orientée',import:'Photo importée'};
 let pendingSrc='terrain', povTarget=null;
 $('btnPhoto').onclick=()=>{ if(!selected) return; pendingSrc='terrain'; navigator.vibrate?.(12); $('photoInput').click(); };
+document.querySelectorAll('.clip[data-src]').forEach(b=>b.onclick=e=>{ e.preventDefault(); e.stopPropagation(); if(!selected) return; pendingSrc=b.dataset.src; navigator.vibrate?.(12); log('btn',{id:'clip_'+pendingSrc}); $('docInput').click(); });
 document.querySelectorAll('.src .doc[data-src]').forEach(b=>b.onclick=()=>{ if(!selected) return; pendingSrc=b.dataset.src; navigator.vibrate?.(12); log('btn',{id:'doc_'+pendingSrc}); $('docInput').click(); });
 const isImg=f=>/^image\//.test(f.type)&&!/svg/.test(f.type);
 const kb=n=>n>=1048576?fmt(n/1048576,1)+' Mo':Math.max(1,Math.round(n/1024))+' Ko';
@@ -1439,6 +1825,10 @@ $('docInput').addEventListener('change',async e=>{ const files=[...e.target.file
   log('attach',{n,src}); if(n) toast(`${n} pièce${n>1?'s':''} jointe${n>1?'s':''} · ${SRC_LABEL[src]||src}`); renderThumbs(lot);
   if(n&&!carnet.find(x=>x.lot===lot)){ setFav(true); saveNow(); } });
 $('photoInput').addEventListener('change',async e=>{ const files=[...e.target.files]; e.target.value=''; if(!files.length) return;
+  if(pendingSrc==='import'){ let lot=povTarget||selected?.lot||null, pos=null;
+    if(!lot){ if(me&&confirm('Ces photos ont-elles été prises ici, maintenant ?\n\nOK : les placer à ta position actuelle (sans direction).\nAnnuler : ouvre plutôt la fiche du lot et importe-les depuis la fiche.')){ pos=[me[0],me[1]]; try{ const j=await lotAt(pos[0],pos[1]); lot=j.features?.[0]?.properties?.NO_LOT||null; }catch{} } else { povTarget=null; return toast('Importation annulée : ouvre la fiche du lot, puis Photos → Depuis la galerie'); } }
+    let n=0; for(const f of files){ try{ const blob=await shrink(f); await dbTx('readwrite',st=>st.put({id:Date.now()+'-'+Math.random().toString(36).slice(2,7),lot,src:'import',t:Date.now(),taken:f.lastModified||null,blob,lat:pos?.[0]??null,lng:pos?.[1]??null,heading:null,acc:pos?meAcc:null})); n++; }catch(err){ log('photo_error',{msg:String(err.message).slice(0,100)}); } }
+    log('photos_import',{n,lot:!!lot,pos:!!pos}); toast(`${n} photo(s) importée(s)${lot?' · lot '+lot:''} · sans direction`); renderPov(); if(selected&&selected.lot===lot) renderThumbs(lot); povTarget=null; return; }
   if(pendingSrc==='marche'){ const pos=me?[me[0],me[1]]:null; let lotNo=povTarget; if(!lotNo&&pos){ try{ const j=await lotAt(pos[0],pos[1]); lotNo=j.features?.[0]?.properties?.NO_LOT||null; }catch{} } let n=0;
     for(const f of files){ try{ const blob=await shrink(f); const id=Date.now()+'-'+Math.random().toString(36).slice(2,7); await dbTx('readwrite',st=>st.put({id,lot:lotNo,src:'marche',t:Date.now(),blob,lat:pos?.[0]??null,lng:pos?.[1]??null,heading:aimHeading,walk:walk?.id||null})); if(walk) walk.photos.push(id); n++; }catch(err){ log('photo_error',{msg:String(err.message).slice(0,100)}); } }
     log('photos_walk',{n,lot:!!lotNo}); toast(`${n} photo(s)${lotNo?' · lot '+lotNo:''}`); renderPov(); if(selected&&selected.lot===lotNo) renderThumbs(lotNo); povTarget=null; return; }
@@ -1450,14 +1840,15 @@ let thumbUrls=[];
 async function renderThumbs(lot){ const box=$('thumbs'); thumbUrls.forEach(u=>URL.revokeObjectURL(u)); thumbUrls=[]; box.innerHTML='';
   document.querySelectorAll('.src .st').forEach(d=>{ if(d.dataset.thumbs) d.innerHTML=''; }); document.querySelectorAll('.src .doc .n').forEach(n=>{ n.hidden=true; n.textContent=''; });
   let ph=[]; try{ ph=await listPhotos(lot); }catch{ box.innerHTML='<span class="hint">Stockage photo indisponible sur ce navigateur</span>'; $('secPhotosC').textContent=''; return; }
+  { const att=ph.filter(p=>p.src&&!['terrain','marche','import'].includes(p.src)).length; $('secExploreC').textContent=att?`${att} pièce${att>1?'s':''}`:''; $('attHint').hidden=att>0; }
   if(selected?.lot!==lot) return;
-  const field=ph.filter(p=>!p.src||p.src==='terrain'||p.src==='marche'); $('secPhotosC').textContent=ph.length?`${ph.length}`:'';
+  const field=ph.filter(p=>!p.src||p.src==='terrain'||p.src==='marche'||p.src==='import'); $('secPhotosC').textContent=ph.length?`${ph.length}`:'';
   if(!field.length) box.innerHTML='<span class="hint">Chemin d\'accès, pancarte, bornes… Les captures d\'écran du Registre ou du rôle se rangent sous chaque source.</span>';
   ph.forEach(p=>{ const u=URL.createObjectURL(p.blob); thumbUrls.push(u); let im;
     if(p.kind==='doc'){ im=document.createElement('button'); im.type='button'; im.className='att'; im.innerHTML=`${icoSvg('doc',16)}<span>${esc(p.title||p.name||'Document')}</span>`; im.setAttribute('aria-label','Document : '+(p.title||p.name||'')); }
     else { im=document.createElement('img'); im.src=u; im.alt=p.title||'Photo du lot'; }
     im.onclick=()=>openViewer(p,u);
-    const src=p.src&&p.src!=='terrain'&&p.src!=='marche'?p.src:null; if(src){ const d=document.querySelector(`.src .st[data-thumbs="${src}"]`); if(d){ d.appendChild(im); const n=document.querySelector(`.src .doc[data-src="${src}"] .n`); if(n){ n.hidden=false; n.textContent=String(+n.textContent+1); } return; } }
+    const src=p.src&&p.src!=='terrain'&&p.src!=='marche'&&p.src!=='import'?p.src:null; if(src){ const d=document.querySelector(`.src .st[data-thumbs="${src}"]`); if(d){ d.appendChild(im); const n=document.querySelector(`.src .doc[data-src="${src}"] .n`); if(n){ n.hidden=false; n.textContent=String(+n.textContent+1); } return; } }
     box.appendChild(im); }); }
 let viewing=null;
 function openViewer(p,u){ viewing=p; const doc=p.kind==='doc'; $('viewerImg').hidden=doc; $('viewerDoc').hidden=!doc;
@@ -1471,32 +1862,50 @@ $('viewerDel').onclick=async()=>{ if(!viewing) return; if(!confirm(viewing.kind=
 let walk=null, walkLayer=L.layerGroup().addTo(map), stepsLayer=L.layerGroup().addTo(map), povLayer=L.layerGroup().addTo(map), aimHeading=null;
 let walks=store.get('terrain.walks',[]);
 let curLot=null, lastBQ=0, bqBusy=false;
+function walkStatText(){ if(!walk) return; $('walkStat').textContent=`${fmtDist(walk.dist)} · ${fmtTime(walkElapsed())}`; }
+setInterval(()=>{ if(walk&&!walk.paused){ walkStatText(); const a=meAcc; $('walkAcc').textContent=a?` · GPS ± ${a} m`:' · GPS en attente'; $('walkAcc').classList.toggle('bad',!!a&&a>25); } },1000);
+function showWalkSummary(r){ $('wsDist').textContent=fmtDist(r.dist); $('wsTime').textContent=fmtTime(r.secs); $('wsLots').textContent=(r.lots||[]).length; $('wsPhotos').textContent=r.photos.length;
+  $('wsLotList').innerHTML=(r.lots||[]).slice(0,8).map(n=>`<li>Lot ${esc(n)}</li>`).join('')||'<li>Aucun lot identifié (réseau ou hors cadastre)</li>'; $('walkSummary').hidden=false; log('walk_summary'); }
 function walkUI(){ const on=!!walk, p=on&&walk.paused; document.body.classList.toggle('walking',on); $('walkStrip').hidden=!on; $('walkStrip').classList.toggle('paused',!!p);
-  $('btnWalk').classList.toggle('walking',on); $('btnWalk').setAttribute('aria-pressed',on); $('walkLabel').textContent=!on?'Marcher':p?'Reprendre':'Pause';
+  $('btnWalk').classList.toggle('walking',on); $('btnWalk').setAttribute('aria-pressed',on); $('walkLabel').textContent=!on?'Marcher':p?'En pause':'En marche'; $('btnWalkPause').textContent=p?'Reprendre':'Pause';
   $('btnWalk').setAttribute('aria-label',!on?'Commencer une marche':p?'Reprendre la marche':'Mettre la marche en pause');
   $('walkState').textContent=p?'· en pause, position non enregistrée':'· en marche'; if(on) $('walkStat').textContent=fmtDist(walk.dist); }
+function persistActiveWalk(force){ if(!walk) return; const now=Date.now(); if(!force&&now-(walk._saved||0)<8000) return; walk._saved=now;
+  try{ localStorage.setItem('terrain.walkActive',JSON.stringify({id:walk.id,start:walk.start,pts:walk.pts,dist:walk.dist,photos:walk.photos,paused:walk.paused,pausedMs:walk.pausedMs,pausedAt:walk.pausedAt,lots:walk.lots||[]})); }catch{} }
+window.addEventListener('pagehide',()=>persistActiveWalk(true)); document.addEventListener('visibilitychange',()=>{ if(document.hidden) persistActiveWalk(true); });
+function resumeWalk(d){ walk={...d,side:1,lastStep:null}; walk.lots=walk.lots||[]; curLot=null; lastBQ=0;
+  walk.line=L.polyline(walk.pts.map(q=>[q.lat,q.lng]),{color:'#3F7A4F',weight:3,opacity:.6,dashArray:'2 8',interactive:false}).addTo(walkLayer); walkUI(); log('walk_resume',{pts:walk.pts.length}); toast('Marche reprise — ton tracé est intact'); }
 function startWalk(){ walk={id:Date.now().toString(36),start:Date.now(),pts:[],dist:0,photos:[],side:1,lastStep:null,paused:false,pausedMs:0,pausedAt:null}; curLot=null; lastBQ=0;
   walkLayer.clearLayers(); stepsLayer.clearLayers(); walk.line=L.polyline([],{color:'#2E7D4F',weight:3,opacity:.5,dashArray:'2 8',interactive:false}).addTo(walkLayer);
-  $('walkLot').textContent='Recherche du lot…'; walkUI(); if(!compassOn) enableCompass(true); log('walk_start');
+  $('walkLot').textContent='Recherche du lot…'; walk.lots=[]; walkUI(); if(!compassOn) enableCompass(true); log('walk_start'); persistActiveWalk(true);
   tip('walk','Tes pas se dessinent sur la carte. Le téléphone vibre quand tu passes d\'un lot à l\'autre.'); if(me) walkPoint(me[0],me[1],5); }
 function walkElapsed(){ return Math.round((Date.now()-walk.start-walk.pausedMs-(walk.pausedAt?Date.now()-walk.pausedAt:0))/1000); }
 function walkPoint(lat,lng,acc){ if(!walk||walk.paused||acc>35) return; const p=[lat,lng]; const last=walk.pts.at(-1);
   if(last){ const d=map.distance([last.lat,last.lng],p); if(d<4) return; walk.dist+=d; const brg=bearing([last.lat,last.lng],p);
     if(!walk.lastStep||map.distance(walk.lastStep,p)>=6){ walk.side*=-1; const off=destination(lat,lng,brg+90*walk.side,1.1); L.marker(off,{icon:L.divIcon({className:'',html:`<div class="step" style="transform:rotate(${brg}deg)"></div>`,iconSize:[10,16],iconAnchor:[5,8]}),interactive:false}).addTo(stepsLayer); walk.lastStep=p; } }
-  walk.pts.push({lat,lng,t:Date.now()}); walk.line.addLatLng(p); $('walkStat').textContent=fmtDist(walk.dist); checkBoundary(lat,lng); }
+  walk.pts.push({lat,lng,t:Date.now()}); walk.line.addLatLng(p); walkStatText(); checkBoundary(lat,lng); persistActiveWalk(); }
 async function checkBoundary(lat,lng){ if(curLot&&curLot.geom&&inPoly([lng,lat],curLot.geom)) return; const now=Date.now(); if(bqBusy||now-lastBQ<6000) return; lastBQ=now; bqBusy=true;
   try{ const j=await lotAt(lat,lng); const f=j.features?.[0]; const first=!curLot;
     if(!f){ if(curLot?.no!==null){ curLot={no:null,geom:null}; $('walkLot').textContent='Hors cadastre — terre publique ou non cadastrée'; if(!first){ navigator.vibrate?.([80,60,80]); toast('Tu sors des lots cadastrés'); log('boundary',{to:null}); } } return; }
     const no=f.properties.NO_LOT; if(curLot?.no===no){ curLot.geom=f.geometry; return; }
-    curLot={no,geom:f.geometry}; const ha=polyArea(f.geometry)/10000; const saved=carnet.find(x=>x.lot===no);
-    $('walkLot').textContent=`Lot ${no} · ${fmt(acres(ha),1)} acres${saved?' · ♥ journal'+(saved.owner?' · '+saved.owner:''):''}`;
+    curLot={no,geom:f.geometry}; if(walk&&!walk.lots.includes(no)) walk.lots.push(no); const ha=polyArea(f.geometry)/10000; const saved=carnet.find(x=>x.lot===no);
+    $('walkLot').textContent=`Lot ${no} · ${areaFmt(ha,true)}${saved?' · ♥ journal'+(saved.owner?' · '+saved.owner:''):''}`;
     if(!first){ navigator.vibrate?.([80,60,80]); toast(`Tu entres dans le lot ${no}`); log('boundary',{to:'lot'}); }
   }catch{ $('walkLot').textContent='Lot inconnu (réseau)'; } finally{ bqBusy=false; } }
-function stopWalk(){ if(!walk) return; const rec={id:walk.id,start:walk.start,end:Date.now(),secs:walkElapsed(),dist:Math.round(walk.dist),pts:walk.pts.map(qq=>[+qq.lat.toFixed(6),+qq.lng.toFixed(6)]),photos:walk.photos};
-  walks.unshift(rec); store.set('terrain.walks',walks); log('walk_stop',{dist:rec.dist,pts:rec.pts.length,photos:rec.photos.length}); toast(`Marche enregistrée dans le journal · ${fmtDist(rec.dist)} · ${rec.photos.length} photo(s)`); walk=null; curLot=null; walkUI(); renderWalks(); }
-$('btnWalk').onclick=()=>{ navigator.vibrate?.(12); if(!walk) return startWalk();
+function stopWalk(){ if(!walk) return; const rec={id:walk.id,start:walk.start,end:Date.now(),secs:walkElapsed(),dist:Math.round(walk.dist),pts:walk.pts.map(qq=>[+qq.lat.toFixed(6),+qq.lng.toFixed(6)]),photos:walk.photos,lots:walk.lots||[]};
+  walks.unshift(rec); store.set('terrain.walks',walks); log('walk_stop',{dist:rec.dist,pts:rec.pts.length,photos:rec.photos.length}); localStorage.removeItem('terrain.walkActive'); showWalkSummary(rec); walk=null; curLot=null; walkUI(); renderWalks(); }
+function toggleWalkPause(){ navigator.vibrate?.(12); if(!walk) return;
   walk.paused=!walk.paused; if(walk.paused){ walk.pausedAt=Date.now(); walk.lastStep=null; } else { walk.pausedMs+=Date.now()-walk.pausedAt; walk.pausedAt=null; }
   walkUI(); log('walk_pause',{p:walk.paused}); };
+$('btnWalkPause').onclick=toggleWalkPause;
+$('btnWalk').onclick=()=>{ log('btn',{id:'btnWalk',walking:!!walk}); Object.values(sheets).forEach(x=>hide(x,true)); syncTabs(); if(walk){ if(me) map.panTo(me); return; } openWalkPrep(); };
+$('btnWalkPhoto').onclick=()=>openAim(curLot?.no||null);
+let prepT=null;
+function prepTick(){ $('wpGps').textContent=meAcc?`± ${meAcc} m`+(meAcc>25?' — attends un meilleur signal':''):'En attente du GPS…'; $('wpGps').classList.toggle('bad',!meAcc||meAcc>25);
+  $('wpNet').textContent=navigator.onLine?'Connecté':'Hors ligne — les lots ne se chargeront pas'; $('wpLot').textContent=peek?.no?`Lot ${peek.no}`:'Aucun lot identifié pour l\'instant'; $('wpCompass').textContent=compassOn?(heading!=null?`Active · ${Math.round(heading)}°`:'Active'):'Inactive — les photos seront sans direction'; }
+function openWalkPrep(){ $('walkPrep').hidden=false; prepTick(); clearInterval(prepT); prepT=setInterval(prepTick,1000); if(!compassOn) enableCompass(true); if(!me) locate().then(c=>{ showMe(c); map.setView(me,Math.max(map.getZoom(),16)); }).catch(()=>{}); log('walk_prep'); }
+function closeWalkPrep(){ $('walkPrep').hidden=true; clearInterval(prepT); }
+$('wpClose').onclick=closeWalkPrep; $('wpStart').onclick=()=>{ closeWalkPrep(); startWalk(); };
 $('btnWalkStop').onclick=()=>{ if(walk&&confirm('Terminer la marche ? Elle sera rangée dans le journal.')) stopWalk(); };
 function renderWalks(){ walkLayer.clearLayers(); stepsLayer.clearLayers(); walks.forEach(w=>{ if(w.pts?.length) L.polyline(w.pts,{color:'#2E7D4F',weight:3,opacity:.35,dashArray:'2 8',interactive:false}).addTo(walkLayer); }); if(walk?.line) walk.line.addTo(walkLayer); renderPov(); }
 function renderWalkList(){ renderJournalChrome(); const ul=$('walkList'); ul.innerHTML=''; if(!walks.length){ ul.innerHTML='<li class="empty">Aucune marche. Touche « Marcher » en bas de l\'écran pour tracer tes pas.</li>'; return; }
@@ -1509,7 +1918,7 @@ function openAim(target){ povTarget=target||null; if(!compassOn) enableCompass(t
 $('btnPov').onclick=()=>openAim(null);
 $('btnPhotoLot').onclick=()=>{ if(selected) openAim(selected.lot); };
 $('aimCancel').onclick=()=>{ $('aim').hidden=true; povTarget=null; updatePeek(); };
-$('aimGallery').onclick=()=>{ $('aim').hidden=true; pendingSrc='marche'; $('photoInput').click(); };
+$('aimGallery').onclick=()=>{ $('aim').hidden=true; pendingSrc='import'; $('photoInput').click(); };
 $('aimFix').onclick=()=>{ aimHeading=heading; $('aim').hidden=true; navigator.vibrate?.(15); log('aim_fix',{h:heading!=null?Math.round(heading):null,flat:tiltFlat}); openSnap(); };
 let snapStream=null, snapTrack=null, snapFacing='environment', snapZoom=1, snapCaps=null, pinchD=null;
 async function openSnap(){ $('snap').hidden=false; $('snapHeading').textContent=aimHeading!=null?Math.round(aimHeading)+'°':'—°'; setZoom(1);
@@ -1529,12 +1938,29 @@ $('snapCancel').onclick=()=>{ stopCam(); $('snap').hidden=true; povTarget=null; 
 $('snapShutter').onclick=async()=>{ navigator.vibrate?.(20); const v=$('snapVideo'), c=$('snapCanvas'); let blob;
   if(snapTrack&&v.videoWidth){ const digital=!(snapCaps?.zoom); const z=digital?snapZoom:1; const sw=v.videoWidth/z, sh=v.videoHeight/z; c.width=Math.min(1600,Math.round(sw)); c.height=Math.round(c.width*sh/sw); c.getContext('2d').drawImage(v,(v.videoWidth-sw)/2,(v.videoHeight-sh)/2,sw,sh,0,0,c.width,c.height); blob=await new Promise(res=>c.toBlob(res,'image/jpeg',.85)); }
   if(!blob) return toast('Capture impossible — réessaie');
-  stopCam(); $('snap').hidden=true; updatePeek();
-  const pos=me?[me[0],me[1]]:null, h=aimHeading; let lotNo=povTarget; if(!lotNo&&pos){ try{ const j=await lotAt(pos[0],pos[1]); lotNo=j.features?.[0]?.properties?.NO_LOT||null; }catch{} }
-  const id=Date.now()+'-'+Math.random().toString(36).slice(2,7); await dbTx('readwrite',st=>st.put({id,lot:lotNo,src:'marche',t:Date.now(),blob,lat:pos?.[0]??null,lng:pos?.[1]??null,heading:h,walk:walk?.id||null,zoom:snapZoom})); if(walk) walk.photos.push(id);
-  log('snap',{h:h!=null?Math.round(h):null,zoom:+snapZoom.toFixed(1),lot:!!lotNo,gps:!!pos}); toast(`Photo enregistrée${h!=null?' · regard '+Math.round(h)+'°':''}${lotNo?' · lot '+lotNo:''}${pos?'':' · sans position GPS'}`);
-  renderPov(); if(selected&&selected.lot===lotNo) renderThumbs(lotNo); povTarget=null; };
-function aimTick(){ if($('aim').hidden) return; const h=heading; $('aimDeg').textContent=h==null?'—°':Math.round(h)+'°'; $('aimRose').style.transform=`rotate(${h==null?0:-h}deg)`; const f=$('aimFlat'); f.classList.toggle('ok',tiltFlat); f.textContent=tiltFlat?'à plat ✓':'tiens-le à plat'; }
+  stopCam(); $('snap').hidden=true;
+  const pos=me?[me[0],me[1]]:null, h=aimHeading; let lotNo=povTarget, auto=null; if(pos){ try{ const j=await lotAt(pos[0],pos[1]); auto=j.features?.[0]?.properties?.NO_LOT||null; }catch{} } if(!lotNo) lotNo=auto;
+  openVerify({blob,pos,acc:pos?meAcc:null,h,lotNo,auto,t:Date.now(),zoom:snapZoom}); };
+const CARD=['N','N-N-E','N-E','E-N-E','E','E-S-E','S-E','S-S-E','S','S-S-O','S-O','O-S-O','O','O-N-O','N-O','N-N-O'];
+const cardinal=h=>CARD[Math.round(((h%360)+360)%360/22.5)%16];
+let pendingShot=null, verifyUrl=null;
+function openVerify(ps){ pendingShot=ps; if(verifyUrl) URL.revokeObjectURL(verifyUrl); verifyUrl=URL.createObjectURL(ps.blob); $('vfImg').src=verifyUrl;
+  $('vfPos').textContent=ps.pos?(ps.acc?`± ${ps.acc} m`:'position obtenue'):'Sans position GPS'; $('vfPos').classList.toggle('bad',!ps.pos||(ps.acc||0)>25);
+  $('vfDir').textContent=ps.h!=null?`${Math.round(ps.h)}° · ${cardinal(ps.h)}`:'Sans direction'; $('vfTime').textContent=new Date(ps.t).toLocaleTimeString('fr-CA',{hour:'2-digit',minute:'2-digit'});
+  const opts=[...new Set([ps.lotNo,ps.auto,selected?.lot].filter(Boolean))]; const sel=$('vfLot'); sel.innerHTML=opts.map(n=>`<option value="${esc(n)}">Lot ${esc(n)}${n===ps.auto?' (sous tes pieds)':''}</option>`).join('')+'<option value="">Aucun lot / incertain</option>'; sel.value=ps.lotNo||'';
+  $('vfLotNote').textContent=!ps.auto?'Lot non déterminé à ta position : choisis-le ou laisse « incertain ».':(ps.acc&&ps.acc>15?'Près d\'une limite ou GPS imprécis : vérifie le lot.':'');
+  $('vfNote').value=''; $('verify').hidden=false; log('verify_open',{gps:!!ps.pos,h:ps.h!=null,lot:!!ps.lotNo}); }
+function closeVerify(){ $('verify').hidden=true; pendingShot=null; updatePeek(); }
+$('vfRetake').onclick=()=>{ $('verify').hidden=true; pendingShot=null; log('verify_retake'); openSnap(); };
+$('vfSave').onclick=async()=>{ const ps=pendingShot; if(!ps) return; const lotNo=$('vfLot').value||null, note=$('vfNote').value.trim();
+  const id=Date.now()+'-'+Math.random().toString(36).slice(2,7);
+  try{ await dbTx('readwrite',st=>st.put({id,lot:lotNo,lotSure:!!lotNo&&lotNo===ps.auto,src:'marche',t:ps.t,blob:ps.blob,lat:ps.pos?.[0]??null,lng:ps.pos?.[1]??null,acc:ps.acc,heading:ps.h,walk:walk?.id||null,zoom:ps.zoom,title:note.slice(0,60)||undefined,note:note||undefined})); }
+  catch(e){ toast('Photo non enregistrée : stockage du téléphone plein ou indisponible'); log('photo_error',{msg:String(e.message).slice(0,80)}); return; }
+  if(walk){ walk.photos.push(id); persistActiveWalk(true); }
+  if(heroNext&&selected&&lotNo===selected.lot){ heroId=id; heroNext=false; saveNow(); heroFor(lotNo); }
+  log('snap',{h:ps.h!=null?Math.round(ps.h):null,lot:!!lotNo,gps:!!ps.pos,note:!!note}); toast(`Photo enregistrée${lotNo?' · lot '+lotNo:''}${walk?' · ta marche continue':''}`);
+  closeVerify(); renderPov(); if(selected&&selected.lot===lotNo) renderThumbs(lotNo); povTarget=null; };
+function aimTick(){ if($('aim').hidden) return; const h=heading; $('aimDeg').textContent=h==null?'—°':Math.round(h)+'°'; $('aimRose').style.transform=`rotate(${h==null?0:-h}deg)`; const f=$('aimFlat'); f.classList.toggle('ok',tiltFlat); f.textContent=h==null?'boussole indisponible':(tiltFlat?'Téléphone à plat ✓':'Tiens le téléphone à plat'); $('aimFix').textContent=h==null?'Continuer sans direction':'Fixer le point de vue'; }
 setInterval(aimTick,150);
 function povIcon(h){ return L.divIcon({className:'',html:`<div class="pov"><div class="cone" style="transform:rotate(${(h??0)+180}deg)"></div><div class="dot"></div></div>`,iconSize:[30,30],iconAnchor:[15,15]}); }
 async function renderPov(){ povLayer.clearLayers(); let ph=[]; try{ ph=(await dbAll('photos')).filter(x=>x.lat!=null); }catch{}
@@ -1624,7 +2050,7 @@ document.querySelectorAll('#permList button').forEach(b=>b.onclick=()=>askPerm(b
   sl.addEventListener('scroll',()=>{ clearTimeout(window._inT); window._inT=setTimeout(upd,80); });
   const off=store.get('terrain.introOff',null)==='1'||store.get('terrain.introOff',null)===1; $('introOff').checked=!!off;
   $('introOff').onchange=e=>{ try{ localStorage.setItem('terrain.introOff',e.target.checked?'1':'0'); }catch{} log('intro_off',{v:e.target.checked}); };
-  $('introVersion').textContent=`lots ${APP_VERSION}`;
+  $('introVersion').textContent=`LOTS ${APP_VERSION}`;
   const close=()=>{ el.hidden=true; log('intro_close',{slide:idx()}); setTimeout(updatePeek,100); };
   $('introNext').onclick=()=>{ const i=idx(); if(i>=n-1) return close(); go(i+1); };
   $('introSkip').onclick=()=>{ const i=idx(); if(i>=n-1) return close(); go(n-1); };
@@ -1636,6 +2062,10 @@ document.querySelectorAll('#permList button').forEach(b=>b.onclick=()=>askPerm(b
     if(!isStandalone()||geo!=='granted'){ try{ openIntro(true); }catch{} } })(); })();
 
 /* ============================ Démarrage ============================ */
+(()=>{ let d=null; try{ d=JSON.parse(localStorage.getItem('terrain.walkActive')||'null'); }catch{}
+  if(!d||!d.pts) return; setTimeout(()=>{ const when=new Date(d.start).toLocaleString('fr-CA',{day:'numeric',month:'long',hour:'2-digit',minute:'2-digit'});
+    if(confirm(`Une marche du ${when} n'a pas été terminée (${fmtDist(d.dist||0)}, ${d.photos?.length||0} photo(s)).\n\nOK : la reprendre.\nAnnuler : l'enregistrer telle quelle dans le journal.`)) resumeWalk(d);
+    else { walk={...d,side:1,lastStep:null}; walk.line=null; stopWalk(); } },1200); })();
 renderCount(); renderSaved(); renderWalks(); applyBase(); walkUI(); setTimeout(loadBaux,500); setTimeout(updatePeek,800);
 if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{});
 
