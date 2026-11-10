@@ -780,7 +780,7 @@ body.walking .mectl{bottom:calc(var(--sab) + 224px)}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script>
 /* ============================ CONFIG ============================ */
-const APP_VERSION='v42';
+const APP_VERSION='v43';
 const CONFIG = {
   ringFraction: 0.70, maxRadius: 1500, coneLength: 150, coneHalfAngle: 25,
   cadastre: 'https://geo.environnement.gouv.qc.ca/donnees/rest/services/Reference/Cadastre_allege/MapServer',
@@ -794,7 +794,7 @@ const CONFIG = {
   registre: 'https://www.registrefoncier.gouv.qc.ca',
   req:      'https://www.registreentreprises.gouv.qc.ca',
   centris:  'https://www.centris.ca/fr/a-vendre',
-  roles: { 'argenteuil':'https://experience.arcgis.com/experience/5f786b7891884c1ebb5e929e7d881bf6/', "pays-d'en-haut":'', 'matawinie':'', "d'autray":'' },
+  roles: { 'argenteuil':'https://experience.arcgis.com/experience/5f786b7891884c1ebb5e929e7d881bf6/', "pays-d'en-haut":'', 'matawinie':'https://carte.matawinie.org/public/', "d'autray":'' },
   // Rôle par municipalité (prioritaire sur la MRC) : nom exact en minuscules → URL publique du rôle
   rolesMuni: { 'laval':'https://pdi.pgmunicipal.com/immosoft/controller/ImmoNetPub/U4051/trouverParAdresse?init_mapping=&fourn_seq=173' }
 };
@@ -1093,7 +1093,15 @@ $('peekGo').onclick=()=>{ if(!peek.f) return; log('peek_open'); highlightOne(pee
 
 /* ============================ Fiche ============================ */
 let selected=null, loading=false;
-function roleUrl(m,lot){ const mrc=(m?.MUS_NM_MRC||'').toLowerCase(), mun=(m?.MUS_NM_MUN||'').toLowerCase().trim();
+/* Projection MTM zone 8 (NAD83, méridien central -73,5°) — pour cadrer les visualiseurs municipaux du sud-ouest du Québec */
+function mtm8(lat,lng){ const a=6378137, f=1/298.257222101, e2=f*(2-f), ep2=e2/(1-e2), k0=0.9999, l0=-73.5*Math.PI/180;
+  const phi=lat*Math.PI/180, lam=lng*Math.PI/180, s=Math.sin(phi), c=Math.cos(phi), N=a/Math.sqrt(1-e2*s*s), T=Math.tan(phi)**2, C=ep2*c*c, A=(lam-l0)*c;
+  const M=a*((1-e2/4-3*e2**2/64-5*e2**3/256)*phi-(3*e2/8+3*e2**2/32+45*e2**3/1024)*Math.sin(2*phi)+(15*e2**2/256+45*e2**3/1024)*Math.sin(4*phi)-(35*e2**3/3072)*Math.sin(6*phi));
+  return [304800+k0*N*(A+(1-T+C)*A**3/6+(5-18*T+T*T+72*C-58*ep2)*A**5/120), k0*(M+N*Math.tan(phi)*(A*A/2+(5-T+9*C+4*C*C)*A**4/24+(61-58*T+T*T+600*C-330*ep2)*A**6/720))]; }
+// Visualiseurs qui acceptent un cadrage dans l'URL : on ouvre directement sur le lot
+const ROLE_ZOOM={ 'matawinie':b=>{ const [x1,y1]=mtm8(b.getSouth(),b.getWest()), [x2,y2]=mtm8(b.getNorth(),b.getEast()); const pad=250, w=Math.max(600,x2-x1+2*pad), h=Math.max(600,y2-y1+2*pad), cx=(x1+x2)/2, cy=(y1+y2)/2;
+  return `https://carte.matawinie.org/public/?autozoom=region;${Math.round(cx-w/2)};${Math.round(cy-h/2)};${Math.round(w)};${Math.round(h)}`; } };
+function roleUrl(m,lot,b){ { const k=Object.keys(ROLE_ZOOM).find(k=>(m?.MUS_NM_MRC||'').toLowerCase().includes(k)); if(k&&b) return ROLE_ZOOM[k](b); } const mrc=(m?.MUS_NM_MRC||'').toLowerCase(), mun=(m?.MUS_NM_MUN||'').toLowerCase().trim();
   if(CONFIG.rolesMuni?.[mun]) return CONFIG.rolesMuni[mun];
   for(const k in CONFIG.roles){ if(mrc.includes(k)&&CONFIG.roles[k]) return CONFIG.roles[k].replace('{lot}',encodeURIComponent(lot||'')); }
   const site=m?.SITE_WEB?(m.SITE_WEB.startsWith('http')?m.SITE_WEB:'https://'+m.SITE_WEB):null; return site||CONFIG.infolot; }
@@ -1105,7 +1113,7 @@ async function openLot(f,m){
   log('lot_open',{lot:no,ha:+(area/10000).toFixed(2),muni:selected.muni});
   $('lotNo').textContent=`Lot ${no}`; $('lotWhere').textContent=m?`${m.MUS_NM_MUN} · MRC ${m.MUS_NM_MRC}`:'Municipalité inconnue';
   $('sumUnits').innerHTML=unitsLine(area/10000);
-  $('lnkInfolot').href=CONFIG.infolot; $('lnkRegistre').href=CONFIG.registre; $('lnkRole').href=roleUrl(m,no);
+  $('lnkInfolot').href=CONFIG.infolot; $('lnkRegistre').href=CONFIG.registre; $('lnkRole').href=roleUrl(m,no,b);
   const tel=(m?.TELEPHONE||'').replace(/[^+\d]/g,''); $('lnkCall').href=tel?'tel:'+tel:'#'; $('lnkCall').textContent=m?.TELEPHONE?'Appeler · '+m.TELEPHONE:'Appeler la municipalité'; $('lnkCall').classList.toggle('disabled',!tel);
   const site=m?.SITE_WEB?(m.SITE_WEB.startsWith('http')?m.SITE_WEB:'https://'+m.SITE_WEB):null; $('lnkMuni').href=site||CONFIG.infolot; $('lnkMuni').textContent=site?`Site de ${m.MUS_NM_MUN}`:'Site web';
   const saved=carnet.find(x=>x.lot===no);
