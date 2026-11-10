@@ -571,6 +571,53 @@ body.walking .peek{bottom:calc(var(--sab) + 170px)}
 .wptips{margin:6px 0 12px;padding-left:18px;font-size:14px;line-height:1.5;color:var(--ink-2)}
 #wpGps.bad{color:#B8321F}
 
+
+/* ---- R3 : fiche résumé et fiche propriétaire ---- */
+.hero{margin:-6px -16px 0;height:150px;overflow:hidden;background:#C9BFA9}
+.hero img{width:100%;height:100%;object-fit:cover;display:block}
+.sum2{padding:14px 0 4px}
+.eyebrow{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ok);min-height:14px}
+.lotbig{font-family:"JetBrains Mono",ui-monospace,monospace;font-weight:700;font-size:28px;letter-spacing:.02em;margin:4px 0 12px}
+.idgrid{display:grid;grid-template-columns:1fr 1fr;border:1px solid var(--line);border-radius:16px;overflow:hidden;background:var(--paper)}
+.idgrid>div,.idgrid>button{padding:12px 14px;min-height:74px;display:flex;flex-direction:column;gap:3px;text-align:left;border-bottom:1px solid var(--line);color:var(--ink)}
+.idgrid>*:nth-child(odd){border-right:1px solid var(--line)}
+.idgrid>*:nth-child(n+3){border-bottom:0}
+.idgrid small{font-size:11.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-2)}
+.idgrid b{font-size:17px;line-height:1.25}
+.idgrid .units{font-size:11.5px;color:var(--ink-2);line-height:1.35}
+.idgrid .units b{font-size:11.5px}
+.gown{position:relative;background:var(--paper)}
+.gown b.unk{color:var(--ink-2)}
+.gown .chev{position:absolute;right:12px;top:50%;transform:translateY(-50%)}
+.gown:active{background:var(--field)}
+.sum2 .tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.sum2 .tags span{font-size:12px;font-weight:700;padding:4px 9px;border-radius:999px;background:var(--paper);border:1px solid var(--line)}
+.sum2 .tags span.hot{background:#F6E7C8;border-color:#C9A15A;color:#6B4B12}
+.sum2 .tags span.good{background:#E1EDE3;border-color:#9CC0A6;color:#1F4A2C}
+.sum2 .tags span.bad{background:#F5DED8;border-color:#D9A090;color:#7E2414}
+.sum2 .prov{font-size:12px;color:var(--ink-2);margin:10px 0 0;line-height:1.35;border-left:3px solid #A68A64;padding-left:8px}
+.chkh{font-size:16px;margin:18px 0 8px;padding-bottom:8px;border-bottom:1px solid var(--line)}
+.prows{display:flex;flex-direction:column;gap:8px}
+.prow{display:flex;align-items:center;gap:12px;padding:12px;min-height:64px;border:1px solid var(--line);border-radius:14px;background:var(--paper);color:var(--ink);text-decoration:none;text-align:left;width:100%}
+.prow:active{background:var(--field)}
+.prow .pic{width:40px;height:40px;border-radius:10px;background:var(--field);display:flex;align-items:center;justify-content:center;flex:none;color:var(--ink)}
+.prow .pt{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.prow .pt b{font-size:15.5px} .prow .pt span{font-size:13px;color:var(--ink-2)}
+.chev{font-size:24px;font-weight:700;color:var(--ink);flex:none;line-height:1}
+#chkBauxWrap{display:block}
+.ownerpage .vbody{padding:18px 16px 24px}
+.opbig{font-size:26px;line-height:1.15;margin:0 0 6px}
+.oplead{font-size:15px;color:var(--ink-2);margin:0 0 14px;line-height:1.45}
+.opcard{border:1px solid var(--line);border-radius:14px;background:var(--paper);padding:12px 14px;display:flex;flex-direction:column;gap:6px}
+.opcard label{font-size:11.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-2)}
+.opcard input,.opcard select{border:0;border-bottom:1.5px solid var(--line);border-radius:0;padding:6px 0;font-size:17px;font-weight:700;min-height:44px;background:transparent}
+.oprole{font-size:14px;margin-top:4px} .oprole button{margin-left:6px;min-height:36px;padding:0 12px;border-radius:999px;background:var(--bark);color:#F2ECDF;font-weight:700}
+#opWeb{margin-top:10px} #opWeb .links{margin-top:0}
+.ownerpage .primary{margin-top:14px}
+.opics{display:block;text-align:center;margin:8px 0 2px;font-weight:700;color:var(--ink)}
+.peek .pkeep{flex:none;width:46px;min-height:46px;border-radius:12px;background:var(--field);color:var(--ink-2);font-size:20px}
+.peek .pkeep[aria-pressed="true"]{background:#F5DED8;color:#B8321F}
+
 /* Éléments retirés de l'ancienne interface */
 .bottom,.mode,.mapbtn,.walkpill,.clearbtn,.legend{display:none !important}
 
@@ -620,7 +667,7 @@ body.walking .peek{bottom:calc(var(--sab) + 170px)}
 <div class="pin" aria-hidden="true"><svg viewBox="0 0 34 44"><path d="M17 1C8 1 1 8 1 17c0 11 16 26 16 26s16-15 16-26C33 8 26 1 17 1z" fill="#1E6FD9" stroke="#fff" stroke-width="2"/><circle cx="17" cy="17" r="6" fill="#fff"/></svg></div>
 <div class="ring" id="ring" aria-hidden="true"><span id="ringLabel">250 m</span></div>
 
-<div class="peek" id="peek" hidden><div class="t"><b id="peekTitle">—</b><span id="peekSub"></span></div><button class="go" id="peekGo">Voir la fiche</button></div>
+<div class="peek" id="peek" hidden><div class="t"><b id="peekTitle">—</b><span id="peekSub"></span></div><button class="pkeep" id="peekKeep" aria-label="Garder dans mon journal" aria-pressed="false">♥</button><button class="go" id="peekGo">Voir la fiche</button></div>
 
 <div class="walkstrip" id="walkStrip" hidden><span class="dot" aria-hidden="true"></span><div class="t"><b id="walkStat">0 m</b> <span id="walkState">· en marche</span><br><span id="walkLot">Recherche du lot…</span><span id="walkAcc"></span></div><button id="btnWalkPhoto" class="wphoto" aria-label="Photo orientée">📷 Photo</button><button id="btnWalkPause">Pause</button><button id="btnWalkStop">Terminer</button></div>
 
@@ -709,11 +756,26 @@ body.walking .peek{bottom:calc(var(--sab) + 170px)}
   <div class="grip"></div>
   <header><div class="t"><h2 id="lotNo">—</h2><p id="lotWhere">—</p></div><button class="keep" id="btnFav" aria-pressed="false"><span class="h" aria-hidden="true">♥</span><span id="favLabel">Garder</span></button><button class="close" id="btnShare" aria-label="Partager ce lot"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="M7.5 7.5L12 3l4.5 4.5"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></svg></button><button class="close" id="closeLot" aria-label="Fermer">×</button></header>
   <div class="body">
-    <div class="sum">
-      <div class="own unk" id="sumOwner">Propriétaire inconnu</div>
-      <div class="units" id="sumUnits"></div>
+    <div class="hero"><img id="heroImg" src="brand/paysage.jpg" alt=""></div>
+    <div class="sum2">
+      <div class="eyebrow" id="sumEyebrow"></div>
+      <div class="lotbig" id="sumLotBig"></div>
+      <div class="idgrid">
+        <div><small>Superficie</small><b id="gArea">—</b><span id="sumUnits" class="units"></span></div>
+        <div><small>Municipalité</small><b id="gMuni">—</b></div>
+        <div><small>MRC</small><b id="gMrc">—</b></div>
+        <button class="gown" id="gOwner" aria-label="Fiche propriétaire"><small>Propriétaire</small><b id="sumOwner" class="unk">À rechercher</b><span class="chev" aria-hidden="true">›</span></button>
+      </div>
       <div class="tags" id="sumTags"></div>
       <p class="prov" id="sumProv"></p>
+    </div>
+    <h3 class="chkh">À vérifier avant d'aller plus loin</h3>
+    <div class="prows" id="chkList">
+      <a class="prow" id="chkAccess" target="_blank" rel="noopener"><span class="pic" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 21V4M5 4h11l-2 4 2 4H5"/></svg></span><span class="pt"><b>Accès routier</b><span id="chkAccessSub">Non confirmé</span></span><span class="chev" aria-hidden="true">›</span></a>
+      <a class="prow" id="chkZoning" target="_blank" rel="noopener"><span class="pic" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 7h14l-2 10H4z"/></svg></span><span class="pt"><b>Zonage et usages</b><span id="chkZoningSub">Ouvrir la source municipale</span></span><span class="chev" aria-hidden="true">›</span></a>
+      <a class="prow" id="chkCadastre" target="_blank" rel="noopener"><span class="pic" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="4" width="14" height="16" rx="1"/><path d="M8 8h8M8 12h8M8 16h5"/></svg></span><span class="pt"><b>Cadastre et superficie</b><span id="chkCadastreSub">Ouvrir Infolot</span></span><span class="chev" aria-hidden="true">›</span></a>
+      <a class="prow" id="chkRole" target="_blank" rel="noopener"><span class="pic" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11l8-7 8 7v9H4z"/></svg></span><span class="pt"><b>Rôle d'évaluation</b><span id="chkRoleSub">Valeurs, usage, propriétaire selon la MRC</span></span><span class="chev" aria-hidden="true">›</span></a>
+      <span id="chkBauxWrap" hidden><button class="prow" id="chkBaux"><span class="pic" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 20h18L12 4z"/></svg></span><span class="pt"><b>Terre publique louée</b><span id="chkBauxSub">Un bail public touche ce lot : à vérifier</span></span><span class="chev" aria-hidden="true">›</span></button></span>
     </div>
 
     <details class="sec" id="secExplore" open>
@@ -733,10 +795,7 @@ body.walking .peek{bottom:calc(var(--sab) + 170px)}
       </div>
     </details>
 
-    <details class="sec" id="secOwner">
-      <summary>Trouver le propriétaire <span class="c" id="secOwnerC"></span></summary>
-      <div class="in">
-        <label class="fine" for="lotOwner">Nom du propriétaire (tel qu'au rôle ou au Registre)</label>
+    <details class="sec" id="secOwner" hidden><summary><span class="c" id="secOwnerC"></span></summary><div id="ownerStash"><label class="fine" for="lotOwner">Nom du propriétaire (tel qu'au rôle ou au Registre)</label>
         <input class="f" id="lotOwner" placeholder="Prénom Nom ou nom de l'entreprise" autocomplete="off">
         <div class="links" id="ownerLinks">
           <a id="lnkC411" target="_blank" rel="noopener">Canada411</a>
@@ -747,9 +806,7 @@ body.walking .peek{bottom:calc(var(--sab) + 170px)}
           <a id="lnkDeces" target="_blank" rel="noopener" hidden>Avis de décès</a>
           <a id="lnkNoms" target="_blank" rel="noopener" class="wide">Registre foncier : autres terres de ce nom</a>
         </div>
-        <p class="fine" id="ownerHint">Inscris le nom pour activer les recherches. Elles s'ouvrent préremplies ; l'app ne collecte rien elle-même.</p>
-      </div>
-    </details>
+        <p class="fine" id="ownerHint">Inscris le nom pour activer les recherches. Elles s'ouvrent préremplies ; l'app ne collecte rien elle-même.</p></div></details>
 
     <details class="sec" id="secContact">
       <summary>Contacter <span class="c" id="secContactC"></span></summary>
@@ -917,6 +974,28 @@ body.walking .peek{bottom:calc(var(--sab) + 170px)}
     <button class="primary" id="wpStart">Démarrer la marche</button><button class="cancel" id="wpClose">Annuler</button>
   </div>
 </div>
+<section class="verify ownerpage" id="ownerPage" hidden role="dialog" aria-modal="true" aria-labelledby="opTitle">
+  <header><button id="opBack" class="vbtn" aria-label="Retour à la fiche">‹</button><h2 id="opTitle">Trouver le propriétaire</h2><span class="vstep" id="opLot"></span></header>
+  <div class="vbody">
+    <h2 class="opbig">Approcher avec respect.</h2>
+    <p class="oplead">Le nom se consulte d'abord à la source officielle. LOTS t'aide ensuite à organiser tes démarches.</p>
+    <div class="opcard"><label for="lotOwner">Nom relevé au rôle / registre</label><div id="opNameHost"></div><div class="oprole" id="opRole" hidden></div></div>
+    <h3 class="chkh">Pistes de recherche</h3>
+    <div class="prows">
+      <a class="prow" id="opRegistre" target="_blank" rel="noopener"><span class="pic" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="4" width="14" height="16" rx="1"/><path d="M8 8h8M8 12h8M8 16h5"/></svg></span><span class="pt"><b>Registre foncier</b><span id="opRegistreSub">Consulter le titre · n° de lot copié</span></span><span class="chev" aria-hidden="true">›</span></a>
+      <a class="prow" id="opRoleLink" target="_blank" rel="noopener"><span class="pic" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11l8-7 8 7v9H4z"/></svg></span><span class="pt"><b>Rôle municipal</b><span id="opRoleLinkSub">Selon la disponibilité</span></span><span class="chev" aria-hidden="true">›</span></a>
+      <button class="prow" id="opWebBtn" aria-expanded="false"><span class="pic" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="6"/><path d="M20 20l-4-4"/></svg></span><span class="pt"><b>Recherche Web</b><span id="opWebBtnSub">À partir du nom saisi</span></span><span class="chev" aria-hidden="true">›</span></button>
+    </div>
+    <div id="opWeb" hidden></div>
+    <h3 class="chkh">Prochaine action</h3>
+    <div class="opcard"><label for="lotOStatus">Statut</label>
+      <select id="lotOStatus"><option value="">À rechercher</option><option value="nom">Nom trouvé</option><option value="coord">Adresse ou coordonnées trouvées</option><option value="lettre">Lettre envoyée</option><option value="contacte">Contacté</option><option value="reponse">Réponse reçue</option><option value="refus">Pas intéressé</option></select>
+      <label for="lotNextDate" style="margin-top:10px">Relancer ou faire le suivi le</label><input type="date" id="lotNextDate"></div>
+    <button class="primary" id="opTask">Ajouter une tâche de suivi →</button>
+    <a class="opics" id="opIcs" href="#" hidden>Ajouter aussi à mon agenda (.ics)</a>
+    <p class="fine" style="text-align:center">Aucune prise de contact automatique.</p>
+  </div>
+</section>
 <section class="verify" id="verify" hidden role="dialog" aria-modal="true" aria-labelledby="vfTitle">
   <header><button id="vfRetake" class="vbtn">‹ Reprendre</button><h2 id="vfTitle">Vérifier la photo</h2><span class="vstep">étape 3 sur 3</span></header>
   <div class="vbody">
@@ -941,7 +1020,7 @@ body.walking .peek{bottom:calc(var(--sab) + 170px)}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script>
 /* ============================ CONFIG ============================ */
-const APP_VERSION='R2';
+const APP_VERSION='R3';
 const CONFIG = {
   ringFraction: 0.70, maxRadius: 1500, coneLength: 150, coneHalfAngle: 25,
   cadastre: 'https://geo.environnement.gouv.qc.ca/donnees/rest/services/Reference/Cadastre_allege/MapServer',
@@ -1097,6 +1176,33 @@ function hide(s,silent){ if(!s.classList.contains('open')) return; s.classList.r
 function syncTabs(){ const open=k=>sheets[k]?.classList.contains('open'); $('btnTabMap').setAttribute('aria-pressed',!open('carnet')&&!open('tools')); $('btnCarnet').setAttribute('aria-pressed',!!open('carnet')); $('btnTools').setAttribute('aria-pressed',!!open('tools')); }
 { const _show=show, _hide=hide; show=function(x){ _show(x); syncTabs(); }; hide=function(x,silent){ _hide(x,silent); syncTabs(); }; }
 $('btnTabMap').onclick=()=>{ Object.values(sheets).forEach(x=>hide(x,true)); closeSearch?.(); syncTabs(); setTimeout(updatePeek,50); log('btn',{id:'btnTabMap'}); };
+/* ---- Fiche propriétaire ---- */
+$('opNameHost').appendChild($('lotOwner')); $('opWeb').appendChild($('ownerLinks')); $('opWeb').appendChild($('ownerHint'));
+function openOwnerPage(){ if(!selected) return; const ro=selected.roleOwner, cur=$('lotOwner').value.trim();
+  $('opRole').hidden=!ro||ro===cur; if(ro&&ro!==cur) $('opRole').innerHTML=`Nom au rôle de la MRC : <b>${esc(ro)}</b> <button type="button" id="opUseRole">Utiliser</button>`;
+  const u=$('opUseRole'); if(u) u.onclick=()=>{ $('lotOwner').value=ro; $('lotOwner').dispatchEvent(new Event('input')); $('opRole').hidden=true; if(!$('lotOStatus').value){ $('lotOStatus').value='nom'; } saveNow(); };
+  $('opWeb').hidden=!cur; $('opWebBtn').setAttribute('aria-expanded',!!cur); $('opWebBtnSub').textContent=cur?'Google, Canada411, Facebook, LinkedIn, registres…':'Inscris d\'abord le nom ci-dessus';
+  $('ownerPage').hidden=false; log('owner_page'); }
+$('opBack').onclick=()=>{ $('ownerPage').hidden=true; flushSave(); renderSummary(); };
+$('gOwner').onclick=openOwnerPage;
+$('opWebBtn').onclick=()=>{ const open=$('opWeb').hidden; $('opWeb').hidden=!open; $('opWebBtn').setAttribute('aria-expanded',open); if(open&&!$('lotOwner').value.trim()) $('lotOwner').focus(); };
+$('lotOwner').addEventListener('input',()=>{ const has=!!$('lotOwner').value.trim(); $('opWebBtnSub').textContent=has?'Google, Canada411, Facebook, LinkedIn, registres…':'Inscris d\'abord le nom ci-dessus'; if(has&&!$('lotOStatus').value){ $('lotOStatus').value='nom'; } });
+$('opRegistre').addEventListener('click',()=>{ if(selected) copy(selected.lot,'N° de lot copié — Registre foncier'); log('btn',{id:'opRegistre'}); });
+$('opRoleLink').addEventListener('click',()=>{ if(selected) copy(selected.lot,'N° de lot copié'); log('btn',{id:'opRoleLink'}); });
+$('lotOStatus').addEventListener('change',e=>{ const v=e.target.value; if(v==='lettre'||v==='contacte'||v==='reponse') $('lotContacted').checked=true; log('owner_status',{v}); saveNow(); renderSummary(); });
+$('lotNextDate').addEventListener('change',()=>{ saveNow(); $('opIcs').hidden=!$('lotNextDate').value; });
+$('opTask').onclick=()=>{ if(!selected) return; if(!$('lotNextDate').value){ const d=new Date(Date.now()+14*864e5); $('lotNextDate').value=d.toISOString().slice(0,10); }
+  saveNow(); $('opIcs').hidden=false; const d=new Date($('lotNextDate').value+'T12:00'); toast(`Suivi ajouté au journal pour le ${d.toLocaleDateString('fr-CA',{day:'numeric',month:'long'})}`); log('owner_task'); };
+$('opIcs').onclick=e=>{ e.preventDefault(); if(!selected||!$('lotNextDate').value) return; const d=$('lotNextDate').value.replace(/-/g,''), d2=new Date(new Date($('lotNextDate').value+'T12:00').getTime()+864e5).toISOString().slice(0,10).replace(/-/g,'');
+  const who=$('lotOwner').value.trim(), st=$('lotOStatus').selectedOptions[0]?.textContent||'';
+  const ics=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//LOTS//Terre de rang//FR','BEGIN:VEVENT',`UID:${Date.now()}@lots.quebec`,`DTSTAMP:${new Date().toISOString().replace(/[-:]/g,'').slice(0,15)}Z`,`DTSTART;VALUE=DATE:${d}`,`DTEND;VALUE=DATE:${d2}`,`SUMMARY:Suivi — lot ${selected.lot}${selected.muni?' ('+selected.muni+')':''}`,`DESCRIPTION:${[who,st].filter(Boolean).join(' · ').replace(/[,;]/g,' ')}`,'END:VEVENT','END:VCALENDAR'].join('\r\n');
+  const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([ics],{type:'text/calendar'})); a.download=`suivi-lot-${selected.lot.replace(/\s/g,'')}.ics`; a.click(); log('owner_ics'); };
+$('chkBaux').onclick=()=>toast('Un bail sur terre publique touche ce lot : vérifie ses limites avant toute démarche (Couches → Terres publiques louées).');
+async function heroFor(no){ const img=$('heroImg'); img.src='brand/paysage.jpg'; try{ const ph=(await listPhotos(no)).filter(p=>p.kind!=='doc'&&(!p.src||p.src==='terrain'||p.src==='marche'||p.src==='import')); if(ph.length&&selected?.lot===no){ img.src=URL.createObjectURL(ph[ph.length-1].blob); } }catch{} }
+/* ---- Aperçu : garder dans le journal sans ouvrir la fiche ---- */
+$('peekKeep').onclick=()=>{ if(!peek.f) return; const f=peek.f, no=f.properties.NO_LOT; const i=carnet.findIndex(x=>x.lot===no);
+  if(i>=0){ carnet[i].fav=!carnet[i].fav; } else { const b=L.geoJSON(f).getBounds(), c=b.getCenter(), today=new Date().toISOString().slice(0,10); carnet.unshift({lot:no,muni:peek.m?.MUS_NM_MUN||'',mrc:peek.m?.MUS_NM_MRC||'',lat:c.lat,lng:c.lng,ha:polyArea(f.geometry)/10000,geom:f.geometry,tags:[],fav:true,date:today,updated:today}); }
+  persist(); renderSaved(); restyleScan(); const on=!!carnet.find(x=>x.lot===no)?.fav; $('peekKeep').setAttribute('aria-pressed',on); navigator.vibrate?.(10); toast(on?`Lot ${no} gardé dans ton journal`:'Retiré des favoris'); log('peek_keep',{on}); };
 $('closeLot').onclick=()=>hide(sheets.lot); $('closeCarnet').onclick=()=>hide(sheets.carnet); $('closeFilters').onclick=()=>{ hide(sheets.filters); if(filtersActive()&&!scanLots.length) toast('Filtres prêts — touche Scanner pour les appliquer aux lots autour de la pin'); }; $('closeLayers').onclick=()=>hide(sheets.layers);
 
 /* ============================ Conseils contextuels (une fois chacun) ============================ */
@@ -1223,7 +1329,7 @@ async function scanAt(lat,lng,radius){
   await applyFilters();
   tip('scan','Ocre : aucune adresse civique connue (ça ne prouve pas que le lot est vacant). Orange : passe tes filtres. Touche un lot pour sa fiche.');
   return {lots:lots.features.length,vacant,muni:lastMuni?.MUS_NM_MUN}; }
-async function applyFilters(){ if(!scanLots.length) return;
+async function applyFilters(){ if(!scanLots.length||!scanMeta) return;
   if(filtersNeedRole()) await Promise.all(scanLots.map(async s=>{ if(s.role===undefined) s.role=await roleFor(s.no); }));
   const on=filtersActive(); let ok=0, unknown=0;
   scanLots.forEach(s=>{ const m=on?lotMatches(s):null; s.state=on?(m?'ok':'no'):null; if(m) ok++; if(on&&filtersNeedRole()&&!s.role) unknown++;
@@ -1256,7 +1362,7 @@ async function updatePeek(){ const el=$('peek');
   try{ const [lots,muni]=await Promise.all([lotAt(c.lat,c.lng),muniAt(c.lat,c.lng).catch(()=>null)]); const f=lots.features[0], m=muni?.features?.[0]?.properties||null;
     if(!f){ peek={no:null,geom:null,f:null,m}; $('peekTitle').textContent='Aucun lot cadastré sous la pin'; $('peekSub').textContent=m?`${m.MUS_NM_MUN} · probablement une terre publique`:'Probablement une terre publique'; $('peekGo').hidden=true; }
     else { const no=f.properties.NO_LOT, ha=polyArea(f.geometry)/10000; peek={no,geom:f.geometry,f,m};
-      const saved=carnet.find(x=>x.lot===no);
+      const saved=carnet.find(x=>x.lot===no); $('peekKeep').setAttribute('aria-pressed',!!saved?.fav);
       $('peekTitle').textContent=`Lot ${no} · ${areaFmt(ha,true)}`; $('peekSub').textContent=[m?.MUS_NM_MUN,saved?'♥ dans ton journal'+(saved.owner?' · '+saved.owner:''):null].filter(Boolean).join(' · ')||'—'; $('peekGo').hidden=false;
       roleFor(no).then(async r=>{ if(peek.no!==no||!r) return; const D=await domains(); const use=(D.CODE_UTILISATION_CUBF_3||{})[r[1]]; const y=roleSince(r);
         $('peekSub').textContent=[m?.MUS_NM_MUN,use,y?'inscrit depuis '+y:null,saved?'♥':null].filter(Boolean).join(' · '); }); }
@@ -1288,12 +1394,14 @@ async function openLot(f,m){
   log('lot_open',{lot:no,ha:+(area/10000).toFixed(2),muni:selected.muni});
   $('lotNo').textContent=`Lot ${no}`; $('lotWhere').textContent=m?`${m.MUS_NM_MUN} · MRC ${m.MUS_NM_MRC}`:'Municipalité inconnue';
   $('sumUnits').innerHTML=unitsLine(area/10000); $('sumProv').textContent=`Superficie calculée sur le contour du cadastre (Gouv. du Québec), consulté le ${new Date().toLocaleDateString('fr-CA',{day:'numeric',month:'long',year:'numeric'})} · à vérifier sur place`;
-  $('lnkInfolot').href=CONFIG.infolot; $('lnkRegistre').href=CONFIG.registre; $('lnkRole').href=roleUrl(m,no,b);
+  $('lnkInfolot').href=CONFIG.infolot; $('chkCadastre').href=CONFIG.infolot; $('chkRole').href=roleUrl(m,no,b); $('opRoleLink').href=$('chkRole').href; $('opRegistre').href=CONFIG.registre;
+  $('chkAccess').href=`https://www.google.com/maps/search/?api=1&query=${c.lat.toFixed(6)},${c.lng.toFixed(6)}`; $('opLot').textContent=`Lot ${no}`;
+  heroFor(no); $('lnkRegistre').href=CONFIG.registre; $('lnkRole').href=roleUrl(m,no,b);
   const tel=(m?.TELEPHONE||'').replace(/[^+\d]/g,''); $('lnkCall').href=tel?'tel:'+tel:'#'; $('lnkCall').textContent=m?.TELEPHONE?'Appeler · '+m.TELEPHONE:'Appeler la municipalité'; $('lnkCall').classList.toggle('disabled',!tel);
-  const site=m?.SITE_WEB?(m.SITE_WEB.startsWith('http')?m.SITE_WEB:'https://'+m.SITE_WEB):null; $('lnkMuni').href=site||CONFIG.infolot; $('lnkMuni').textContent=site?`Site de ${m.MUS_NM_MUN}`:'Site web';
+  const site=m?.SITE_WEB?(m.SITE_WEB.startsWith('http')?m.SITE_WEB:'https://'+m.SITE_WEB):null; $('lnkMuni').href=site||CONFIG.infolot; $('chkZoning').href=site||CONFIG.infolot; $('chkZoningSub').textContent=site?`Règlement de zonage de ${m.MUS_NM_MUN}`:'Municipalité inconnue — ouvre Infolot'; $('lnkMuni').textContent=site?`Site de ${m.MUS_NM_MUN}`:'Site web';
   const saved=carnet.find(x=>x.lot===no);
   $('lotOwner').value=saved?.owner||''; $('lotEmail').value=saved?.email||''; $('lotPhone').value=saved?.phone||''; $('lotAddrPost').value=saved?.addrPost||''; $('lotNote').value=saved?.note||'';
-  $('lotVisited').checked=!!saved?.visited; $('lotContacted').checked=!!(saved?.tags||[]).includes('c'); setFav(!!saved?.fav);
+  $('lotOStatus').value=saved?.ownerStatus||''; $('lotNextDate').value=saved?.nextDate||''; $('opIcs').hidden=!saved?.nextDate; $('lotVisited').checked=!!saved?.visited; $('lotContacted').checked=!!(saved?.tags||[]).includes('c'); setFav(!!saved?.fav);
   syncCentris(saved?.centris||'',saved?.centrisInfo||null); loading=false;
   renderSummary(); ownerLinks(); contactLinks(); updateFicheState(); renderThumbs(no); renderAdsLot();
   $('secExplore').open=true; $('secOwner').open=false; $('secContact').open=!!saved?.owner&&!(saved?.tags||[]).includes('c');
@@ -1304,7 +1412,13 @@ async function openLot(f,m){
   bauxAt(c.lat,c.lng).then(bx=>{ if(selected?.lot!==no) return; selected.baux=bx.features?.length||0; renderSummary(); }).catch(e=>log('tenure_error',{msg:String(e.message).slice(0,120)}));
 }
 function renderSummary(){ if(!selected) return; const s=selected, r=s.role, own=$('lotOwner').value.trim()||s.roleOwner||'';
-  const o=$('sumOwner'); o.textContent=own||'Propriétaire inconnu'; o.classList.toggle('unk',!own);
+  const o=$('sumOwner'); o.textContent=own||'À rechercher'; o.classList.toggle('unk',!own);
+  const st={nom:'Nom trouvé',coord:'Coordonnées trouvées',lettre:'Lettre envoyée',contacte:'Contacté',reponse:'Réponse reçue',refus:'Pas intéressé'}[$('lotOStatus').value]; if(own&&st) o.textContent=own+' · '+st;
+  $('sumLotBig').textContent=`Lot ${s.lot}`; $('gArea').textContent=areaFmt(s.ha); $('gMuni').textContent=s.muni||'—'; $('gMrc').textContent=s.mrc||'—';
+  const adr=r&&r[9]&&roleDomains?adrLabel(r[9],roleDomains):''; $('sumEyebrow').textContent=(adr?adr+' · ':'')+(s.muni||'');
+  $('chkAccessSub').textContent=s.built===true?`Adresse civique sur le lot${s.builtAddr?' : '+s.builtAddr:''} · accès probable`:s.built===false?'Non confirmé · aucune adresse civique':'Vérification en cours…';
+  $('chkBauxWrap').hidden=!s.baux;
+  if(r){ const use=(roleDomains?.CODE_UTILISATION_CUBF_3||{})[r[1]]; $('chkRoleSub').textContent=[use,r[5]!=null?'évalué '+money(r[5]):null].filter(Boolean).join(' · ')||'Valeurs, usage, propriétaire selon la MRC'; }
   const tags=[];
   if(r){ const use=(roleDomains?.CODE_UTILISATION_CUBF_3||{})[r[1]]; if(use) tags.push(`<span>${esc(use)}</span>`); }
   if(s.built===true) tags.push(`<span class="bad">Bâti${s.builtAddr?' · '+esc(s.builtAddr):''}</span>`); else if(s.built===false) tags.push('<span class="good">Sans adresse civique connue</span>');
@@ -1321,10 +1435,10 @@ function updateFicheState(){ if(!selected) return; const saved=carnet.find(x=>x.
 function setFav(on){ $('btnFav').setAttribute('aria-pressed',on); $('favLabel').textContent=on?'Gardé':'Garder'; }
 $('btnFav').onclick=()=>{ if(!selected) return; const on=$('btnFav').getAttribute('aria-pressed')!=='true'; setFav(on); navigator.vibrate?.(10); log('fav',{on}); saveNow(); toast(on?'Gardé dans ton journal':'Retiré des favoris'); };
 function collect(){ const s=selected; const tags=$('lotContacted').checked?['c']:[];
-  return {lot:s.lot,muni:s.muni,mrc:s.mrc,lat:s.lat,lng:s.lng,ha:s.ha,geom:s.geom,owner:$('lotOwner').value.trim(),email:$('lotEmail').value.trim(),phone:$('lotPhone').value.trim(),addrPost:$('lotAddrPost').value.trim(),note:$('lotNote').value.trim(),tags,visited:$('lotVisited').checked,fav:$('btnFav').getAttribute('aria-pressed')==='true',centris:centrisUrl,centrisInfo}; }
+  return {lot:s.lot,muni:s.muni,mrc:s.mrc,lat:s.lat,lng:s.lng,ha:s.ha,geom:s.geom,owner:$('lotOwner').value.trim(),email:$('lotEmail').value.trim(),phone:$('lotPhone').value.trim(),addrPost:$('lotAddrPost').value.trim(),note:$('lotNote').value.trim(),tags,visited:$('lotVisited').checked,fav:$('btnFav').getAttribute('aria-pressed')==='true',centris:centrisUrl,centrisInfo,ownerStatus:$('lotOStatus').value,nextDate:$('lotNextDate').value}; }
 let saveT=null;
 function saveNow(){ clearTimeout(saveT); saveT=null; if(!selected||loading) return; const rec=collect(); const i=carnet.findIndex(x=>x.lot===rec.lot);
-  const has=rec.fav||rec.owner||rec.email||rec.phone||rec.addrPost||rec.note||rec.visited||rec.tags.length||rec.centris;
+  const has=rec.ownerStatus||rec.nextDate||rec.fav||rec.owner||rec.email||rec.phone||rec.addrPost||rec.note||rec.visited||rec.tags.length||rec.centris;
   if(i<0&&!has){ updateFicheState(); return; }
   const today=new Date().toISOString().slice(0,10);
   if(i<0){ carnet.unshift({...rec,date:today,updated:today}); toast('Ajouté à ton journal'); log('save',{new:true}); }
@@ -1482,6 +1596,8 @@ $('selDelete').onclick=()=>{ if(!selSet.size) return toast('Rien de sélectionn�
 let J={tab:'lots',filter:'todo',q:'',sort:'next',...store.get('terrain.journal',{})}; J.q='';
 const daysSince=d=>d?Math.floor((Date.now()-new Date(d).getTime())/864e5):null;
 function nextAction(r){ const t=r.tags||[];
+  if(r.ownerStatus==='refus') return {rank:9,label:'Pas intéressé',sec:'secOwner',todo:false};
+  if(r.nextDate){ const d=Math.round((new Date(r.nextDate+'T12:00')-Date.now())/864e5); if(d<=0) return {rank:0,label:d<0?`Suivi en retard · ${-d} j`:'Suivi prévu aujourd\'hui',sec:'secOwner',todo:true}; if(d<=7) return {rank:1,label:`Suivi dans ${d} j`,sec:'secOwner',todo:true}; }
   if(t.includes('c')){ const d=daysSince(r.updated||r.date); return d>=21?{rank:1,label:`Relancer · ${d} j`,sec:'secContact',todo:true}:{rank:7,label:'En attente de réponse',sec:'secFollow',todo:false}; }
   if(r.centris&&!r.owner) return {rank:5,label:'Voir l\'annonce',sec:'secSale',todo:true};
   if(!r.owner) return {rank:4,label:'Trouver le propriétaire',sec:'secOwner',todo:true};
@@ -1510,6 +1626,7 @@ $('jSort').onchange=e=>{ J.sort=e.target.value; saveJ(); if(J.sort==='near'&&!me
 $('jSearch').addEventListener('input',e=>{ J.q=e.target.value; renderCarnet(); });
 $('jBackupGo').onclick=()=>{ $('btnBackup').click(); renderJournalChrome(); };
 async function openFromJournal(r,sec){ hide(sheets.carnet,true); map.setView([r.lat,r.lng],16); await identify(r.lat,r.lng);
+  if(sec==='secOwner'&&selected?.lot===r.lot) return openOwnerPage();
   if(sec&&selected?.lot===r.lot){ const el=$(sec); el.open=true; setTimeout(()=>el.scrollIntoView?.({behavior:'smooth',block:'start'}),250); } }
 async function renderCarnet(){ renderJournalChrome(); const ul=$('carnetList'); const pc=await photoCounts(); ul.innerHTML='';
   if(!carnet.length){ ul.innerHTML='<li class="jempty"><b>Ton journal est vide</b>Ouvre la fiche d\'un lot et touche <b>♥ Garder</b> — ou écris simplement une note : le lot s\'ajoute ici avec sa prochaine étape.</li>'; return; }
