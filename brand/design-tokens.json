@@ -1,0 +1,29 @@
+{
+  "brand": "LOTS — Terre de rang",
+  "version": "1.0",
+  "color": {
+    "spruce": "#1F3328",
+    "birchPaper": "#F2ECDF",
+    "hunterOrange": "#FF5A1F",
+    "octoberMaple": "#B8321F",
+    "novemberLake": "#5E7A84",
+    "rangGravel": "#A68A64",
+    "stoveCharcoal": "#16140F",
+    "night": "#0B1F16"
+  },
+  "semantic": {
+    "background": "{color.birchPaper}",
+    "text": "{color.stoveCharcoal}",
+    "header": "{color.spruce}",
+    "primaryActionBackground": "{color.hunterOrange}",
+    "primaryActionText": "{color.stoveCharcoal}",
+    "selectedLotOutline": "{color.hunterOrange}",
+    "nightBackground": "{color.night}",
+    "nightText": "{color.birchPaper}"
+  },
+  "spacing": [4, 8, 12, 16, 24, 32],
+  "radii": {"small": 8, "control": 12, "card": 16, "sheet": 20},
+  "typography": {"logo": "LOTS original SVG", "ui": "Atkinson Hyperlegible, system-ui", "numeric": "JetBrains Mono, ui-monospace"},
+  "accessibility": {"minTouchTargetPx": 44, "preferredTouchTargetFieldPx": 48, "wcagTarget": "AA", "primaryButtonInkContrastRatio": 5.90},
+  "notes": ["Only hunterOrange is an action color", "No normal-size white text on hunterOrange", "Treat demo lot data as fictional"]
+}
