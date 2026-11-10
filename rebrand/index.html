@@ -538,6 +538,39 @@ html[data-theme="night"] .offline{background:#8E2A1A}
 .verify .vfoot{padding:10px 16px calc(var(--sab) + 12px);border-top:1px solid var(--line)}
 .wslots{margin:6px 0 10px;padding-left:18px;font-size:14px;line-height:1.6}
 
+
+/* ---- R2 : navigation à 4 onglets, puces de carte, outils ---- */
+.navbar.tabs4{grid-template-columns:repeat(4,minmax(0,1fr));align-items:stretch;padding-top:4px}
+.navbar.tabs4 .nav{min-height:60px}
+.chips{position:fixed;left:0;right:0;top:calc(var(--sat) + 60px);z-index:1001;display:flex;gap:8px;padding:8px 10px;overflow-x:auto;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chips button{flex:none;min-height:44px;padding:0 14px;border-radius:999px;font-weight:700;font-size:14px;display:flex;align-items:center;gap:6px;box-shadow:0 2px 8px rgba(0,0,0,.18);position:relative}
+.chips .chip-a{background:var(--act);color:var(--act-ink)} .chips .chip-a svg{width:20px;height:20px}
+.chips .chip-a.busy{opacity:.7}
+.chips .chip-b{background:var(--paper);color:var(--ink);border:1.5px solid var(--line)}
+.chips .chip-b[aria-pressed="true"]{background:var(--bark);color:#F2ECDF;border-color:var(--bark)}
+html[data-theme="night"] .chips .chip-b[aria-pressed="true"]{background:#F2ECDF;color:#0B1F16}
+.chips .badge{position:static;margin-left:4px;min-width:20px;height:20px;line-height:20px;border-radius:999px;background:var(--act);color:var(--act-ink);font-size:11px;text-align:center;padding:0 5px}
+.strip,.measure{top:calc(var(--sat) + 116px)}
+.mapctl{top:calc(var(--sat) + 176px)}
+body.isoff .chips{top:calc(var(--sat) + 100px)} body.isoff .strip,body.isoff .measure{top:calc(var(--sat) + 156px)} body.isoff .mapctl{top:calc(var(--sat) + 216px)}
+.walkstrip{flex-wrap:wrap;row-gap:6px}
+.walkstrip .wphoto{background:var(--act);color:var(--act-ink);min-height:48px;padding:0 16px;font-size:15px}
+.walkstrip #btnWalkPause{background:rgba(255,255,255,.18);color:#fff}
+body.walking .peek{bottom:calc(var(--sab) + 170px)}
+.trows{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:14px;overflow:hidden;margin:6px 0 10px}
+.trowb{display:flex;flex-direction:column;align-items:flex-start;text-align:left;gap:2px;padding:12px 14px;min-height:58px;background:var(--paper);color:var(--ink);border-bottom:1px solid var(--line)}
+.trowb:last-child{border-bottom:0} .trowb b{font-size:15.5px} .trowb span{font-size:13px;color:var(--ink-2)}
+.srclist{list-style:none;padding:0;margin:6px 0 10px;border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.srclist li{padding:10px 14px;border-bottom:1px solid var(--line);display:flex;flex-direction:column;gap:2px} .srclist li:last-child{border-bottom:0}
+.srclist b{font-size:15px} .srclist span{font-size:13px;color:var(--ink-2)}
+.sum .prov{font-size:12px;color:var(--ink-2);margin:8px 0 0;line-height:1.35}
+.incl{list-style:none;padding:0;margin:10px 0;border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.incl li{padding:9px 12px 9px 36px;font-size:14px;border-bottom:1px solid var(--line);position:relative} .incl li:last-child{border-bottom:0}
+.incl li::before{position:absolute;left:12px;font-weight:700} .incl li.y::before{content:"✓";color:#3F7A4F} .incl li.n::before{content:"✕";color:#B8321F}
+.wptips{margin:6px 0 12px;padding-left:18px;font-size:14px;line-height:1.5;color:var(--ink-2)}
+#wpGps.bad{color:#B8321F}
+
 /* Éléments retirés de l'ancienne interface */
 .bottom,.mode,.mapbtn,.walkpill,.clearbtn,.legend{display:none !important}
 
@@ -568,9 +601,15 @@ html[data-theme="night"] .offline{background:#8E2A1A}
   <div class="b"><button id="mUndo">↶ Retirer le point</button><button id="mClose">Fermer la forme</button><button id="mClear">Effacer</button><button id="mDone" class="main">Terminer</button></div>
 </div>
 
+<div class="chips" id="chips" role="toolbar" aria-label="Actions de la carte">
+  <button class="chip-a" id="btnScan" aria-label="Scanner les lots dans l'anneau"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8" stroke-dasharray="3 3"/><circle cx="12" cy="12" r="3"/></svg><span>Scanner la zone</span></button>
+  <button class="chip-b" id="chipVacant" aria-pressed="false">Sans adresse ?</button>
+  <button class="chip-b" id="btnFilters" aria-pressed="false">Filtres<b class="badge" id="filterCount" hidden>0</b></button>
+</div>
 <div class="mapctl">
   <button class="ctl dark" id="btnLayers" aria-label="Couches et légende"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l9 5-9 5-9-5 9-5z"/><path d="M3 13l9 5 9-5"/></svg></button>
   <button class="ctl dark" id="btnMeasure" aria-pressed="false" aria-label="Mesurer une distance ou une surface"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17L17 3l4 4L7 21z"/><path d="M7 13l2 2M10 10l2 2M13 7l2 2"/></svg></button>
+  <button class="ctl dark" id="btnPov" aria-label="Photo orientée"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg></button>
   <button class="compass off" id="compass" aria-label="Boussole">
     <svg viewBox="0 0 44 44"><circle cx="22" cy="22" r="20" fill="none" stroke="#C9D1C4" stroke-width="2"/><path d="M22 5 L27 22 L22 20 L17 22 Z" fill="#B4541E"/><path d="M22 39 L27 22 L22 24 L17 22 Z" fill="#C9D1C4"/><text x="22" y="14" text-anchor="middle" font-size="9" font-weight="700" fill="#1F3D2B">N</text></svg>
     <span class="deg" id="deg">boussole</span>
@@ -583,16 +622,15 @@ html[data-theme="night"] .offline{background:#8E2A1A}
 
 <div class="peek" id="peek" hidden><div class="t"><b id="peekTitle">—</b><span id="peekSub"></span></div><button class="go" id="peekGo">Voir la fiche</button></div>
 
-<div class="walkstrip" id="walkStrip" hidden><span class="dot" aria-hidden="true"></span><div class="t"><b id="walkStat">0 m</b> <span id="walkState">· en marche</span><br><span id="walkLot">Recherche du lot…</span><span id="walkAcc"></span></div><button id="btnWalkStop">Terminer</button></div>
+<div class="walkstrip" id="walkStrip" hidden><span class="dot" aria-hidden="true"></span><div class="t"><b id="walkStat">0 m</b> <span id="walkState">· en marche</span><br><span id="walkLot">Recherche du lot…</span><span id="walkAcc"></span></div><button id="btnWalkPhoto" class="wphoto" aria-label="Photo orientée">📷 Photo</button><button id="btnWalkPause">Pause</button><button id="btnWalkStop">Terminer</button></div>
 
 <div class="tip" id="tip" role="status" hidden><span id="tipText"></span><button id="tipOk">OK</button></div>
 
-<nav class="navbar" aria-label="Actions">
+<nav class="navbar tabs4" aria-label="Navigation">
+  <button class="nav" id="btnTabMap" aria-pressed="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6l6-2 6 2 6-2v14l-6 2-6-2-6 2z"/><path d="M9 4v14M15 6v14"/></svg><span>Carte</span></button>
   <button class="nav" id="btnWalk" aria-pressed="false"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 3.5c1.9 0 3 1.6 3 3.6 0 2.1-.7 4.4-2 5.3-.6.4-1.5.4-2.1 0-1.2-.9-1.9-3.2-1.9-5.3 0-2 1.1-3.6 3-3.6z"/><rect x="5.2" y="14" width="3.8" height="2.6" rx="1.3"/><path d="M17 8.5c1.9 0 3 1.6 3 3.6 0 2.1-.7 4.4-2 5.3-.6.4-1.5.4-2.1 0-1.2-.9-1.9-3.2-1.9-5.3 0-2 1.1-3.6 3-3.6z"/><rect x="15.2" y="19" width="3.8" height="2.6" rx="1.3"/></svg><span id="walkLabel">Marcher</span></button>
-  <button class="nav" id="btnPov"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg><span>Photo</span></button>
-  <div class="navscan"><button class="scan" id="btnScan" aria-label="Scanner les lots dans l'anneau"><span class="face"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8" stroke-dasharray="3 3"/><circle cx="12" cy="12" r="3"/></svg></span></button><span aria-hidden="true">Scanner</span></div>
-  <button class="nav" id="btnFilters" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h16M7 12h10M10 18h4"/></svg><span>Filtres</span><b class="badge" id="filterCount" hidden>0</b></button>
   <button class="nav" id="btnCarnet" aria-label="Journal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 3h11l3 3v15H5z"/><path d="M8 8h8M8 12h8M8 16h5"/></svg><span>Journal</span><b class="badge" id="carnetCount" hidden>0</b></button>
+  <button class="nav" id="btnTools" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.6 2.6-2.4-.6-.6-2.4z"/></svg><span>Outils</span></button>
 </nav>
 
 <section class="aim" id="aim" hidden>
@@ -675,6 +713,7 @@ html[data-theme="night"] .offline{background:#8E2A1A}
       <div class="own unk" id="sumOwner">Propriétaire inconnu</div>
       <div class="units" id="sumUnits"></div>
       <div class="tags" id="sumTags"></div>
+      <p class="prov" id="sumProv"></p>
     </div>
 
     <details class="sec" id="secExplore" open>
@@ -787,8 +826,7 @@ html[data-theme="night"] .offline{background:#8E2A1A}
   <div class="grip"></div>
   <header><div class="t"><h2>Couches</h2><p>Ce qui s'affiche sur la carte</p></div><button class="close" id="closeLayers" aria-label="Fermer">×</button></header>
   <div class="body">
-    <h3>Apparence</h3>
-    <div class="seg" id="themeSeg" role="group" aria-label="Apparence"><button data-v="auto">Auto</button><button data-v="jour">Jour</button><button data-v="nuit">Nuit</button></div>
+    
     <div class="trow"><div class="t">Photo aérienne</div><label class="switch"><input type="checkbox" id="lyrSat"><span class="track"></span></label></div>
     <div class="trow"><div class="t">Terres publiques louées<small>Baux de villégiature et abris sommaires (zoom rapproché)</small></div><label class="switch"><input type="checkbox" id="lyrBauxT" checked><span class="track"></span></label></div>
     <div class="trow"><div class="t">Seulement mes favoris<small>Masque les autres lots du journal</small></div><label class="switch"><input type="checkbox" id="lyrFavOnly"><span class="track"></span></label></div>
@@ -805,6 +843,35 @@ html[data-theme="night"] .offline{background:#8E2A1A}
   </div>
 </section>
 
+<section class="sheet" id="sheetTools" aria-hidden="true" aria-labelledby="toolsTitle">
+  <div class="grip"></div>
+  <header><div class="t"><h2 id="toolsTitle">Outils</h2><p>Réglages, données, aide</p></div><button class="close" id="closeTools" aria-label="Fermer">×</button></header>
+  <div class="body">
+    <h3>Apparence</h3>
+    <div class="seg" id="themeSeg" role="group" aria-label="Apparence"><button data-v="auto">Auto</button><button data-v="jour">Jour</button><button data-v="nuit">Nuit</button></div>
+    <h3>Unité de superficie</h3>
+    <div class="seg" id="unitSeg" role="group" aria-label="Unité de superficie"><button data-v="pi2">pi²</button><button data-v="ac">acres</button><button data-v="ha">hectares</button></div>
+    <h3>Carte</h3>
+    <div class="trows"><button class="trowb" id="tLayers"><b>Couches et légende</b><span>Photo aérienne, terres publiques louées, favoris, annonces</span></button><button class="trowb" id="tMeasure"><b>Mesurer</b><span>Distance ou surface au doigt</span></button></div>
+    <h3>Mes données</h3>
+    <div class="trows"><button class="trowb" id="tBackup"><b>Sauvegarder le journal</b><span id="tBackupSub">Lots, notes et marches dans un fichier</span></button><button class="trowb" id="tRestore"><b>Restaurer une sauvegarde</b><span>Les lots déjà présents sont conservés</span></button>
+      <button class="trowb" id="tCsv"><b>Journal (.csv)</b><span>Lots, statuts et notes, pour un tableur</span></button><button class="trowb" id="tKml"><b>Journal (KML / GeoJSON)</b><span>Contours des lots gardés et marches, pour Google Earth</span></button></div>
+    <p class="fine">Les exports de journal contiennent ce que tu as noté, y compris les noms de propriétaires. Ne les partage qu'avec des personnes de confiance.</p>
+    <h3>Sources et provenance</h3>
+    <ul class="srclist">
+      <li><b>Cadastre du Québec</b><span>Contours et numéros de lot · Gouvernement du Québec · lu en direct</span></li>
+      <li><b>Rôle d'évaluation 2026</b><span>Usage, valeurs, ancienneté · MAMH, données ouvertes CC-BY 4.0 · mis à jour chaque mois</span></li>
+      <li><b>Rôle de la MRC d'Argenteuil</b><span>Propriétaire et valeurs, un lot à la fois · lu en direct</span></li>
+      <li><b>Adresses Québec, découpage municipal, baux</b><span>Gouvernement du Québec · lus en direct</span></li>
+      <li><b>Fonds de carte</b><span>© contributeurs OpenStreetMap · imagerie © Esri</span></li>
+    </ul>
+    <p class="vwarn">Aucune hypothèse de constructibilité ne remplace une confirmation municipale. Superficies et limites sont à vérifier auprès d'un arpenteur-géomètre.</p>
+    <h3>Aide</h3>
+    <div class="trows"><button class="trowb" id="tGuide"><b>Guide et préparation du téléphone</b><span>Installation, autorisations, premiers pas</span></button><button class="trowb" id="tVoice"><b>Commentaire vocal</b><span>Dis ce qui t'a mêlé, ça m'aide à améliorer LOTS</span></button><button class="trowb" id="tReport"><b>Partager le rapport d'usage</b><span>Seulement si tu le choisis</span></button></div>
+    <p class="version"><a href="confidentialite.html" target="_blank" rel="noopener">Confidentialité et conditions</a> · <a href="mailto:bonjour@lots.quebec?subject=LOTS">Nous écrire</a></p>
+    <p class="version" id="toolsVersion"></p>
+  </div>
+</section>
 <section class="sheet" id="sheetCarnet" aria-hidden="true" aria-labelledby="jTitle">
   <div class="grip"></div>
   <header><div class="t"><h2 id="jTitle">Journal</h2><p id="jSub">Dans ce téléphone seulement</p></div><button class="close" id="closeCarnet" aria-label="Fermer">×</button></header>
@@ -833,12 +900,21 @@ html[data-theme="night"] .offline{background:#8E2A1A}
 
 <div class="modal" id="shareModal" hidden role="dialog" aria-modal="true" aria-labelledby="shareTitle">
   <div class="mbox">
-    <h2 id="shareTitle">Partager le lot</h2>
+    <div class="aimstep">Ton dossier, tes données</div><h2 id="shareTitle">Partager le lot</h2>
     <button class="primary" id="shareZip">Exporter photos + GPS (.zip)</button>
     <p class="fine">Photos, position et direction de chaque prise, contour du lot et marches qui le traversent (GeoJSON et KML pour Google Earth), avec une fiche résumé. Fabriqué dans ton téléphone, rien n'est envoyé à un serveur. Le nom du propriétaire, ses coordonnées et tes notes ne sont pas inclus.</p>
+    <ul class="incl"><li class="y">Photos de terrain, positions et orientations</li><li class="y">Contour du lot et marches qui le traversent</li><li class="n">Noms et coordonnées de propriétaires : exclus</li><li class="n">Captures et documents des sources : exclus</li></ul>
     <div class="prem"><button id="shareLink" disabled>Lien de fiche partageable</button><span class="badge-p">Premium · bientôt</span></div>
     <p class="fine">Envoie la fiche complète par un simple lien, à jour, à un conjoint, un courtier ou un notaire. <a href="#" id="premiumNotify">Me prévenir au lancement</a></p>
     <button class="cancel" id="shareClose">Fermer</button>
+  </div>
+</div>
+<div class="modal" id="walkPrep" hidden role="dialog" aria-modal="true" aria-labelledby="wpTitle">
+  <div class="mbox">
+    <div class="aimstep">Préparer la sortie</div><h2 id="wpTitle">Prêt à marcher ?</h2>
+    <div class="vgrid"><div><small>Précision GPS</small><b id="wpGps">—</b></div><div><small>Réseau</small><b id="wpNet">—</b></div><div class="wide"><small>Lot sous la pin</small><b id="wpLot">—</b></div><div class="wide"><small>Boussole</small><b id="wpCompass">—</b></div></div>
+    <ul class="wptips"><li>Préviens quelqu'un de ton trajet : le réseau peut manquer.</li><li>En saison de chasse, porte du orange.</li><li>Ne marche jamais sur une terre privée sans permission.</li></ul>
+    <button class="primary" id="wpStart">Démarrer la marche</button><button class="cancel" id="wpClose">Annuler</button>
   </div>
 </div>
 <section class="verify" id="verify" hidden role="dialog" aria-modal="true" aria-labelledby="vfTitle">
@@ -865,7 +941,7 @@ html[data-theme="night"] .offline{background:#8E2A1A}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script>
 /* ============================ CONFIG ============================ */
-const APP_VERSION='R1';
+const APP_VERSION='R2';
 const CONFIG = {
   ringFraction: 0.70, maxRadius: 1500, coneLength: 150, coneHalfAngle: 25,
   cadastre: 'https://geo.environnement.gouv.qc.ca/donnees/rest/services/Reference/Cadastre_allege/MapServer',
@@ -994,7 +1070,9 @@ function destination(lat,lng,bearing,dist){const R=6371000,b=rad(bearing),la=rad
 const fmt=(n,d=2)=>Number(n||0).toLocaleString('fr-CA',{maximumFractionDigits:d,minimumFractionDigits:d});
 const ft2=ha=>fmt(ha*107639.1,0)+' pi²';
 const acres=ha=>ha*2.471054;
-const unitsLine=ha=>`<b>${fmt(ha*107639.1,0)} pi²</b> · ${fmt(ha*10000,0)} m² · ${fmt(acres(ha),2)} acres · ${fmt(ha,2)} ha`;
+const UNIT=()=>store.get('lots.unit','pi2');
+const areaFmt=(ha,short)=>{ const u=UNIT(); return u==='ac'?`${fmt(acres(ha),short?1:2)} acres`:u==='ha'?`${fmt(ha,2)} ha`:`${fmt(ha*107639.1,0)} pi²`; };
+const unitsLine=ha=>{ const all=[['pi2',`${fmt(ha*107639.1,0)} pi²`],['m2',`${fmt(ha*10000,0)} m²`],['ac',`${fmt(acres(ha),2)} acres`],['ha',`${fmt(ha,2)} ha`]]; const u=UNIT(); const first=all.find(x=>x[0]===u)||all[0]; return `<b>${first[1]}</b> · `+all.filter(x=>x!==first).map(x=>x[1]).join(' · '); };
 function addrLabel(p){const k=Object.keys(p);const civ=k.find(x=>/CIV/i.test(x)),odo=k.find(x=>/ODON|RUE|VOIE/i.test(x));return [civ&&p[civ],odo&&p[odo]].filter(Boolean).join(' ');}
 const fmtDist=m=>m>=1000?fmt(m/1000,2)+' km':Math.round(m)+' m';
 const fmtTime=s=>`${String(Math.floor(s/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`;
@@ -1012,10 +1090,13 @@ map.on('zoom move resize',drawRing); window.addEventListener('resize',drawRing);
 let mvT; map.on('moveend',()=>{ clearTimeout(mvT); mvT=setTimeout(()=>log('map_move',{z:+map.getZoom().toFixed(1),r:Math.round(ringMeters())}),800); });
 
 /* ============================ Feuilles ============================ */
-const sheets={lot:$('sheetLot'),carnet:$('sheetCarnet'),filters:$('sheetFilters'),layers:$('sheetLayers')};
+const sheets={lot:$('sheetLot'),carnet:$('sheetCarnet'),filters:$('sheetFilters'),layers:$('sheetLayers'),tools:$('sheetTools')};
 function anySheetOpen(){ return Object.values(sheets).some(s=>s.classList.contains('open')); }
 function show(s){ Object.values(sheets).forEach(x=>{ if(x!==s) hide(x,true); }); s.classList.add('open'); s.setAttribute('aria-hidden','false'); ctx.screen=Object.keys(sheets).find(k=>sheets[k]===s)||'?'; $('peek').hidden=true; }
 function hide(s,silent){ if(!s.classList.contains('open')) return; s.classList.remove('open'); s.setAttribute('aria-hidden','true'); if(!silent) log('close_'+ctx.screen); if(s===sheets.lot){ flushSave(); ctx.lot=null; } ctx.screen='carte'; if(!silent) setTimeout(updatePeek,50); }
+function syncTabs(){ const open=k=>sheets[k]?.classList.contains('open'); $('btnTabMap').setAttribute('aria-pressed',!open('carnet')&&!open('tools')); $('btnCarnet').setAttribute('aria-pressed',!!open('carnet')); $('btnTools').setAttribute('aria-pressed',!!open('tools')); }
+{ const _show=show, _hide=hide; show=function(x){ _show(x); syncTabs(); }; hide=function(x,silent){ _hide(x,silent); syncTabs(); }; }
+$('btnTabMap').onclick=()=>{ Object.values(sheets).forEach(x=>hide(x,true)); closeSearch?.(); syncTabs(); setTimeout(updatePeek,50); log('btn',{id:'btnTabMap'}); };
 $('closeLot').onclick=()=>hide(sheets.lot); $('closeCarnet').onclick=()=>hide(sheets.carnet); $('closeFilters').onclick=()=>{ hide(sheets.filters); if(filtersActive()&&!scanLots.length) toast('Filtres prêts — touche Scanner pour les appliquer aux lots autour de la pin'); }; $('closeLayers').onclick=()=>hide(sheets.layers);
 
 /* ============================ Conseils contextuels (une fois chacun) ============================ */
@@ -1094,7 +1175,7 @@ let F={...F0,...store.get('terrain.filters',{})};
 const filtersActive=()=>F.vacant||F.minAc>0||F.since>0||F.multi||F.type!=='all';
 const filtersNeedRole=()=>F.since>0||F.multi||F.type!=='all';
 function filterCount(){ return [F.vacant,F.minAc>0,F.since>0,F.multi,F.type!=='all'].filter(Boolean).length; }
-function renderFilterUI(){ $('fVacant').checked=F.vacant; $('fMulti').checked=F.multi;
+function renderFilterUI(){ $('fVacant').checked=F.vacant; $('chipVacant').setAttribute('aria-pressed',!!F.vacant); $('fMulti').checked=F.multi;
   [['fMinAc','minAc'],['fSince','since'],['fType','type']].forEach(([id,k])=>$(id).querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.v)===String(F[k]))));
   const n=filterCount(); $('filterCount').textContent=n; $('filterCount').hidden=!n; $('btnFilters').setAttribute('aria-pressed',n>0); }
 function setFilter(k,v){ F[k]=v; store.set('terrain.filters',F); renderFilterUI(); log('filter',{k,v}); applyFilters(); }
@@ -1102,6 +1183,7 @@ $('fVacant').onchange=e=>setFilter('vacant',e.target.checked); $('fMulti').oncha
 [['fMinAc','minAc',Number],['fSince','since',Number],['fType','type',String]].forEach(([id,k,cast])=>$(id).querySelectorAll('button').forEach(b=>b.onclick=()=>setFilter(k,cast(b.dataset.v))));
 $('fReset').onclick=()=>{ F={...F0}; store.set('terrain.filters',F); renderFilterUI(); applyFilters(); toast('Filtres réinitialisés'); };
 $('btnFilters').onclick=()=>{ renderFilterUI(); show(sheets.filters); log('btn',{id:'btnFilters'}); if(!scanLots.length) tip('filtres','Règle tes filtres, puis touche Scanner : les lots qui passent s\'allumeront en orange.'); };
+$('chipVacant').onclick=()=>{ setFilter('vacant',!F.vacant); if(!scanLots.length) toast(F.vacant?'Filtre « sans adresse civique » prêt — touche Scanner la zone':'Filtre retiré'); };
 $('stripFilters').onclick=()=>$('btnFilters').click();
 renderFilterUI();
 function lotMatches(s){ if(F.vacant&&s.built) return false; if(F.minAc>0&&acres(s.ha)<F.minAc) return false;
@@ -1134,7 +1216,7 @@ async function scanAt(lat,lng,radius){
   lots.features.forEach(f=>{ const built=pts.some(p=>inPoly(p,f.geometry)); if(!built) vacant++;
     const no=f.properties.NO_LOT, ha=polyArea(f.geometry)/10000;
     const layer=L.geoJSON(f,{style:lotStyle(no,built)});
-    layer.bindTooltip(`${built?'<span style="color:#5C6B62">'+icoSvg('house',13)+'</span> ':'<span style="color:#A86F00">'+icoSvg('leaf',13)+'</span> '}${no}<br>${ft2(ha)}`,{permanent:true,direction:'center',className:'lot-label'});
+    layer.bindTooltip(`${built?'<span style="color:#5C6B62">'+icoSvg('house',13)+'</span> ':'<span style="color:#A86F00">'+icoSvg('leaf',13)+'</span> '}${no}<br>${areaFmt(ha,true)}`,{permanent:true,direction:'center',className:'lot-label'});
     layer.on('click',ev=>{ L.DomEvent.stopPropagation(ev); if(measuring) return addMeasurePoint(ev.latlng); log('lot_tap',{from:'scan',built}); openLot(f,lastMuni); });
     layer.addTo(scanGroup); scanLots.push({f,no,ha,built,layer,role:undefined,state:null}); });
   scanMeta={n:lots.features.length,vacant,radius};
@@ -1175,7 +1257,7 @@ async function updatePeek(){ const el=$('peek');
     if(!f){ peek={no:null,geom:null,f:null,m}; $('peekTitle').textContent='Aucun lot cadastré sous la pin'; $('peekSub').textContent=m?`${m.MUS_NM_MUN} · probablement une terre publique`:'Probablement une terre publique'; $('peekGo').hidden=true; }
     else { const no=f.properties.NO_LOT, ha=polyArea(f.geometry)/10000; peek={no,geom:f.geometry,f,m};
       const saved=carnet.find(x=>x.lot===no);
-      $('peekTitle').textContent=`Lot ${no} · ${fmt(acres(ha),1)} acres`; $('peekSub').textContent=[m?.MUS_NM_MUN,saved?'♥ dans ton journal'+(saved.owner?' · '+saved.owner:''):null].filter(Boolean).join(' · ')||'—'; $('peekGo').hidden=false;
+      $('peekTitle').textContent=`Lot ${no} · ${areaFmt(ha,true)}`; $('peekSub').textContent=[m?.MUS_NM_MUN,saved?'♥ dans ton journal'+(saved.owner?' · '+saved.owner:''):null].filter(Boolean).join(' · ')||'—'; $('peekGo').hidden=false;
       roleFor(no).then(async r=>{ if(peek.no!==no||!r) return; const D=await domains(); const use=(D.CODE_UTILISATION_CUBF_3||{})[r[1]]; const y=roleSince(r);
         $('peekSub').textContent=[m?.MUS_NM_MUN,use,y?'inscrit depuis '+y:null,saved?'♥':null].filter(Boolean).join(' · '); }); }
     el.hidden=anySheetOpen()||measuring; if(!el.hidden&&peek.no) tip('peek','Le lot sous la pin bleue s\'affiche ici. Bouge la carte, puis « Voir la fiche ».');
@@ -1205,7 +1287,7 @@ async function openLot(f,m){
   selected.role=null; selected.built=null;
   log('lot_open',{lot:no,ha:+(area/10000).toFixed(2),muni:selected.muni});
   $('lotNo').textContent=`Lot ${no}`; $('lotWhere').textContent=m?`${m.MUS_NM_MUN} · MRC ${m.MUS_NM_MRC}`:'Municipalité inconnue';
-  $('sumUnits').innerHTML=unitsLine(area/10000);
+  $('sumUnits').innerHTML=unitsLine(area/10000); $('sumProv').textContent=`Superficie calculée sur le contour du cadastre (Gouv. du Québec), consulté le ${new Date().toLocaleDateString('fr-CA',{day:'numeric',month:'long',year:'numeric'})} · à vérifier sur place`;
   $('lnkInfolot').href=CONFIG.infolot; $('lnkRegistre').href=CONFIG.registre; $('lnkRole').href=roleUrl(m,no,b);
   const tel=(m?.TELEPHONE||'').replace(/[^+\d]/g,''); $('lnkCall').href=tel?'tel:'+tel:'#'; $('lnkCall').textContent=m?.TELEPHONE?'Appeler · '+m.TELEPHONE:'Appeler la municipalité'; $('lnkCall').classList.toggle('disabled',!tel);
   const site=m?.SITE_WEB?(m.SITE_WEB.startsWith('http')?m.SITE_WEB:'https://'+m.SITE_WEB):null; $('lnkMuni').href=site||CONFIG.infolot; $('lnkMuni').textContent=site?`Site de ${m.MUS_NM_MUN}`:'Site web';
@@ -1300,7 +1382,7 @@ async function loadRole(no,geom,m){ const box=$('roleBox'); box.hidden=true; box
     btn.onclick=()=>{ $('lotOwner').value=owner; ownerLinks(); contactLinks(); btn.hidden=true; saveNow(); log('role_use'); }; } }
 async function loadOpenRole(no,m){ const box=$('openBox'); box.hidden=true; box.innerHTML='';
   const [r,D]=await Promise.all([roleFor(no),domains()]); if(selected?.lot!==no) return; if(!r){ log('open_role',{found:false}); return; }
-  selected.role=r; ownerLinks(); renderSummary();
+  selected.role=r; ownerLinks(); renderSummary(); if(!/Rôle 2026/.test($('sumProv').textContent)) $('sumProv').textContent+=' · Rôle d\'évaluation 2026 (MAMH)';
   const [mat,cubf,sup,vt,vb,vi,an,agri,foret,adr]=r; const isArg=/argenteuil/i.test(m?.MUS_NM_MRC||'');
   box.innerHTML=`<h4>Rôle 2026 · données ouvertes</h4>${adr?`<div class="sub">${esc(adrLabel(adr,D))}</div>`:''}
     ${isArg?'':`<dl>${sup?`<dt>Superficie au rôle</dt><dd>${fmt(sup*10.7639,0)} pi²</dd>`:''}<dt>Terrain</dt><dd>${money(vt)}</dd><dt>Bâtiment</dt><dd>${money(vb)}</dd><dt>Immeuble</dt><dd><b>${money(vi)}</b></dd>${an&&an!=='0000'?`<dt>Construction</dt><dd>${esc(an)}</dd>`:''}${foret?`<dt>Forêt au rôle</dt><dd>${fmt(foret*10.7639,0)} pi²</dd>`:''}<dt>Matricule (n° au rôle)</dt><dd>${esc(mat||'—')}</dd></dl>`}
@@ -1505,6 +1587,29 @@ $('wsClose').onclick=()=>{ $('walkSummary').hidden=true; };
 $('wsJournal').onclick=()=>{ $('walkSummary').hidden=true; $('btnCarnet').click(); setTimeout(()=>$('jTabWalks')?.click(),50); };
 $('premiumNotify').onclick=e=>{ e.preventDefault(); log('premium_interest',{feature:'share_link'}); location.href='mailto:bonjour@lots.quebec?subject='+encodeURIComponent('Prévenez-moi : lots Premium (partage de fiche)'); };
 
+/* ============================ Outils ============================ */
+function renderTools(){ document.querySelectorAll('#unitSeg button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.v===UNIT())); applyTheme();
+  const lb=store.get('terrain.lastBackup',null); $('tBackupSub').textContent=lb?`Dernière sauvegarde : ${new Date(lb).toLocaleDateString('fr-CA')}`:'Jamais sauvegardé — fais-le avant de changer de téléphone';
+  $('toolsVersion').textContent=`LOTS ${APP_VERSION} · Terre de rang · tes données restent dans ce téléphone`; }
+$('btnTools').onclick=()=>{ renderTools(); show(sheets.tools); log('btn',{id:'btnTools'}); };
+$('closeTools').onclick=()=>hide(sheets.tools);
+document.querySelectorAll('#unitSeg button').forEach(b=>b.onclick=()=>{ store.set('lots.unit',b.dataset.v); renderTools(); restyleScan(); scanLots.forEach(x=>x.layer.setTooltipContent?.(`${x.built?'<span style="color:#5C6B62">'+icoSvg('house',13)+'</span> ':'<span style="color:#A86F00">'+icoSvg('leaf',13)+'</span> '}${x.no}<br>${areaFmt(x.ha,true)}`)); peek.no=null; peek.geom=null; log('unit',{v:b.dataset.v}); });
+$('tLayers').onclick=()=>{ hide(sheets.tools,true); $('btnLayers').click(); };
+$('tMeasure').onclick=()=>{ hide(sheets.tools,true); syncTabs(); if(!measuring) $('btnMeasure').click(); };
+$('tBackup').onclick=()=>{ $('btnBackup').click(); renderTools(); };
+$('tRestore').onclick=()=>$('btnRestore').click();
+$('tCsv').onclick=()=>$('exportCsv').click();
+$('tKml').onclick=()=>{ if(!carnet.length&&!walks.length) return toast('Journal vide'); const pl=[]; const feats=[];
+  carnet.forEach(r=>{ const desc=[labelOf(r),r.muni,r.owner,r.note].filter(Boolean).join(' · '); if(r.geom){ const ring=(r.geom.type==='Polygon'?r.geom.coordinates[0]:r.geom.coordinates[0][0]); pl.push(`<Placemark><name>Lot ${xmlEsc(r.lot)}</name><description>${xmlEsc(desc)}</description><Style><LineStyle><color>ff1f5aff</color><width>3</width></LineStyle><PolyStyle><color>401f5aff</color></PolyStyle></Style><Polygon><outerBoundaryIs><LinearRing><coordinates>${ring.map(c=>c.join(',')).join(' ')}</coordinates></LinearRing></outerBoundaryIs></Polygon></Placemark>`); feats.push({type:'Feature',properties:{lot:r.lot,municipalite:r.muni,statut:labelOf(r),proprietaire:r.owner||'',note:r.note||''},geometry:r.geom}); }
+    else { pl.push(`<Placemark><name>Lot ${xmlEsc(r.lot)}</name><description>${xmlEsc(desc)}</description><Point><coordinates>${r.lng},${r.lat}</coordinates></Point></Placemark>`); feats.push({type:'Feature',properties:{lot:r.lot,municipalite:r.muni,statut:labelOf(r)},geometry:{type:'Point',coordinates:[r.lng,r.lat]}}); } });
+  walks.forEach(w=>{ if(!w.pts?.length) return; pl.push(`<Placemark><name>Marche du ${new Date(w.start).toLocaleDateString('fr-CA')}</name><Style><LineStyle><color>ff4f7a3f</color><width>3</width></LineStyle></Style><LineString><coordinates>${w.pts.map(([la,ln])=>ln+','+la).join(' ')}</coordinates></LineString></Placemark>`); feats.push({type:'Feature',properties:{type:'marche',date:new Date(w.start).toISOString(),distance_m:w.dist},geometry:{type:'LineString',coordinates:w.pts.map(([la,ln])=>[ln,la])}}); });
+  const enc=new TextEncoder(), d=new Date().toISOString().slice(0,10);
+  const z=makeZip([{name:`journal-lots-${d}.kml`,data:enc.encode(`<?xml version="1.0" encoding="UTF-8"?>\n<kml xmlns="http://www.opengis.net/kml/2.2"><Document><name>Journal LOTS — ${d}</name>${pl.join('')}</Document></kml>`)},{name:`journal-lots-${d}.geojson`,data:enc.encode(JSON.stringify({type:'FeatureCollection',features:feats}))}]);
+  const a=document.createElement('a'); a.href=URL.createObjectURL(z); a.download=`journal-lots-${d}.zip`; a.click(); log('export_kml',{lots:carnet.length,walks:walks.length}); toast('Journal exporté (KML et GeoJSON)'); };
+$('tGuide').onclick=()=>{ hide(sheets.tools,true); syncTabs(); $('btnHelp').click(); };
+$('tVoice').onclick=()=>$('btnMic').click();
+$('tReport').onclick=()=>$('shareLog').click();
+
 /* ============================ Couches ============================ */
 let sat=store.get('terrain.sat',false);
 function applyBase(){ if(sat){ map.removeLayer(baseOSM); baseSat.addTo(map); } else { map.removeLayer(baseSat); baseOSM.addTo(map); } lyrMuni.bringToFront(); lyrCadastre.bringToFront(); }
@@ -1575,7 +1680,7 @@ setInterval(()=>{ if(walk&&!walk.paused){ walkStatText(); const a=meAcc; $('walk
 function showWalkSummary(r){ $('wsDist').textContent=fmtDist(r.dist); $('wsTime').textContent=fmtTime(r.secs); $('wsLots').textContent=(r.lots||[]).length; $('wsPhotos').textContent=r.photos.length;
   $('wsLotList').innerHTML=(r.lots||[]).slice(0,8).map(n=>`<li>Lot ${esc(n)}</li>`).join('')||'<li>Aucun lot identifié (réseau ou hors cadastre)</li>'; $('walkSummary').hidden=false; log('walk_summary'); }
 function walkUI(){ const on=!!walk, p=on&&walk.paused; document.body.classList.toggle('walking',on); $('walkStrip').hidden=!on; $('walkStrip').classList.toggle('paused',!!p);
-  $('btnWalk').classList.toggle('walking',on); $('btnWalk').setAttribute('aria-pressed',on); $('walkLabel').textContent=!on?'Marcher':p?'Reprendre':'Pause';
+  $('btnWalk').classList.toggle('walking',on); $('btnWalk').setAttribute('aria-pressed',on); $('walkLabel').textContent=!on?'Marcher':p?'En pause':'En marche'; $('btnWalkPause').textContent=p?'Reprendre':'Pause';
   $('btnWalk').setAttribute('aria-label',!on?'Commencer une marche':p?'Reprendre la marche':'Mettre la marche en pause');
   $('walkState').textContent=p?'· en pause, position non enregistrée':'· en marche'; if(on) $('walkStat').textContent=fmtDist(walk.dist); }
 function persistActiveWalk(force){ if(!walk) return; const now=Date.now(); if(!force&&now-(walk._saved||0)<8000) return; walk._saved=now;
@@ -1597,14 +1702,23 @@ async function checkBoundary(lat,lng){ if(curLot&&curLot.geom&&inPoly([lng,lat],
     if(!f){ if(curLot?.no!==null){ curLot={no:null,geom:null}; $('walkLot').textContent='Hors cadastre — terre publique ou non cadastrée'; if(!first){ navigator.vibrate?.([80,60,80]); toast('Tu sors des lots cadastrés'); log('boundary',{to:null}); } } return; }
     const no=f.properties.NO_LOT; if(curLot?.no===no){ curLot.geom=f.geometry; return; }
     curLot={no,geom:f.geometry}; if(walk&&!walk.lots.includes(no)) walk.lots.push(no); const ha=polyArea(f.geometry)/10000; const saved=carnet.find(x=>x.lot===no);
-    $('walkLot').textContent=`Lot ${no} · ${fmt(acres(ha),1)} acres${saved?' · ♥ journal'+(saved.owner?' · '+saved.owner:''):''}`;
+    $('walkLot').textContent=`Lot ${no} · ${areaFmt(ha,true)}${saved?' · ♥ journal'+(saved.owner?' · '+saved.owner:''):''}`;
     if(!first){ navigator.vibrate?.([80,60,80]); toast(`Tu entres dans le lot ${no}`); log('boundary',{to:'lot'}); }
   }catch{ $('walkLot').textContent='Lot inconnu (réseau)'; } finally{ bqBusy=false; } }
 function stopWalk(){ if(!walk) return; const rec={id:walk.id,start:walk.start,end:Date.now(),secs:walkElapsed(),dist:Math.round(walk.dist),pts:walk.pts.map(qq=>[+qq.lat.toFixed(6),+qq.lng.toFixed(6)]),photos:walk.photos,lots:walk.lots||[]};
   walks.unshift(rec); store.set('terrain.walks',walks); log('walk_stop',{dist:rec.dist,pts:rec.pts.length,photos:rec.photos.length}); localStorage.removeItem('terrain.walkActive'); showWalkSummary(rec); walk=null; curLot=null; walkUI(); renderWalks(); }
-$('btnWalk').onclick=()=>{ navigator.vibrate?.(12); if(!walk) return startWalk();
+function toggleWalkPause(){ navigator.vibrate?.(12); if(!walk) return;
   walk.paused=!walk.paused; if(walk.paused){ walk.pausedAt=Date.now(); walk.lastStep=null; } else { walk.pausedMs+=Date.now()-walk.pausedAt; walk.pausedAt=null; }
   walkUI(); log('walk_pause',{p:walk.paused}); };
+$('btnWalkPause').onclick=toggleWalkPause;
+$('btnWalk').onclick=()=>{ log('btn',{id:'btnWalk',walking:!!walk}); Object.values(sheets).forEach(x=>hide(x,true)); syncTabs(); if(walk){ if(me) map.panTo(me); return; } openWalkPrep(); };
+$('btnWalkPhoto').onclick=()=>openAim(curLot?.no||null);
+let prepT=null;
+function prepTick(){ $('wpGps').textContent=meAcc?`± ${meAcc} m`+(meAcc>25?' — attends un meilleur signal':''):'En attente du GPS…'; $('wpGps').classList.toggle('bad',!meAcc||meAcc>25);
+  $('wpNet').textContent=navigator.onLine?'Connecté':'Hors ligne — les lots ne se chargeront pas'; $('wpLot').textContent=peek?.no?`Lot ${peek.no}`:'Aucun lot identifié pour l\'instant'; $('wpCompass').textContent=compassOn?(heading!=null?`Active · ${Math.round(heading)}°`:'Active'):'Inactive — les photos seront sans direction'; }
+function openWalkPrep(){ $('walkPrep').hidden=false; prepTick(); clearInterval(prepT); prepT=setInterval(prepTick,1000); if(!compassOn) enableCompass(true); if(!me) locate().then(c=>{ showMe(c); map.setView(me,Math.max(map.getZoom(),16)); }).catch(()=>{}); log('walk_prep'); }
+function closeWalkPrep(){ $('walkPrep').hidden=true; clearInterval(prepT); }
+$('wpClose').onclick=closeWalkPrep; $('wpStart').onclick=()=>{ closeWalkPrep(); startWalk(); };
 $('btnWalkStop').onclick=()=>{ if(walk&&confirm('Terminer la marche ? Elle sera rangée dans le journal.')) stopWalk(); };
 function renderWalks(){ walkLayer.clearLayers(); stepsLayer.clearLayers(); walks.forEach(w=>{ if(w.pts?.length) L.polyline(w.pts,{color:'#2E7D4F',weight:3,opacity:.35,dashArray:'2 8',interactive:false}).addTo(walkLayer); }); if(walk?.line) walk.line.addTo(walkLayer); renderPov(); }
 function renderWalkList(){ renderJournalChrome(); const ul=$('walkList'); ul.innerHTML=''; if(!walks.length){ ul.innerHTML='<li class="empty">Aucune marche. Touche « Marcher » en bas de l\'écran pour tracer tes pas.</li>'; return; }
