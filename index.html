@@ -450,6 +450,29 @@ body.walking .mectl{bottom:calc(var(--sab) + 224px)}
 .badge-p{flex:none;font-size:12px;font-weight:700;padding:5px 10px;border-radius:999px;background:#FFF1CF;color:#7A5300;border:1px solid #E0A422}
 .modal .cancel{width:100%;min-height:46px;margin-top:6px;font-weight:700;color:var(--ink-2)}
 #btnShare{margin-right:6px}
+/* v41 : Journal */
+.jbackup{display:flex;align-items:center;gap:10px;background:#FFF1CF;border:1px solid #E0A422;color:#5C3D00;border-radius:12px;padding:8px 8px 8px 12px;margin:0 0 10px;font-size:14px}
+.jbackup[hidden]{display:none} .jbackup span{flex:1} .jbackup button{min-height:40px;padding:0 12px;border-radius:10px;background:#7A5300;color:#fff;font-weight:700}
+.jtabs{margin:0 0 10px} .jtabs button{flex:1} .jtabs b{font-family:"JetBrains Mono",ui-monospace,monospace;font-size:12px;opacity:.75;margin-left:4px}
+#jSearch{margin-bottom:8px}
+.jfilter{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;margin:0 0 8px;padding-bottom:2px} .jfilter::-webkit-scrollbar{display:none} .jfilter button{flex:none;min-height:40px}
+.jbar{display:flex;align-items:center;gap:8px;margin:0 0 10px;font-size:13px;color:var(--ink-2)}
+.jbar select{flex:1;min-width:0;min-height:42px;border-radius:10px;border:1.5px solid var(--line);background:var(--paper,#fff);color:var(--ink);font:inherit;font-size:14px;padding:0 8px}
+.jbar button{flex:none;min-height:42px;padding:0 12px;border-radius:10px;background:var(--bark);color:#fff;font-weight:700;font-size:13px}
+.jlist{list-style:none;margin:0 0 14px;padding:0;display:flex;flex-direction:column;gap:8px}
+.jcard{display:flex;flex-wrap:wrap;align-items:stretch;background:var(--paper,#fff);border:1.5px solid var(--line);border-radius:14px;overflow:hidden}
+.jcard .selbox{width:26px;height:26px;margin:0 0 0 12px;align-self:center;accent-color:#B3261E}
+.jmain{flex:1 1 200px;min-width:0;display:flex;gap:12px;align-items:flex-start;text-align:left;padding:12px;color:var(--ink)}
+.jico{flex:none;margin-top:2px}
+.jt{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.jt b{font-family:"JetBrains Mono",ui-monospace,monospace;font-size:16px} .jt .jfav{color:#C62828;font-family:inherit}
+.jt span{font-size:13px;color:var(--ink-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.jt .jo{color:var(--ink);font-weight:700;font-size:14px} .jt .jn{font-style:italic}
+.jnext{flex:1 0 100%;min-height:46px;border-top:1px solid var(--line);background:#FFF5EF;color:#B23A0B;font-weight:700;font-size:14px;text-align:left;padding:0 14px}
+.jnext.wait{background:var(--field);color:var(--ink-2)}
+.jempty{list-style:none;background:var(--field);border-radius:14px;padding:16px;font-size:14px;line-height:1.45;color:var(--ink-2);display:flex;flex-direction:column;gap:4px}
+.jempty b{color:var(--ink);font-size:15px} .jempty button{color:var(--bark);font-weight:700;text-decoration:underline;padding:0;min-height:36px;align-self:flex-start}
+#jTools{margin-top:6px}
 /* Éléments retirés de l'ancienne interface */
 .bottom,.mode,.mapbtn,.walkpill,.clearbtn,.legend{display:none !important}
 
@@ -471,7 +494,7 @@ body.walking .mectl{bottom:calc(var(--sab) + 224px)}
   <button type="submit">Aller</button>
 </form>
 
-<div class="offline" id="offline" role="status" hidden>Hors ligne — la carte et les données ne se chargent plus. Ton carnet, tes marches et tes photos restent disponibles.</div>
+<div class="offline" id="offline" role="status" hidden>Hors ligne — la carte et les données ne se chargent plus. Ton journal, tes marches et tes photos restent disponibles.</div>
 
 <div class="strip" id="strip" role="status" hidden><div class="t" id="stripText"></div><button id="stripFilters">Filtres</button><button id="btnClear" aria-label="Nettoyer la carte">Nettoyer</button></div>
 
@@ -504,7 +527,7 @@ body.walking .mectl{bottom:calc(var(--sab) + 224px)}
   <button class="nav" id="btnPov"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg><span>Photo</span></button>
   <div class="navscan"><button class="scan" id="btnScan" aria-label="Scanner les lots dans l'anneau"><span class="face"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8" stroke-dasharray="3 3"/><circle cx="12" cy="12" r="3"/></svg></span></button><span aria-hidden="true">Scanner</span></div>
   <button class="nav" id="btnFilters" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h16M7 12h10M10 18h4"/></svg><span>Filtres</span><b class="badge" id="filterCount" hidden>0</b></button>
-  <button class="nav" id="btnCarnet"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 3h11l3 3v15H5z"/><path d="M8 8h8M8 12h8M8 16h5"/></svg><span>Carnet</span><b class="badge" id="carnetCount" hidden>0</b></button>
+  <button class="nav" id="btnCarnet" aria-label="Journal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 3h11l3 3v15H5z"/><path d="M8 8h8M8 12h8M8 16h5"/></svg><span>Journal</span><b class="badge" id="carnetCount" hidden>0</b></button>
 </nav>
 
 <section class="aim" id="aim" hidden>
@@ -543,7 +566,7 @@ body.walking .mectl{bottom:calc(var(--sab) + 224px)}
     <article>
       <div class="ill"><svg viewBox="0 0 120 120"><rect x="15" y="12" width="90" height="96" rx="12" fill="#fff" stroke="#C9D1C4" stroke-width="2"/><rect x="26" y="24" width="50" height="10" rx="3" fill="#1F3D2B"/><rect x="26" y="42" width="68" height="18" rx="6" fill="#ECEDE8"/><rect x="26" y="68" width="68" height="8" rx="3" fill="#C9D1C4"/><rect x="26" y="82" width="68" height="8" rx="3" fill="#C9D1C4"/><path d="M90 22c-3 0-5 2-5 5 0 4 5 8 5 8s5-4 5-8c0-3-2-5-5-5z" fill="#C62828"/></svg></div>
       <h2>La fiche : explorer, puis trouver le propriétaire</h2>
-      <p>Rôle d'évaluation, Registre foncier, Canada411, Google, réseaux, Registre des entreprises. <b>♥ Garder</b> met le lot au carnet ; tout ce que tu écris s'enregistre seul.</p>
+      <p>Rôle d'évaluation, Registre foncier, Canada411, Google, réseaux, Registre des entreprises. <b>♥ Garder</b> met le lot au journal ; tout ce que tu écris s'enregistre seul.</p>
     </article>
     <article>
       <div class="ill"><svg viewBox="0 0 120 120"><ellipse cx="35" cy="80" rx="6" ry="10" fill="#2E7D4F" transform="rotate(-20 35 80)"/><ellipse cx="52" cy="62" rx="6" ry="10" fill="#2E7D4F" transform="rotate(-20 52 62)"/><ellipse cx="70" cy="46" rx="6" ry="10" fill="#2E7D4F" transform="rotate(-20 70 46)"/><circle cx="88" cy="32" r="7" fill="#FF5A1F" stroke="#fff" stroke-width="2"/><path d="M88 32 L76 8 A26 26 0 0 1 100 8 Z" fill="rgba(255,90,31,.4)"/></svg></div>
@@ -563,6 +586,8 @@ body.walking .mectl{bottom:calc(var(--sab) + 224px)}
       <p class="fine" id="permHelp">Accès refusé par erreur ? Chrome → ⋮ → Paramètres → Paramètres des sites → lots.quebec.</p>
       <p class="fine">En utilisant lots, tu acceptes les <a href="confidentialite.html" target="_blank" rel="noopener">conditions et la politique de confidentialité</a>. Données à titre indicatif, sans valeur légale. Respecte toujours la propriété privée.</p>
       <label class="nomore"><input type="checkbox" id="introOff"> Ne plus afficher au démarrage</label>
+      <h3>Améliorer Lots <span id="logCount" style="font-weight:400"></span></h3>
+      <div class="links" style="width:100%;max-width:380px"><button id="btnMic">Commentaire vocal</button><button id="shareLog">Partager le rapport</button><button id="copyLog">Copier le rapport</button><button id="clearLog">Effacer le rapport</button></div>
       <p class="fine" id="introVersion"></p>
     </article>
   </div>
@@ -660,7 +685,7 @@ body.walking .mectl{bottom:calc(var(--sab) + 224px)}
         <h3>Note de terrain</h3>
         <textarea id="lotNote" placeholder="Accès par chemin forestier, ruisseau au nord, aucune construction visible…"></textarea>
         <p class="fine" id="saveState">Enregistrement automatique.</p>
-        <button class="danger" id="btnRemove" hidden>Retirer ce lot du carnet</button>
+        <button class="danger" id="btnRemove" hidden>Retirer ce lot du journal</button>
       </div>
     </details>
   </div>
@@ -689,36 +714,41 @@ body.walking .mectl{bottom:calc(var(--sab) + 224px)}
   <div class="body">
     <div class="trow"><div class="t">Photo aérienne</div><label class="switch"><input type="checkbox" id="lyrSat"><span class="track"></span></label></div>
     <div class="trow"><div class="t">Terres publiques louées<small>Baux de villégiature et abris sommaires (zoom rapproché)</small></div><label class="switch"><input type="checkbox" id="lyrBauxT" checked><span class="track"></span></label></div>
-    <div class="trow"><div class="t">Seulement mes favoris<small>Masque les autres lots du carnet</small></div><label class="switch"><input type="checkbox" id="lyrFavOnly"><span class="track"></span></label></div>
+    <div class="trow"><div class="t">Seulement mes favoris<small>Masque les autres lots du journal</small></div><label class="switch"><input type="checkbox" id="lyrFavOnly"><span class="track"></span></label></div>
     <h3>Annonces à vendre ici</h3>
     <p class="hint">Chaque site s'ouvre sur la zone que tu regardes, au plus près de ce qu'il accepte.</p>
     <div class="links" id="adsMap"></div>
     <h3>Légende</h3>
     <p class="hint">Lots du scan</p>
     <div class="lg"><span><i style="background:#E0A422"></i><span class="lgk" style="color:#A86F00" id="lgLeaf"></span>sans adresse, probablement vacant</span><span><i style="background:#B8BFB5"></i><span class="lgk" style="color:#5C6B62" id="lgHouse"></span>bâti</span><span><i style="background:#FF5A1F"></i>passe tes filtres</span></div>
-    <p class="hint">Ton carnet</p>
+    <p class="hint">Ton journal</p>
     <div class="lg" id="legendSaved"></div>
     <p class="hint">Terres publiques louées</p>
     <div class="lg" id="legendBaux"></div>
   </div>
 </section>
 
-<section class="sheet" id="sheetCarnet" aria-hidden="true">
+<section class="sheet" id="sheetCarnet" aria-hidden="true" aria-labelledby="jTitle">
   <div class="grip"></div>
-  <header><div class="t"><h2>Carnet</h2><p>Stocké dans ce téléphone seulement</p></div><button class="close" id="closeCarnet" aria-label="Fermer">×</button></header>
+  <header><div class="t"><h2 id="jTitle">Journal</h2><p id="jSub">Dans ce téléphone seulement</p></div><button class="close" id="closeCarnet" aria-label="Fermer">×</button></header>
   <div class="body">
-    <h3>Lots <button id="selMode" class="chip" style="float:right;background:var(--field);color:var(--ink);border:0;min-height:36px;font-size:13px">Sélectionner</button></h3>
-    <ul class="list" id="carnetList"></ul>
-    <div class="actions" id="selActions" hidden><button id="selDelete" class="wide" style="background:#B3261E">Supprimer la sélection</button></div>
-    <div class="links"><button id="btnFitFav" class="wide">Voir mes favoris sur la carte</button><button id="exportCsv">Exporter (CSV)</button><button id="shareCsv">Partager</button><button id="copyRegistre" class="wide">Copier les favoris sans propriétaire</button><button id="btnBackup">Sauvegarder</button><button id="btnRestore">Restaurer</button></div>
-    <input type="file" id="restoreInput" accept="application/json,.json" hidden>
-    <p class="fine">La sauvegarde (lots, notes, marches) est un fichier à garder ailleurs : sans elle, vider le navigateur efface ton carnet. Les photos restent dans le téléphone.</p>
-    <h3>Marches</h3>
-    <ul class="list" id="walkList"></ul>
-    <h3>Améliorer l'app <span id="logCount" style="font-weight:400"></span></h3>
-    <div class="links"><button id="btnMic">Commentaire vocal</button><button id="shareLog">Partager le rapport</button><button id="copyLog">Copier le rapport</button><button id="clearLog">Effacer le journal</button></div>
+    <div class="jbackup" id="jBackup" hidden><span id="jBackupText"></span><button id="jBackupGo">Sauvegarder</button></div>
+    <div class="seg jtabs" role="group" aria-label="Contenu du journal"><button id="jTabLots" aria-pressed="true">Lots <b id="jNLots"></b></button><button id="jTabWalks" aria-pressed="false">Marches <b id="jNWalks"></b></button></div>
+    <div id="jLots">
+      <input class="f" id="jSearch" type="search" placeholder="Chercher : n° de lot, ville, propriétaire, note" aria-label="Chercher dans le journal" autocomplete="off">
+      <div class="seg jfilter" id="jFilter" role="group" aria-label="Filtrer"><button data-v="todo">À faire</button><button data-v="all">Tous</button><button data-v="fav">♥ Favoris</button><button data-v="contacted">Contactés</button><button data-v="sale">En vente</button></div>
+      <div class="jbar"><label for="jSort">Trier</label><select id="jSort"><option value="next">Prochaine action</option><option value="recent">Modifiés récemment</option><option value="size">Plus grands</option><option value="near">Plus proches de moi</option><option value="muni">Par municipalité</option></select><button id="btnFitFav">Voir sur la carte</button></div>
+      <ul class="jlist" id="carnetList"></ul>
+      <div class="actions" id="selActions" hidden><button id="selDelete" class="wide" style="background:#B3261E">Supprimer la sélection</button></div>
+    </div>
+    <div id="jWalks" hidden><ul class="list" id="walkList"></ul></div>
+    <details class="sec" id="jTools"><summary>Sauvegarder, exporter, supprimer</summary><div class="in">
+      <div class="links"><button id="btnBackup">Sauvegarder</button><button id="btnRestore">Restaurer</button><button id="exportCsv">Exporter (CSV)</button><button id="shareCsv">Partager (CSV)</button><button id="copyRegistre" class="wide">Copier les favoris sans propriétaire</button><button id="selMode" class="wide">Sélectionner pour supprimer</button></div>
+      <input type="file" id="restoreInput" accept="application/json,.json" hidden>
+      <p class="fine">La sauvegarde (lots, notes, marches) est un fichier à garder ailleurs : sans elle, vider le navigateur efface ton journal. Les photos restent dans le téléphone ; exporte-les lot par lot avec Partager, dans la fiche.</p>
+    </div></details>
     <p class="version" id="carnetVersion"></p>
-    <p class="version"><a href="confidentialite.html" target="_blank" rel="noopener">Confidentialité et conditions</a> · <a href="mailto:bonjour@lots.quebec?subject=lots">Nous écrire</a></p>
+    <p class="version"><a href="confidentialite.html" target="_blank" rel="noopener">Confidentialité et conditions</a> · <a href="mailto:bonjour@lots.quebec?subject=Lots">Nous écrire</a> · Aide et rapport : bouton ?</p>
   </div>
 </section>
 
@@ -739,7 +769,7 @@ body.walking .mectl{bottom:calc(var(--sab) + 224px)}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script>
 /* ============================ CONFIG ============================ */
-const APP_VERSION='v40';
+const APP_VERSION='v41';
 const CONFIG = {
   ringFraction: 0.70, maxRadius: 1500, coneLength: 150, coneHalfAngle: 25,
   cadastre: 'https://geo.environnement.gouv.qc.ca/donnees/rest/services/Reference/Cadastre_allege/MapServer',
@@ -772,7 +802,7 @@ window.addEventListener('error',e=>log('js_error',{msg:String(e.message).slice(0
 window.addEventListener('unhandledrejection',e=>log('js_error',{msg:String(e.reason?.message||e.reason).slice(0,160)}));
 document.addEventListener('visibilitychange',()=>log(document.hidden?'app_hide':'app_show'));
 
-/* ============================ Statuts du carnet ============================ */
+/* ============================ Statuts du journal ============================ */
 const TAGS={c:['Contacté','#6A3FB5']};
 const STATUS={...TAGS,i:['Favori','#E0A422'],e:['En vente','#C62828'],s:['Visité','#2E7D4F'],v:['À voir','#8A948C']};
 function keyOf(r){ const t=r.tags||[]; return r.centris?'e':t.includes('c')?'c':r.fav?'i':r.visited?'s':'v'; }
@@ -797,7 +827,7 @@ let carnet=store.get('terrain.carnet',[]).map(migrate);
 
 /* ============================ Réseau : hors ligne et connexion faible ============================ */
 let netFails=[];
-function setOffline(v,weak){ const el=$('offline'); el.hidden=!v; el.textContent= weak ? 'Connexion faible ou service injoignable — certaines données ne se chargent pas.' : 'Hors ligne — la carte et les données ne se chargent plus. Ton carnet, tes marches et tes photos restent disponibles.'; document.body.classList.toggle('isoff',!!v); }
+function setOffline(v,weak){ const el=$('offline'); el.hidden=!v; el.textContent= weak ? 'Connexion faible ou service injoignable — certaines données ne se chargent pas.' : 'Hors ligne — la carte et les données ne se chargent plus. Ton journal, tes marches et tes photos restent disponibles.'; document.body.classList.toggle('isoff',!!v); }
 window.addEventListener('online',()=>{ netFails=[]; setOffline(false); log('net',{on:true}); });
 window.addEventListener('offline',()=>{ setOffline(true); log('net',{on:false}); });
 if(!navigator.onLine) setOffline(true);
@@ -1039,7 +1069,7 @@ async function updatePeek(){ const el=$('peek');
     if(!f){ peek={no:null,geom:null,f:null,m}; $('peekTitle').textContent='Aucun lot cadastré sous la pin'; $('peekSub').textContent=m?`${m.MUS_NM_MUN} · probablement une terre publique`:'Probablement une terre publique'; $('peekGo').hidden=true; }
     else { const no=f.properties.NO_LOT, ha=polyArea(f.geometry)/10000; peek={no,geom:f.geometry,f,m};
       const saved=carnet.find(x=>x.lot===no);
-      $('peekTitle').textContent=`Lot ${no} · ${fmt(acres(ha),1)} acres`; $('peekSub').textContent=[m?.MUS_NM_MUN,saved?'♥ dans ton carnet'+(saved.owner?' · '+saved.owner:''):null].filter(Boolean).join(' · ')||'—'; $('peekGo').hidden=false;
+      $('peekTitle').textContent=`Lot ${no} · ${fmt(acres(ha),1)} acres`; $('peekSub').textContent=[m?.MUS_NM_MUN,saved?'♥ dans ton journal'+(saved.owner?' · '+saved.owner:''):null].filter(Boolean).join(' · ')||'—'; $('peekGo').hidden=false;
       roleFor(no).then(async r=>{ if(peek.no!==no||!r) return; const D=await domains(); const use=(D.CODE_UTILISATION_CUBF_3||{})[r[1]]; const y=roleSince(r);
         $('peekSub').textContent=[m?.MUS_NM_MUN,use,y?'inscrit depuis '+y:null,saved?'♥':null].filter(Boolean).join(' · '); }); }
     el.hidden=anySheetOpen()||measuring; if(!el.hidden&&peek.no) tip('peek','Le lot sous la pin bleue s\'affiche ici. Bouge la carte, puis « Voir la fiche ».');
@@ -1071,7 +1101,7 @@ async function openLot(f,m){
   renderSummary(); ownerLinks(); contactLinks(); updateFicheState(); renderThumbs(no); renderAdsLot();
   $('secExplore').open=true; $('secOwner').open=false; $('secContact').open=!!saved?.owner&&!(saved?.tags||[]).includes('c');
   loadRole(no,f.geometry,m); loadOpenRole(no,m);
-  show(sheets.lot); tip('fiche','♥ Garder ajoute ce lot au carnet. Tout ce que tu écris ici s\'enregistre tout seul.');
+  show(sheets.lot); tip('fiche','♥ Garder ajoute ce lot au journal. Tout ce que tu écris ici s\'enregistre tout seul.');
   addrInEnvelope(b).then(r=>{ if(selected?.lot!==no) return; const inside=r.features.filter(x=>inPoly(x.geometry.coordinates,f.geometry)); selected.built=inside.length>0; selected.builtAddr=inside.slice(0,2).map(x=>addrLabel(x.properties)).filter(Boolean).join(', '); renderSummary(); })
     .catch(()=>{ if(selected?.lot===no){ selected.built='?'; renderSummary(); } });
   bauxAt(c.lat,c.lng).then(bx=>{ if(selected?.lot!==no) return; selected.baux=bx.features?.length||0; renderSummary(); }).catch(e=>log('tenure_error',{msg:String(e.message).slice(0,120)}));
@@ -1086,13 +1116,13 @@ function renderSummary(){ if(!selected) return; const s=selected, r=s.role, own=
   if(centrisUrl) tags.push(`<span class="bad">En vente${centrisInfo?.price?' · '+money(centrisInfo.price):''}</span>`);
   $('sumTags').innerHTML=tags.join(''); }
 function updateFicheState(){ if(!selected) return; const saved=carnet.find(x=>x.lot===selected.lot);
-  $('btnRemove').hidden=!saved; $('saveState').textContent=saved?'Dans ton carnet · enregistrement automatique.':'Pas encore dans le carnet · tout ce que tu écris l\'y ajoute.';
+  $('btnRemove').hidden=!saved; $('saveState').textContent=saved?'Dans ton journal · enregistrement automatique.':'Pas encore dans le journal · tout ce que tu écris l\'y ajoute.';
   $('secOwnerC').textContent=$('lotOwner').value.trim()?'nom connu':''; $('secContactC').textContent=$('lotContacted').checked?'contacté':'';
   $('secSaleC').textContent=centrisUrl?'annonce attachée':''; $('secFollowC').textContent=[$('lotVisited').checked?'visité':null,$('lotNote').value.trim()?'note':null].filter(Boolean).join(' · '); }
 
 /* ---- Garder (♥) et enregistrement automatique ---- */
 function setFav(on){ $('btnFav').setAttribute('aria-pressed',on); $('favLabel').textContent=on?'Gardé':'Garder'; }
-$('btnFav').onclick=()=>{ if(!selected) return; const on=$('btnFav').getAttribute('aria-pressed')!=='true'; setFav(on); navigator.vibrate?.(10); log('fav',{on}); saveNow(); toast(on?'Gardé dans ton carnet':'Retiré des favoris'); };
+$('btnFav').onclick=()=>{ if(!selected) return; const on=$('btnFav').getAttribute('aria-pressed')!=='true'; setFav(on); navigator.vibrate?.(10); log('fav',{on}); saveNow(); toast(on?'Gardé dans ton journal':'Retiré des favoris'); };
 function collect(){ const s=selected; const tags=$('lotContacted').checked?['c']:[];
   return {lot:s.lot,muni:s.muni,mrc:s.mrc,lat:s.lat,lng:s.lng,ha:s.ha,geom:s.geom,owner:$('lotOwner').value.trim(),email:$('lotEmail').value.trim(),phone:$('lotPhone').value.trim(),addrPost:$('lotAddrPost').value.trim(),note:$('lotNote').value.trim(),tags,visited:$('lotVisited').checked,fav:$('btnFav').getAttribute('aria-pressed')==='true',centris:centrisUrl,centrisInfo}; }
 let saveT=null;
@@ -1100,7 +1130,7 @@ function saveNow(){ clearTimeout(saveT); saveT=null; if(!selected||loading) retu
   const has=rec.fav||rec.owner||rec.email||rec.phone||rec.addrPost||rec.note||rec.visited||rec.tags.length||rec.centris;
   if(i<0&&!has){ updateFicheState(); return; }
   const today=new Date().toISOString().slice(0,10);
-  if(i<0){ carnet.unshift({...rec,date:today,updated:today}); toast('Ajouté à ton carnet'); log('save',{new:true}); }
+  if(i<0){ carnet.unshift({...rec,date:today,updated:today}); toast('Ajouté à ton journal'); log('save',{new:true}); }
   else { carnet[i]={...carnet[i],...rec,updated:today}; log('save',{fav:rec.fav,owner:!!rec.owner,note:!!rec.note,centris:!!rec.centris}); }
   persist(); restyleScan(); renderSaved(); updateFicheState(); renderSummary(); }
 function saveSoon(){ if(loading) return; clearTimeout(saveT); saveT=setTimeout(saveNow,700); updateFicheState(); }
@@ -1110,8 +1140,8 @@ function flushSave(){ if(saveT) saveNow(); }
 $('lotOwner').addEventListener('input',()=>{ ownerLinks(); contactLinks(); renderSummary(); });
 ['lotEmail','lotPhone','lotAddrPost'].forEach(id=>$(id).addEventListener('input',contactLinks));
 window.addEventListener('pagehide',flushSave); document.addEventListener('visibilitychange',()=>{ if(document.hidden) flushSave(); });
-$('btnRemove').onclick=()=>{ if(!selected) return; if(!confirm(`Retirer le lot ${selected.lot} de ton carnet ? Les photos restent dans le téléphone.`)) return;
-  carnet=carnet.filter(x=>x.lot!==selected.lot); persist(); restyleScan(); renderSaved(); setFav(false); updateFicheState(); log('remove'); toast('Retiré du carnet'); };
+$('btnRemove').onclick=()=>{ if(!selected) return; if(!confirm(`Retirer le lot ${selected.lot} de ton journal ? Les photos restent dans le téléphone.`)) return;
+  carnet=carnet.filter(x=>x.lot!==selected.lot); persist(); restyleScan(); renderSaved(); setFav(false); updateFicheState(); log('remove'); toast('Retiré du journal'); };
 
 /* ---- Trouver le propriétaire ---- */
 const corp=/\b(inc|ltée|ltee|limitée|ltd|enr|s\.?e\.?n\.?c|senc|compagnie|cie|société|societe|corporation|corp|fiducie|ferme|gestion|holding|placements|immeubles|investissements)\b|\d{4}-\d{4}\s+québec/i;
@@ -1247,27 +1277,62 @@ function renderSaved(){ savedGroup.clearLayers(); const zoomed=map.getZoom()>=14
   $('lgLeaf').innerHTML=icoSvg('leaf',16); $('lgHouse').innerHTML=icoSvg('house',16);
   const missing=carnet.filter(r=>!r.geom&&!r._tried); missing.slice(0,10).forEach(async r=>{ r._tried=true; try{ const j=await lotAt(r.lat,r.lng); const f=j.features?.[0]; if(f){ r.geom=f.geometry; persist(); renderSaved(); } }catch{} }); }
 map.on('zoomend',()=>renderSaved());
-$('btnCarnet').onclick=()=>{ log('btn',{id:'btnCarnet'}); renderWalkList(); renderCarnet(); renderLogCount(); $('carnetVersion').textContent=`lots ${APP_VERSION} · tes données restent dans ce téléphone`; show(sheets.carnet); };
+$('btnCarnet').onclick=()=>{ log('btn',{id:'btnCarnet'}); renderWalkList(); renderCarnet(); $('carnetVersion').textContent=`lots ${APP_VERSION} · tes données restent dans ce téléphone`; show(sheets.carnet); };
 async function photoCounts(){ try{ const all=await dbAll('photos'); const m={}; all.forEach(p=>{ if(p.lot) m[p.lot]=(m[p.lot]||0)+1; }); return m; }catch{ return {}; } }
 let selMode=false, selSet=new Set();
-$('selMode').onclick=()=>{ selMode=!selMode; selSet.clear(); $('selMode').textContent=selMode?'Annuler':'Sélectionner'; $('selActions').hidden=!selMode; renderCarnet(); };
-$('selDelete').onclick=()=>{ if(!selSet.size) return toast('Rien de sélectionné'); if(!confirm(`Supprimer ${selSet.size} lot(s) du carnet ? Les photos restent dans le téléphone.`)) return; carnet=carnet.filter(x=>!selSet.has(x.lot)); persist(); restyleScan(); renderSaved(); log('carnet_delete',{n:selSet.size}); selSet.clear(); selMode=false; $('selMode').textContent='Sélectionner'; $('selActions').hidden=true; renderCarnet(); };
-async function renderCarnet(){ const pc=await photoCounts(); const ul=$('carnetList'); ul.innerHTML='';
-  if(!carnet.length){ ul.innerHTML='<li class="empty">Ton carnet est vide. Ouvre la fiche d\'un lot et touche ♥ Garder — ou écris simplement une note.</li>'; return; }
-  carnet.forEach(r=>{ const li=document.createElement('li');
-    li.innerHTML=`<div class="t"><b>Lot ${esc(r.lot)}</b><span>${esc(r.muni||'—')} · ${ft2(r.ha)} · ${esc(r.date||'')}${pc[r.lot]?' · 📷 '+pc[r.lot]:''}</span>${r.owner?`<span>${esc(r.owner)}</span>`:''}${r.note?`<span>${esc(r.note)}</span>`:''}</div><span class="st" style="background:${stColor(keyOf(r))}22;color:${stColor(keyOf(r))}">${labelOf(r)}</span>${selMode?`<input type="checkbox" class="selbox" ${selSet.has(r.lot)?'checked':''} aria-label="Sélectionner le lot ${esc(r.lot)}">`:`<button class="close" aria-label="Retirer le lot ${esc(r.lot)}">×</button>`}`;
-    li.querySelector('.t').onclick=()=>{ if(selMode){ const cb=li.querySelector('.selbox'); cb.checked=!cb.checked; cb.checked?selSet.add(r.lot):selSet.delete(r.lot); return; } hide(sheets.carnet,true); map.setView([r.lat,r.lng],16); identify(r.lat,r.lng); };
+$('selMode').onclick=()=>{ selMode=!selMode; selSet.clear(); $('selMode').textContent=selMode?'Annuler la sélection':'Sélectionner pour supprimer'; if(selMode){ J.tab='lots'; $('jTools').open=false; $('carnetList').scrollIntoView?.({block:'start'}); } $('selActions').hidden=!selMode; renderCarnet(); };
+$('selDelete').onclick=()=>{ if(!selSet.size) return toast('Rien de sélectionné'); if(!confirm(`Supprimer ${selSet.size} lot(s) du journal ? Les photos restent dans le téléphone.`)) return; carnet=carnet.filter(x=>!selSet.has(x.lot)); persist(); restyleScan(); renderSaved(); log('carnet_delete',{n:selSet.size}); selSet.clear(); selMode=false; $('selMode').textContent='Sélectionner pour supprimer'; $('selActions').hidden=true; renderCarnet(); };
+let J={tab:'lots',filter:'todo',q:'',sort:'next',...store.get('terrain.journal',{})}; J.q='';
+const daysSince=d=>d?Math.floor((Date.now()-new Date(d).getTime())/864e5):null;
+function nextAction(r){ const t=r.tags||[];
+  if(t.includes('c')){ const d=daysSince(r.updated||r.date); return d>=21?{rank:1,label:`Relancer · ${d} j`,sec:'secContact',todo:true}:{rank:7,label:'En attente de réponse',sec:'secFollow',todo:false}; }
+  if(r.centris&&!r.owner) return {rank:5,label:'Voir l\'annonce',sec:'secSale',todo:true};
+  if(!r.owner) return {rank:4,label:'Trouver le propriétaire',sec:'secOwner',todo:true};
+  if(!r.addrPost&&!r.email&&!r.phone) return {rank:3,label:'Trouver son adresse',sec:'secContact',todo:true};
+  return {rank:2,label:'Envoyer la lettre',sec:'secContact',todo:true}; }
+function journalRows(){ const q=J.q.trim().toLowerCase(), qd=q.replace(/\s/g,'');
+  let rows=carnet.map(r=>({r,n:nextAction(r)}));
+  if(q) rows=rows.filter(({r})=>(r.lot||'').replace(/\s/g,'').includes(qd)&&qd.length>0||[r.muni,r.owner,r.note,r.mrc].some(v=>(v||'').toLowerCase().includes(q)));
+  rows=rows.filter(({r,n})=>J.filter==='all'||(J.filter==='todo'&&n.todo)||(J.filter==='fav'&&r.fav)||(J.filter==='contacted'&&(r.tags||[]).includes('c'))||(J.filter==='sale'&&r.centris));
+  const by={next:(a,b)=>a.n.rank-b.n.rank||(b.r.fav-a.r.fav)||((b.r.updated||'').localeCompare(a.r.updated||'')),
+    recent:(a,b)=>(b.r.updated||b.r.date||'').localeCompare(a.r.updated||a.r.date||''), size:(a,b)=>b.r.ha-a.r.ha,
+    muni:(a,b)=>(a.r.muni||'').localeCompare(b.r.muni||'','fr')||a.n.rank-b.n.rank,
+    near:(a,b)=>me?map.distance(me,[a.r.lat,a.r.lng])-map.distance(me,[b.r.lat,b.r.lng]):0};
+  return rows.sort(by[J.sort]||by.next); }
+function saveJ(){ store.set('terrain.journal',{tab:J.tab,filter:J.filter,sort:J.sort}); }
+function renderJournalChrome(){ const todo=carnet.filter(r=>nextAction(r).todo).length;
+  $('jSub').textContent=carnet.length?`${carnet.length} lot${carnet.length>1?'s':''} · ${todo} à faire · ${walks.length} marche${walks.length>1?'s':''} · dans ce téléphone seulement`:'Dans ce téléphone seulement';
+  $('jNLots').textContent=carnet.length||''; $('jNWalks').textContent=walks.length||'';
+  $('jTabLots').setAttribute('aria-pressed',J.tab==='lots'); $('jTabWalks').setAttribute('aria-pressed',J.tab==='walks'); $('jLots').hidden=J.tab!=='lots'; $('jWalks').hidden=J.tab!=='walks';
+  $('jFilter').querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.v===J.filter)); $('jSort').value=J.sort;
+  const lb=store.get('terrain.lastBackup',0), d=lb?Math.floor((Date.now()-lb)/864e5):null; const need=carnet.length>0&&(d===null||d>=14);
+  $('jBackup').hidden=!need; if(need) $('jBackupText').textContent=d===null?'Ton journal n\'a jamais été sauvegardé.':`Dernière sauvegarde il y a ${d} jours.`; }
+$('jTabLots').onclick=()=>{ J.tab='lots'; saveJ(); renderCarnet(); }; $('jTabWalks').onclick=()=>{ J.tab='walks'; saveJ(); renderJournalChrome(); renderWalkList(); };
+$('jFilter').querySelectorAll('button').forEach(b=>b.onclick=()=>{ J.filter=b.dataset.v; saveJ(); log('journal_filter',{v:J.filter}); renderCarnet(); });
+$('jSort').onchange=e=>{ J.sort=e.target.value; saveJ(); if(J.sort==='near'&&!me) toast('Position inconnue — touche Ma position sur la carte'); renderCarnet(); };
+$('jSearch').addEventListener('input',e=>{ J.q=e.target.value; renderCarnet(); });
+$('jBackupGo').onclick=()=>{ $('btnBackup').click(); renderJournalChrome(); };
+async function openFromJournal(r,sec){ hide(sheets.carnet,true); map.setView([r.lat,r.lng],16); await identify(r.lat,r.lng);
+  if(sec&&selected?.lot===r.lot){ const el=$(sec); el.open=true; setTimeout(()=>el.scrollIntoView?.({behavior:'smooth',block:'start'}),250); } }
+async function renderCarnet(){ renderJournalChrome(); const ul=$('carnetList'); const pc=await photoCounts(); ul.innerHTML='';
+  if(!carnet.length){ ul.innerHTML='<li class="jempty"><b>Ton journal est vide</b>Ouvre la fiche d\'un lot et touche <b>♥ Garder</b> — ou écris simplement une note : le lot s\'ajoute ici avec sa prochaine étape.</li>'; return; }
+  const rows=journalRows();
+  if(!rows.length){ ul.innerHTML=`<li class="jempty"><b>Aucun lot ne correspond</b>${J.q?'Essaie un autre mot, ou ':''}<button type="button" id="jReset">voir tous les lots</button></li>`; $('jReset').onclick=()=>{ J.q=''; $('jSearch').value=''; J.filter='all'; saveJ(); renderCarnet(); }; return; }
+  rows.forEach(({r,n})=>{ const k=keyOf(r), col=stColor(k), li=document.createElement('li'); li.className='jcard';
+    const dist=me?` · ${fmtDist(map.distance(me,[r.lat,r.lng]))}`:'';
+    li.innerHTML=`${selMode?`<input type="checkbox" class="selbox" ${selSet.has(r.lot)?'checked':''} aria-label="Sélectionner le lot ${esc(r.lot)}">`:''}<button type="button" class="jmain"><span class="jico">${pinHtml(k,col)}</span><span class="jt"><b>Lot ${esc(r.lot)}${r.fav?' <span class="jfav" aria-label="favori">♥</span>':''}</b><span>${esc(r.muni||'—')} · ${fmt(acres(r.ha),1)} acres${dist}${pc[r.lot]?` · 📷 ${pc[r.lot]}`:''}</span>${r.owner?`<span class="jo">${esc(r.owner)}</span>`:''}${r.note?`<span class="jn">${esc(r.note)}</span>`:''}</span></button><button type="button" class="jnext${n.todo?'':' wait'}">${esc(n.label)} ›</button>`;
+    li.querySelector('.jmain').onclick=()=>{ if(selMode){ const cb=li.querySelector('.selbox'); cb.checked=!cb.checked; cb.checked?selSet.add(r.lot):selSet.delete(r.lot); return; } log('journal_open',{via:'card'}); openFromJournal(r,null); };
+    li.querySelector('.jnext').onclick=()=>{ log('journal_open',{via:'next',action:n.sec}); openFromJournal(r,n.sec); };
     li.querySelector('.selbox')?.addEventListener('change',e=>{ e.target.checked?selSet.add(r.lot):selSet.delete(r.lot); });
-    li.querySelector('button.close')?.addEventListener('click',()=>{ if(!confirm(`Retirer le lot ${r.lot} du carnet ?`)) return; carnet=carnet.filter(x=>x.lot!==r.lot); persist(); restyleScan(); renderSaved(); renderCarnet(); });
     ul.appendChild(li); }); }
-$('btnFitFav').onclick=()=>{ const f=carnet.filter(r=>r.fav); const l=f.length?f:carnet; if(!l.length) return toast('Ton carnet est vide'); hide(sheets.carnet,true); map.fitBounds(L.latLngBounds(l.map(r=>[r.lat,r.lng])).pad(.3),{maxZoom:16}); log('fav_fit',{n:l.length}); if(!f.length) toast('Aucun favori : tous les lots du carnet sont affichés'); };
+$('btnFitFav').onclick=()=>{ const l=journalRows().map(x=>x.r); if(!l.length) return toast('Aucun lot à afficher'); hide(sheets.carnet,true); map.fitBounds(L.latLngBounds(l.map(r=>[r.lat,r.lng])).pad(.3),{maxZoom:16}); log('journal_fit',{n:l.length}); };
 function csv(){ const head=['lot','municipalite','mrc','pi2','hectares','proprietaire','adresse_postale','courriel','telephone','favori','statut','centris','centris_no','prix','courtier','note','date','lat','lng'];
   const rows=carnet.map(r=>[r.lot,r.muni,r.mrc,Math.round(r.ha*107639.1),r.ha.toFixed(3),r.owner||'',r.addrPost||'',r.email||'',r.phone||'',r.fav?'oui':'',labelOf(r),r.centris||'',r.centrisInfo?.id||'',r.centrisInfo?.price||'',r.centrisInfo?.broker||'',r.note||'',r.date||'',r.lat.toFixed(6),r.lng.toFixed(6)].map(v=>`"${String(v??'').replace(/"/g,'""')}"`).join(','));
   return '\ufeff'+[head.join(','),...rows].join('\n'); }
-$('exportCsv').onclick=()=>{ log('btn',{id:'exportCsv'}); if(!carnet.length) return toast('Carnet vide'); const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([csv()],{type:'text/csv;charset=utf-8'})); a.download=`lots-${new Date().toISOString().slice(0,10)}.csv`; a.click(); };
+$('exportCsv').onclick=()=>{ log('btn',{id:'exportCsv'}); if(!carnet.length) return toast('Journal vide'); const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([csv()],{type:'text/csv;charset=utf-8'})); a.download=`lots-${new Date().toISOString().slice(0,10)}.csv`; a.click(); };
 $('copyRegistre').onclick=()=>{ const l=carnet.filter(r=>r.fav&&!r.owner); if(!l.length) return toast('Aucun favori sans propriétaire'); copy(l.map(r=>`${r.lot}\t${r.muni}`).join('\n'),`${l.length} lot(s) copié(s) — à chercher au Registre`); };
-$('shareCsv').onclick=async()=>{ log('btn',{id:'shareCsv'}); if(!carnet.length) return toast('Carnet vide'); const file=new File([csv()],'lots.csv',{type:'text/csv'});
-  if(navigator.canShare?.({files:[file]})){ try{ await navigator.share({files:[file],title:'Carnet lots'}); }catch{} } else copy(csv(),'CSV copié'); };
+$('shareCsv').onclick=async()=>{ log('btn',{id:'shareCsv'}); if(!carnet.length) return toast('Journal vide'); const file=new File([csv()],'lots.csv',{type:'text/csv'});
+  if(navigator.canShare?.({files:[file]})){ try{ await navigator.share({files:[file],title:'Journal Lots'}); }catch{} } else copy(csv(),'CSV copié'); };
 
 $('btnBackup').onclick=()=>{ const data={app:'lots',v:APP_VERSION,date:new Date().toISOString(),carnet,walks,filters:F}; const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([JSON.stringify(data)],{type:'application/json'})); a.download=`lots-sauvegarde-${new Date().toISOString().slice(0,10)}.json`; a.click(); store.set('terrain.lastBackup',Date.now()); log('backup',{n:carnet.length}); toast('Sauvegarde téléchargée — garde-la dans Drive ou par courriel'); };
 $('btnRestore').onclick=()=>$('restoreInput').click();
@@ -1389,18 +1454,18 @@ async function checkBoundary(lat,lng){ if(curLot&&curLot.geom&&inPoly([lng,lat],
     if(!f){ if(curLot?.no!==null){ curLot={no:null,geom:null}; $('walkLot').textContent='Hors cadastre — terre publique ou non cadastrée'; if(!first){ navigator.vibrate?.([80,60,80]); toast('Tu sors des lots cadastrés'); log('boundary',{to:null}); } } return; }
     const no=f.properties.NO_LOT; if(curLot?.no===no){ curLot.geom=f.geometry; return; }
     curLot={no,geom:f.geometry}; const ha=polyArea(f.geometry)/10000; const saved=carnet.find(x=>x.lot===no);
-    $('walkLot').textContent=`Lot ${no} · ${fmt(acres(ha),1)} acres${saved?' · ♥ carnet'+(saved.owner?' · '+saved.owner:''):''}`;
+    $('walkLot').textContent=`Lot ${no} · ${fmt(acres(ha),1)} acres${saved?' · ♥ journal'+(saved.owner?' · '+saved.owner:''):''}`;
     if(!first){ navigator.vibrate?.([80,60,80]); toast(`Tu entres dans le lot ${no}`); log('boundary',{to:'lot'}); }
   }catch{ $('walkLot').textContent='Lot inconnu (réseau)'; } finally{ bqBusy=false; } }
 function stopWalk(){ if(!walk) return; const rec={id:walk.id,start:walk.start,end:Date.now(),secs:walkElapsed(),dist:Math.round(walk.dist),pts:walk.pts.map(qq=>[+qq.lat.toFixed(6),+qq.lng.toFixed(6)]),photos:walk.photos};
-  walks.unshift(rec); store.set('terrain.walks',walks); log('walk_stop',{dist:rec.dist,pts:rec.pts.length,photos:rec.photos.length}); toast(`Marche enregistrée dans le carnet · ${fmtDist(rec.dist)} · ${rec.photos.length} photo(s)`); walk=null; curLot=null; walkUI(); renderWalks(); }
+  walks.unshift(rec); store.set('terrain.walks',walks); log('walk_stop',{dist:rec.dist,pts:rec.pts.length,photos:rec.photos.length}); toast(`Marche enregistrée dans le journal · ${fmtDist(rec.dist)} · ${rec.photos.length} photo(s)`); walk=null; curLot=null; walkUI(); renderWalks(); }
 $('btnWalk').onclick=()=>{ navigator.vibrate?.(12); if(!walk) return startWalk();
   walk.paused=!walk.paused; if(walk.paused){ walk.pausedAt=Date.now(); walk.lastStep=null; } else { walk.pausedMs+=Date.now()-walk.pausedAt; walk.pausedAt=null; }
   walkUI(); log('walk_pause',{p:walk.paused}); };
-$('btnWalkStop').onclick=()=>{ if(walk&&confirm('Terminer la marche ? Elle sera rangée dans le carnet.')) stopWalk(); };
+$('btnWalkStop').onclick=()=>{ if(walk&&confirm('Terminer la marche ? Elle sera rangée dans le journal.')) stopWalk(); };
 function renderWalks(){ walkLayer.clearLayers(); stepsLayer.clearLayers(); walks.forEach(w=>{ if(w.pts?.length) L.polyline(w.pts,{color:'#2E7D4F',weight:3,opacity:.35,dashArray:'2 8',interactive:false}).addTo(walkLayer); }); if(walk?.line) walk.line.addTo(walkLayer); renderPov(); }
-function renderWalkList(){ const ul=$('walkList'); ul.innerHTML=''; if(!walks.length){ ul.innerHTML='<li class="empty">Aucune marche. Touche « Marcher » en bas de l\'écran pour tracer tes pas.</li>'; return; }
-  walks.forEach(w=>{ const li=document.createElement('li'); const d=new Date(w.start); li.innerHTML=`<div class="t"><b>${d.toLocaleDateString('fr-CA',{day:'numeric',month:'short'})} · ${fmtDist(w.dist)}</b><span>${fmtTime(w.secs??Math.round((w.end-w.start)/1000))} · ${w.photos.length} photo(s)</span></div><button class="close" aria-label="Supprimer cette marche">×</button>`;
+function renderWalkList(){ renderJournalChrome(); const ul=$('walkList'); ul.innerHTML=''; if(!walks.length){ ul.innerHTML='<li class="empty">Aucune marche. Touche « Marcher » en bas de l\'écran pour tracer tes pas.</li>'; return; }
+  walks.forEach(w=>{ const li=document.createElement('li'); const d=new Date(w.start); const nl=carnet.filter(r=>r.geom&&w.pts.some(([la,ln])=>inPoly([ln,la],r.geom))).length; li.innerHTML=`<div class="t"><b>${d.toLocaleDateString('fr-CA',{weekday:'short',day:'numeric',month:'short'})} · ${fmtDist(w.dist)}</b><span>${fmtTime(w.secs??Math.round((w.end-w.start)/1000))} · ${w.photos.length} photo${w.photos.length>1?'s':''}${nl?` · ${nl} lot${nl>1?'s':''} de ton journal`:''} · voir sur la carte ›</span></div><button class="close" aria-label="Supprimer cette marche">×</button>`;
     li.querySelector('.t').onclick=()=>{ hide(sheets.carnet,true); if(w.pts.length) map.fitBounds(L.latLngBounds(w.pts).pad(.3)); };
     li.querySelector('button').onclick=()=>{ if(!confirm('Supprimer cette marche ?')) return; walks=walks.filter(x=>x.id!==w.id); store.set('terrain.walks',walks); renderWalks(); renderWalkList(); }; ul.appendChild(li); }); }
 
@@ -1489,12 +1554,12 @@ function report(){ const sessions=[...new Set(LOG.map(e=>e.s))];
 $('shareLog').onclick=async()=>{ const txt=report(); const file=new File([txt],`lots-rapport-${new Date().toISOString().slice(0,10)}.md`,{type:'text/markdown'});
   if(navigator.canShare?.({files:[file]})){ try{ await navigator.share({files:[file],title:'Rapport lots'}); }catch{} } else { const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([txt],{type:'text/markdown'})); a.download=file.name; a.click(); } };
 $('copyLog').onclick=()=>copy(report(),'Rapport copié — colle-le dans la conversation');
-$('clearLog').onclick=()=>{ if(confirm('Effacer tout le journal d\'usage ?')){ LOG=[]; try{ localStorage.removeItem('terrain.log'); }catch{} renderLogCount(); toast('Journal effacé'); } };
+$('clearLog').onclick=()=>{ if(confirm('Effacer tout le rapport d\'usage ?')){ LOG=[]; try{ localStorage.removeItem('terrain.log'); }catch{} renderLogCount(); toast('Rapport effacé'); } };
 
 /* ============================ Partage reçu depuis Centris ============================ */
 (function(){ const qs=new URLSearchParams(location.search); const txt=[qs.get('title'),qs.get('text'),qs.get('url')].filter(Boolean).join('\n'); if(!/centris\.ca/i.test(txt)) return; history.replaceState(null,'',location.pathname);
   const info=parseCentris(txt); if(!info) return; log('share_received',{id:!!info.id});
-  const pick=async()=>{ if(info.address||info.city){ const ok=await goToCentris(info); if(ok) return; } if(!carnet.length) return toast('Carnet vide — ouvre d\'abord un lot, puis repartage');
+  const pick=async()=>{ if(info.address||info.city){ const ok=await goToCentris(info); if(ok) return; } if(!carnet.length) return toast('Journal vide — ouvre d\'abord un lot, puis repartage');
     const sorted=me?[...carnet].sort((a,b)=>map.distance(me,[a.lat,a.lng])-map.distance(me,[b.lat,b.lng])):carnet;
     const list=sorted.slice(0,6).map((r,i)=>`${i+1}. Lot ${r.lot}${r.owner?' · '+r.owner:''}${me?' · '+Math.round(map.distance(me,[r.lat,r.lng]))+' m':''}`).join('\n');
     const ans=prompt(`Annonce ${info.id||''} reçue.\nAttacher à quel lot ?\n\n${list}`,'1'); const r=sorted[(+ans)-1]; if(!r) return toast('Annonce non attachée');
@@ -1528,7 +1593,7 @@ document.querySelectorAll('#permList button').forEach(b=>b.onclick=()=>askPerm(b
   const close=()=>{ el.hidden=true; log('intro_close',{slide:idx()}); setTimeout(updatePeek,100); };
   $('introNext').onclick=()=>{ const i=idx(); if(i>=n-1) return close(); go(i+1); };
   $('introSkip').onclick=()=>{ const i=idx(); if(i>=n-1) return close(); go(n-1); };
-  window.openIntro=(atSetup)=>{ el.hidden=false; sl.scrollLeft=atSetup?(n-1)*(sl.clientWidth||0):0; upd(); refreshPerms(); log('intro_open',{setup:!!atSetup}); };
+  window.openIntro=(atSetup)=>{ el.hidden=false; try{ renderLogCount(); }catch{} sl.scrollLeft=atSetup?(n-1)*(sl.clientWidth||0):0; upd(); refreshPerms(); log('intro_open',{setup:!!atSetup}); };
   $('btnHelp').onclick=()=>openIntro(false);
   // Au démarrage : seulement si quelque chose d'important manque (installation ou position), sauf si désactivé.
   (async()=>{ if(off) return; const geo=await permState('geolocation'); const firstTime=!store.get('terrain.seenGuide',false);
