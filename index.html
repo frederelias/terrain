@@ -406,6 +406,18 @@ details.sec .in{padding:0 0 14px}
 .src .doc.link span{display:inline}
 body.isoff .strip,body.isoff .measure{top:calc(var(--sat) + 104px)}
 body.isoff .mapctl{top:calc(var(--sat) + 164px)}
+/* v36 : en-tête jamais tronqué ; contrôles de carte à la Google Maps */
+.topbar h1.brand{flex:0 0 auto;min-width:auto;overflow:visible;max-width:none}
+.mapctl{gap:10px}
+.mapctl .ctl{margin-top:0;width:48px;height:48px}
+.ctl.dark{color:var(--ink,#17201A)} .ctl.dark svg{width:24px;height:24px}
+.ctl[aria-pressed="true"]{background:#FF5A1F;color:#141A16}
+.mapctl .compass{width:48px;height:48px;margin-top:2px}
+.mapctl .compass svg{width:38px;height:38px}
+.mectl{position:fixed;right:12px;bottom:calc(var(--sab) + 166px);z-index:1000}
+.mectl .ctl{margin:0;width:56px;height:56px}
+body.walking .mectl{bottom:calc(var(--sab) + 224px)}
+.measure{right:74px}
 /* Éléments retirés de l'ancienne interface */
 .bottom,.mode,.mapbtn,.walkpill,.clearbtn,.legend{display:none !important}
 
@@ -419,8 +431,6 @@ body.isoff .mapctl{top:calc(var(--sat) + 164px)}
 <header class="topbar">
   <h1 class="brand" aria-label="LOTS"><svg xmlns="http://www.w3.org/2000/svg" class="logo" viewBox="-60 -60 3546 1246" role="img" aria-label="LOTS"><rect x="47.5" y="47.5" width="3361" height="1061" fill="#F3EBD7" stroke="#141A16" stroke-width="95"/><g fill="#141A16" transform="translate(190 967) scale(1 -1)"><path transform="translate(0 0)" d="M20 0V164H70V614H20V778H442V614H350V164H440V256H639V0Z"/><path transform="translate(708 0)" d="M14 389Q14 600 113.5 696.0Q213 792 396 792Q579 792 678.5 696.0Q778 600 778 389Q778 178 678.5 82.0Q579 -14 396 -14Q213 -14 113.5 82.0Q14 178 14 389ZM464 238V540Q464 578 447.0 596.0Q430 614 396 614Q362 614 345.0 596.0Q328 578 328 540V238Q328 199 345.0 181.5Q362 164 396 164Q430 164 447.0 182.0Q464 200 464 238Z"/><path transform="translate(1555 0)" d="M766 536H594V614H530V164H600V0H180V164H250V614H186V536H14V778H766Z"/><path transform="translate(2390 0)" d="M17 40V238H237Q237 207 251.0 193.0Q265 179 302 179Q333 179 346.5 188.5Q360 198 360 217Q360 233 347.0 244.5Q334 256 302 268L216 298Q105 340 56.5 397.0Q8 454 8 551Q8 669 85.5 730.5Q163 792 344 792Q431 792 507.5 774.5Q584 757 631 728V549H431Q431 599 369 599Q339 599 326.5 591.5Q314 584 314 565Q314 548 328.5 538.0Q343 528 376 517L463 487Q569 451 617.5 393.5Q666 336 666 243Q666 116 580.5 51.0Q495 -14 330 -14Q234 -14 148.5 2.5Q63 19 17 40Z"/></g><rect x="-30" y="-30" width="230" height="230" fill="#FF5A1F" stroke="#141A16" stroke-width="40"/></svg></h1>
   <button class="searchbtn" id="btnSearch" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg><span>N° de lot, adresse, lien Centris</span></button>
-  <button class="chip icon" id="btnLayers" aria-label="Couches et légende"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l9 5-9 5-9-5 9-5z"/><path d="M3 13l9 5 9-5"/></svg></button>
-  <button class="chip icon" id="btnMeasure" aria-pressed="false" aria-label="Mesurer une distance ou une surface"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17L17 3l4 4L7 21z"/><path d="M7 13l2 2M10 10l2 2M13 7l2 2"/></svg></button>
   <button class="chip icon" id="btnHelp" aria-label="Guide et réglages">?</button>
 </header>
 
@@ -439,12 +449,14 @@ body.isoff .mapctl{top:calc(var(--sat) + 164px)}
 </div>
 
 <div class="mapctl">
+  <button class="ctl dark" id="btnLayers" aria-label="Couches et légende"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l9 5-9 5-9-5 9-5z"/><path d="M3 13l9 5 9-5"/></svg></button>
+  <button class="ctl dark" id="btnMeasure" aria-pressed="false" aria-label="Mesurer une distance ou une surface"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17L17 3l4 4L7 21z"/><path d="M7 13l2 2M10 10l2 2M13 7l2 2"/></svg></button>
   <button class="compass off" id="compass" aria-label="Boussole">
     <svg viewBox="0 0 44 44"><circle cx="22" cy="22" r="20" fill="none" stroke="#C9D1C4" stroke-width="2"/><path d="M22 5 L27 22 L22 20 L17 22 Z" fill="#B4541E"/><path d="M22 39 L27 22 L22 24 L17 22 Z" fill="#C9D1C4"/><text x="22" y="14" text-anchor="middle" font-size="9" font-weight="700" fill="#1F3D2B">N</text></svg>
     <span class="deg" id="deg">boussole</span>
   </button>
-  <button class="ctl" id="btnMe" aria-label="Aller à ma position"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="12" cy="12" r="3" fill="currentColor"/><circle cx="12" cy="12" r="8"/><path d="M12 1v3M12 20v3M1 12h3M20 12h3"/></svg></button>
 </div>
+<div class="mectl"><button class="ctl" id="btnMe" aria-label="Aller à ma position"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="12" cy="12" r="3" fill="currentColor"/><circle cx="12" cy="12" r="8"/><path d="M12 1v3M12 20v3M1 12h3M20 12h3"/></svg></button></div>
 
 <div class="pin" aria-hidden="true"><svg viewBox="0 0 34 44"><path d="M17 1C8 1 1 8 1 17c0 11 16 26 16 26s16-15 16-26C33 8 26 1 17 1z" fill="#1E6FD9" stroke="#fff" stroke-width="2"/><circle cx="17" cy="17" r="6" fill="#fff"/></svg></div>
 <div class="ring" id="ring" aria-hidden="true"><span id="ringLabel">250 m</span></div>
@@ -677,7 +689,7 @@ body.isoff .mapctl{top:calc(var(--sat) + 164px)}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script>
 /* ============================ CONFIG ============================ */
-const APP_VERSION='v35';
+const APP_VERSION='v36';
 const CONFIG = {
   ringFraction: 0.70, maxRadius: 1500, coneLength: 150, coneHalfAngle: 25,
   cadastre: 'https://geo.environnement.gouv.qc.ca/donnees/rest/services/Reference/Cadastre_allege/MapServer',
