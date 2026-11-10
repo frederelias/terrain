@@ -618,6 +618,27 @@ body.walking .peek{bottom:calc(var(--sab) + 170px)}
 .peek .pkeep{flex:none;width:46px;min-height:46px;border-radius:12px;background:var(--field);color:var(--ink-2);font-size:20px}
 .peek .pkeep[aria-pressed="true"]{background:#F5DED8;color:#B8321F}
 
+
+/* ---- R4 : fiche épurée ---- */
+.hero{position:relative}
+.heroedit{position:absolute;right:10px;bottom:10px;min-height:40px;padding:0 14px;border-radius:999px;background:rgba(22,20,15,.72);color:#F2ECDF;font-weight:700;font-size:14px;backdrop-filter:blur(4px)}
+.eyebrow[hidden]{display:none}
+.idgrid.two>*{border-bottom:0}
+.grole[hidden]{display:none}
+.idgrid .grole b{font-size:15.5px}
+.prowwrap{display:flex;gap:8px;align-items:stretch}
+.prowwrap .prow{flex:1;min-width:0}
+.clip{flex:none;width:52px;border:1px solid var(--line);border-radius:14px;background:var(--paper);color:var(--ink);display:flex;align-items:center;justify-content:center}
+.clip:active{background:var(--field)}
+#secExplore .src>a,#secExplore .src>.doc{display:none}
+#secExplore .src{display:block;padding:8px 0;border-bottom:1px solid var(--line)}
+#secExplore .src:has(.st:empty){display:none}
+#secExplore .slab{display:block;font-weight:700;font-size:14px;margin-bottom:6px}
+.hmpick{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;margin:6px 0 10px}
+.hmthumb{aspect-ratio:1;border-radius:10px;overflow:hidden;padding:0;border:2px solid transparent}
+.hmthumb[aria-pressed="true"]{border-color:var(--act)}
+.hmthumb img{width:100%;height:100%;object-fit:cover;display:block}
+
 /* Éléments retirés de l'ancienne interface */
 .bottom,.mode,.mapbtn,.walkpill,.clearbtn,.legend{display:none !important}
 
@@ -756,15 +777,15 @@ body.walking .peek{bottom:calc(var(--sab) + 170px)}
   <div class="grip"></div>
   <header><div class="t"><h2 id="lotNo">—</h2><p id="lotWhere">—</p></div><button class="keep" id="btnFav" aria-pressed="false"><span class="h" aria-hidden="true">♥</span><span id="favLabel">Garder</span></button><button class="close" id="btnShare" aria-label="Partager ce lot"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="M7.5 7.5L12 3l4.5 4.5"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></svg></button><button class="close" id="closeLot" aria-label="Fermer">×</button></header>
   <div class="body">
-    <div class="hero"><img id="heroImg" src="brand/paysage.jpg" alt=""></div>
+    <div class="hero"><img id="heroImg" src="brand/paysage.jpg" alt="Photo du lot"><button class="heroedit" id="heroEdit" aria-label="Changer la photo du lot">✎ Photo</button></div>
     <div class="sum2">
       <div class="eyebrow" id="sumEyebrow"></div>
-      <div class="lotbig" id="sumLotBig"></div>
+      
       <div class="idgrid">
         <div><small>Superficie</small><b id="gArea">—</b><span id="sumUnits" class="units"></span></div>
-        <div><small>Municipalité</small><b id="gMuni">—</b></div>
-        <div><small>MRC</small><b id="gMrc">—</b></div>
         <button class="gown" id="gOwner" aria-label="Fiche propriétaire"><small>Propriétaire</small><b id="sumOwner" class="unk">À rechercher</b><span class="chev" aria-hidden="true">›</span></button>
+        <div class="grole" id="gValueCell" hidden><small>Valeur au rôle</small><b id="gValue">—</b></div>
+        <div class="grole" id="gUseCell" hidden><small>Usage au rôle</small><b id="gUse">—</b></div>
       </div>
       <div class="tags" id="sumTags"></div>
       <p class="prov" id="sumProv"></p>
@@ -772,28 +793,13 @@ body.walking .peek{bottom:calc(var(--sab) + 170px)}
     <h3 class="chkh">À vérifier avant d'aller plus loin</h3>
     <div class="prows" id="chkList">
       <a class="prow" id="chkAccess" target="_blank" rel="noopener"><span class="pic" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 21V4M5 4h11l-2 4 2 4H5"/></svg></span><span class="pt"><b>Accès routier</b><span id="chkAccessSub">Non confirmé</span></span><span class="chev" aria-hidden="true">›</span></a>
-      <a class="prow" id="chkZoning" target="_blank" rel="noopener"><span class="pic" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 7h14l-2 10H4z"/></svg></span><span class="pt"><b>Zonage et usages</b><span id="chkZoningSub">Ouvrir la source municipale</span></span><span class="chev" aria-hidden="true">›</span></a>
-      <a class="prow" id="chkCadastre" target="_blank" rel="noopener"><span class="pic" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="4" width="14" height="16" rx="1"/><path d="M8 8h8M8 12h8M8 16h5"/></svg></span><span class="pt"><b>Cadastre et superficie</b><span id="chkCadastreSub">Ouvrir Infolot</span></span><span class="chev" aria-hidden="true">›</span></a>
-      <a class="prow" id="chkRole" target="_blank" rel="noopener"><span class="pic" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11l8-7 8 7v9H4z"/></svg></span><span class="pt"><b>Rôle d'évaluation</b><span id="chkRoleSub">Valeurs, usage, propriétaire selon la MRC</span></span><span class="chev" aria-hidden="true">›</span></a>
+      <div class="prowwrap"><a class="prow" id="chkZoning" target="_blank" rel="noopener"><span class="pic" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 7h14l-2 10H4z"/></svg></span><span class="pt"><b>Zonage et usages</b><span id="chkZoningSub">Ouvrir la source municipale</span></span><span class="chev" aria-hidden="true">›</span></a><button class="clip" data-src="muni" aria-label="Joindre une capture ou un document (municipalité)"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.5 11.5l-8.2 8.2a5 5 0 0 1-7.1-7.1l8.6-8.6a3.4 3.4 0 0 1 4.8 4.8l-8.5 8.5a1.7 1.7 0 0 1-2.4-2.4l7.8-7.8"/></svg></button></div>
+      <div class="prowwrap"><a class="prow" id="chkCadastre" target="_blank" rel="noopener"><span class="pic" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="4" width="14" height="16" rx="1"/><path d="M8 8h8M8 12h8M8 16h5"/></svg></span><span class="pt"><b>Cadastre et superficie</b><span id="chkCadastreSub">Ouvrir Infolot</span></span><span class="chev" aria-hidden="true">›</span></a><button class="clip" data-src="infolot" aria-label="Joindre une capture ou un document (Infolot)"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.5 11.5l-8.2 8.2a5 5 0 0 1-7.1-7.1l8.6-8.6a3.4 3.4 0 0 1 4.8 4.8l-8.5 8.5a1.7 1.7 0 0 1-2.4-2.4l7.8-7.8"/></svg></button></div>
+      <a class="prow" id="chkCall" href="#"><span class="pic" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/></svg></span><span class="pt"><b>Appeler la municipalité</b><span id="chkCallSub">Confirmer le zonage, l'accès, un permis</span></span><span class="chev" aria-hidden="true">›</span></a>
       <span id="chkBauxWrap" hidden><button class="prow" id="chkBaux"><span class="pic" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 20h18L12 4z"/></svg></span><span class="pt"><b>Terre publique louée</b><span id="chkBauxSub">Un bail public touche ce lot : à vérifier</span></span><span class="chev" aria-hidden="true">›</span></button></span>
     </div>
 
-    <details class="sec" id="secExplore" open>
-      <summary>Explorer ce lot <span class="c">rôle · registre · cadastre</span></summary>
-      <div class="in">
-        <div class="role" id="roleBox" hidden></div>
-        <div class="role" id="openBox" hidden></div>
-        <h3>Ouvrir les sources officielles</h3>
-        <p class="fine">Le trombone joint à chaque source une capture d'écran ou un document (PDF du Registre, fiche du rôle…), gardé dans ton téléphone.</p>
-        <div class="sources">
-          <div class="src" data-src="registre"><a id="lnkRegistre" target="_blank" rel="noopener">Registre foncier (acte de vente, adresse)</a><button class="doc" data-src="registre" aria-label="Joindre une capture ou un document"><svg viewBox="0 0 24 24"><path d="M20.5 11.5l-8.2 8.2a5 5 0 0 1-7.1-7.1l8.6-8.6a3.4 3.4 0 0 1 4.8 4.8l-8.5 8.5a1.7 1.7 0 0 1-2.4-2.4l7.8-7.8"/></svg><b class="n" hidden></b></button><div class="st" data-thumbs="registre"></div></div>
-          <div class="src" data-src="role"><a id="lnkRole" target="_blank" rel="noopener">Rôle d'évaluation de la MRC</a><button class="doc" data-src="role" aria-label="Joindre une capture ou un document"><svg viewBox="0 0 24 24"><path d="M20.5 11.5l-8.2 8.2a5 5 0 0 1-7.1-7.1l8.6-8.6a3.4 3.4 0 0 1 4.8 4.8l-8.5 8.5a1.7 1.7 0 0 1-2.4-2.4l7.8-7.8"/></svg><b class="n" hidden></b></button><div class="st" data-thumbs="role"></div></div>
-          <div class="src" data-src="infolot"><a id="lnkInfolot" target="_blank" rel="noopener">Infolot (plan du cadastre)</a><button class="doc" data-src="infolot" aria-label="Joindre une capture ou un document"><svg viewBox="0 0 24 24"><path d="M20.5 11.5l-8.2 8.2a5 5 0 0 1-7.1-7.1l8.6-8.6a3.4 3.4 0 0 1 4.8 4.8l-8.5 8.5a1.7 1.7 0 0 1-2.4-2.4l7.8-7.8"/></svg><b class="n" hidden></b></button><div class="st" data-thumbs="infolot"></div></div>
-          <div class="src muni" data-src="muni"><a id="lnkCall" href="#">Appeler la municipalité</a><a id="lnkMuni" target="_blank" rel="noopener">Site web</a><button class="doc" data-src="muni" aria-label="Joindre une capture ou un document"><svg viewBox="0 0 24 24"><path d="M20.5 11.5l-8.2 8.2a5 5 0 0 1-7.1-7.1l8.6-8.6a3.4 3.4 0 0 1 4.8 4.8l-8.5 8.5a1.7 1.7 0 0 1-2.4-2.4l7.8-7.8"/></svg><b class="n" hidden></b></button><div class="st" data-thumbs="muni"></div></div>
-        </div>
-        <div class="links"><button id="copyLot" class="wide">Copier le n° de lot</button></div>
-      </div>
-    </details>
+    
 
     <details class="sec" id="secOwner" hidden><summary><span class="c" id="secOwnerC"></span></summary><div id="ownerStash"><label class="fine" for="lotOwner">Nom du propriétaire (tel qu'au rôle ou au Registre)</label>
         <input class="f" id="lotOwner" placeholder="Prénom Nom ou nom de l'entreprise" autocomplete="off">
@@ -834,6 +840,23 @@ body.walking .peek{bottom:calc(var(--sab) + 170px)}
         <input type="file" id="photoInput" accept="image/*" multiple hidden>
         <input type="file" id="docInput" accept="image/*,application/pdf,.pdf,.doc,.docx,.xls,.xlsx,.csv,.txt,.rtf,.html,.htm,.mht,.mhtml" multiple hidden>
         <div class="thumbs" id="thumbs"></div>
+      </div>
+    </details>
+
+    <details class="sec" id="secExplore">
+      <summary>Rôle et pièces jointes <span class="c" id="secExploreC"></span></summary>
+      <div class="in">
+        <div class="role" id="roleBox" hidden></div>
+        <div class="role" id="openBox" hidden></div>
+        <h3>Pièces jointes</h3>
+        <p class="fine" id="attHint">Joins une capture ou un PDF avec le trombone, à côté de chaque source : Infolot et municipalité ici, Registre foncier et rôle dans la fiche propriétaire. Tout reste dans ton téléphone.</p>
+        <div class="sources">
+          <div class="src" data-src="registre"><span class="slab">Registre foncier</span><a id="lnkRegistre" target="_blank" rel="noopener">Registre foncier (acte de vente, adresse)</a><button class="doc" data-src="registre" aria-label="Joindre une capture ou un document"><svg viewBox="0 0 24 24"><path d="M20.5 11.5l-8.2 8.2a5 5 0 0 1-7.1-7.1l8.6-8.6a3.4 3.4 0 0 1 4.8 4.8l-8.5 8.5a1.7 1.7 0 0 1-2.4-2.4l7.8-7.8"/></svg><b class="n" hidden></b></button><div class="st" data-thumbs="registre"></div></div>
+          <div class="src" data-src="role"><span class="slab">Rôle d'évaluation</span><a id="lnkRole" target="_blank" rel="noopener">Rôle d'évaluation de la MRC</a><button class="doc" data-src="role" aria-label="Joindre une capture ou un document"><svg viewBox="0 0 24 24"><path d="M20.5 11.5l-8.2 8.2a5 5 0 0 1-7.1-7.1l8.6-8.6a3.4 3.4 0 0 1 4.8 4.8l-8.5 8.5a1.7 1.7 0 0 1-2.4-2.4l7.8-7.8"/></svg><b class="n" hidden></b></button><div class="st" data-thumbs="role"></div></div>
+          <div class="src" data-src="infolot"><span class="slab">Infolot</span><a id="lnkInfolot" target="_blank" rel="noopener">Infolot (plan du cadastre)</a><button class="doc" data-src="infolot" aria-label="Joindre une capture ou un document"><svg viewBox="0 0 24 24"><path d="M20.5 11.5l-8.2 8.2a5 5 0 0 1-7.1-7.1l8.6-8.6a3.4 3.4 0 0 1 4.8 4.8l-8.5 8.5a1.7 1.7 0 0 1-2.4-2.4l7.8-7.8"/></svg><b class="n" hidden></b></button><div class="st" data-thumbs="infolot"></div></div>
+          <div class="src muni" data-src="muni"><span class="slab">Municipalité</span><a id="lnkCall" href="#">Appeler la municipalité</a><a id="lnkMuni" target="_blank" rel="noopener">Site web</a><button class="doc" data-src="muni" aria-label="Joindre une capture ou un document"><svg viewBox="0 0 24 24"><path d="M20.5 11.5l-8.2 8.2a5 5 0 0 1-7.1-7.1l8.6-8.6a3.4 3.4 0 0 1 4.8 4.8l-8.5 8.5a1.7 1.7 0 0 1-2.4-2.4l7.8-7.8"/></svg><b class="n" hidden></b></button><div class="st" data-thumbs="muni"></div></div>
+        </div>
+        <div class="links"><button id="copyLot" class="wide">Copier le n° de lot</button></div>
       </div>
     </details>
 
@@ -966,6 +989,15 @@ body.walking .peek{bottom:calc(var(--sab) + 170px)}
     <button class="cancel" id="shareClose">Fermer</button>
   </div>
 </div>
+<div class="modal" id="heroModal" hidden role="dialog" aria-modal="true" aria-labelledby="hmTitle">
+  <div class="mbox">
+    <h2 id="hmTitle">Photo du lot</h2>
+    <div class="trows"><button class="trowb" id="hmTake"><b>Prendre une photo orientée</b><span>Position et direction enregistrées</span></button><button class="trowb" id="hmGallery"><b>Choisir dans la galerie</b><span>Sans position ni direction</span></button><button class="trowb" id="hmReset"><b>Remettre l'illustration</b><span>Paysage Terre de rang</span></button></div>
+    <div id="hmPickWrap" hidden><h3>Parmi les photos du lot</h3><div class="hmpick" id="hmPick"></div></div>
+    <input type="file" id="heroInput" accept="image/*" hidden>
+    <button class="cancel" id="hmClose">Fermer</button>
+  </div>
+</div>
 <div class="modal" id="walkPrep" hidden role="dialog" aria-modal="true" aria-labelledby="wpTitle">
   <div class="mbox">
     <div class="aimstep">Préparer la sortie</div><h2 id="wpTitle">Prêt à marcher ?</h2>
@@ -982,8 +1014,8 @@ body.walking .peek{bottom:calc(var(--sab) + 170px)}
     <div class="opcard"><label for="lotOwner">Nom relevé au rôle / registre</label><div id="opNameHost"></div><div class="oprole" id="opRole" hidden></div></div>
     <h3 class="chkh">Pistes de recherche</h3>
     <div class="prows">
-      <a class="prow" id="opRegistre" target="_blank" rel="noopener"><span class="pic" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="4" width="14" height="16" rx="1"/><path d="M8 8h8M8 12h8M8 16h5"/></svg></span><span class="pt"><b>Registre foncier</b><span id="opRegistreSub">Consulter le titre · n° de lot copié</span></span><span class="chev" aria-hidden="true">›</span></a>
-      <a class="prow" id="opRoleLink" target="_blank" rel="noopener"><span class="pic" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11l8-7 8 7v9H4z"/></svg></span><span class="pt"><b>Rôle municipal</b><span id="opRoleLinkSub">Selon la disponibilité</span></span><span class="chev" aria-hidden="true">›</span></a>
+      <div class="prowwrap"><a class="prow" id="opRegistre" target="_blank" rel="noopener"><span class="pic" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="4" width="14" height="16" rx="1"/><path d="M8 8h8M8 12h8M8 16h5"/></svg></span><span class="pt"><b>Registre foncier</b><span id="opRegistreSub">Consulter le titre · n° de lot copié</span></span><span class="chev" aria-hidden="true">›</span></a><button class="clip" data-src="registre" aria-label="Joindre une capture ou un document (Registre foncier)"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.5 11.5l-8.2 8.2a5 5 0 0 1-7.1-7.1l8.6-8.6a3.4 3.4 0 0 1 4.8 4.8l-8.5 8.5a1.7 1.7 0 0 1-2.4-2.4l7.8-7.8"/></svg></button></div>
+      <div class="prowwrap"><a class="prow" id="opRoleLink" target="_blank" rel="noopener"><span class="pic" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11l8-7 8 7v9H4z"/></svg></span><span class="pt"><b>Rôle municipal</b><span id="opRoleLinkSub">Selon la disponibilité</span></span><span class="chev" aria-hidden="true">›</span></a><button class="clip" data-src="role" aria-label="Joindre une capture ou un document (rôle)"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.5 11.5l-8.2 8.2a5 5 0 0 1-7.1-7.1l8.6-8.6a3.4 3.4 0 0 1 4.8 4.8l-8.5 8.5a1.7 1.7 0 0 1-2.4-2.4l7.8-7.8"/></svg></button></div>
       <button class="prow" id="opWebBtn" aria-expanded="false"><span class="pic" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="6"/><path d="M20 20l-4-4"/></svg></span><span class="pt"><b>Recherche Web</b><span id="opWebBtnSub">À partir du nom saisi</span></span><span class="chev" aria-hidden="true">›</span></button>
     </div>
     <div id="opWeb" hidden></div>
@@ -1020,7 +1052,7 @@ body.walking .peek{bottom:calc(var(--sab) + 170px)}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script>
 /* ============================ CONFIG ============================ */
-const APP_VERSION='R3';
+const APP_VERSION='R4';
 const CONFIG = {
   ringFraction: 0.70, maxRadius: 1500, coneLength: 150, coneHalfAngle: 25,
   cadastre: 'https://geo.environnement.gouv.qc.ca/donnees/rest/services/Reference/Cadastre_allege/MapServer',
@@ -1151,6 +1183,7 @@ const ft2=ha=>fmt(ha*107639.1,0)+' pi²';
 const acres=ha=>ha*2.471054;
 const UNIT=()=>store.get('lots.unit','pi2');
 const areaFmt=(ha,short)=>{ const u=UNIT(); return u==='ac'?`${fmt(acres(ha),short?1:2)} acres`:u==='ha'?`${fmt(ha,2)} ha`:`${fmt(ha*107639.1,0)} pi²`; };
+const unitsOthers=ha=>{ const u=UNIT(); return [['pi2',`${fmt(ha*107639.1,0)} pi²`],['m2',`${fmt(ha*10000,0)} m²`],['ac',`${fmt(acres(ha),2)} acres`],['ha',`${fmt(ha,2)} ha`]].filter(x=>x[0]!==u).map(x=>x[1]).join(' · '); };
 const unitsLine=ha=>{ const all=[['pi2',`${fmt(ha*107639.1,0)} pi²`],['m2',`${fmt(ha*10000,0)} m²`],['ac',`${fmt(acres(ha),2)} acres`],['ha',`${fmt(ha,2)} ha`]]; const u=UNIT(); const first=all.find(x=>x[0]===u)||all[0]; return `<b>${first[1]}</b> · `+all.filter(x=>x!==first).map(x=>x[1]).join(' · '); };
 function addrLabel(p){const k=Object.keys(p);const civ=k.find(x=>/CIV/i.test(x)),odo=k.find(x=>/ODON|RUE|VOIE/i.test(x));return [civ&&p[civ],odo&&p[odo]].filter(Boolean).join(' ');}
 const fmtDist=m=>m>=1000?fmt(m/1000,2)+' km':Math.round(m)+' m';
@@ -1198,7 +1231,21 @@ $('opIcs').onclick=e=>{ e.preventDefault(); if(!selected||!$('lotNextDate').valu
   const ics=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//LOTS//Terre de rang//FR','BEGIN:VEVENT',`UID:${Date.now()}@lots.quebec`,`DTSTAMP:${new Date().toISOString().replace(/[-:]/g,'').slice(0,15)}Z`,`DTSTART;VALUE=DATE:${d}`,`DTEND;VALUE=DATE:${d2}`,`SUMMARY:Suivi — lot ${selected.lot}${selected.muni?' ('+selected.muni+')':''}`,`DESCRIPTION:${[who,st].filter(Boolean).join(' · ').replace(/[,;]/g,' ')}`,'END:VEVENT','END:VCALENDAR'].join('\r\n');
   const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([ics],{type:'text/calendar'})); a.download=`suivi-lot-${selected.lot.replace(/\s/g,'')}.ics`; a.click(); log('owner_ics'); };
 $('chkBaux').onclick=()=>toast('Un bail sur terre publique touche ce lot : vérifie ses limites avant toute démarche (Couches → Terres publiques louées).');
-async function heroFor(no){ const img=$('heroImg'); img.src='brand/paysage.jpg'; try{ const ph=(await listPhotos(no)).filter(p=>p.kind!=='doc'&&(!p.src||p.src==='terrain'||p.src==='marche'||p.src==='import')); if(ph.length&&selected?.lot===no){ img.src=URL.createObjectURL(ph[ph.length-1].blob); } }catch{} }
+let heroId=null, heroNext=false, heroUrl=null;
+const isField=p=>p.kind!=='doc'&&(!p.src||p.src==='terrain'||p.src==='marche'||p.src==='import');
+async function heroFor(no){ const img=$('heroImg'); let ph=[]; try{ ph=(await listPhotos(no)).filter(isField); }catch{}
+  if(selected?.lot!==no) return; const pick=(heroId&&ph.find(p=>p.id===heroId))||(heroId===''?null:ph[ph.length-1]);
+  if(heroUrl){ URL.revokeObjectURL(heroUrl); heroUrl=null; } if(pick){ heroUrl=URL.createObjectURL(pick.blob); img.src=heroUrl; } else img.src='brand/paysage.jpg'; }
+$('heroEdit').onclick=async()=>{ if(!selected) return; let ph=[]; try{ ph=(await listPhotos(selected.lot)).filter(isField); }catch{}
+  const box=$('hmPick'); box.innerHTML=''; ph.slice(-12).reverse().forEach(p=>{ const u=URL.createObjectURL(p.blob); const b=document.createElement('button'); b.className='hmthumb'; b.setAttribute('aria-pressed',p.id===heroId); b.innerHTML=`<img src="${u}" alt="${esc(p.title||'Photo')}">`; b.onclick=()=>{ heroId=p.id; saveNow(); heroFor(selected.lot); $('heroModal').hidden=true; log('hero',{via:'pick'}); }; box.appendChild(b); });
+  $('hmPickWrap').hidden=!ph.length; $('heroModal').hidden=false; log('hero_open',{n:ph.length}); };
+$('hmClose').onclick=()=>{ $('heroModal').hidden=true; };
+$('hmReset').onclick=()=>{ heroId=''; saveNow(); heroFor(selected.lot); $('heroModal').hidden=true; log('hero',{via:'reset'}); };
+$('hmTake').onclick=()=>{ $('heroModal').hidden=true; heroNext=true; openAim(selected.lot); };
+$('hmGallery').onclick=()=>$('heroInput').click();
+$('heroInput').addEventListener('change',async e=>{ const f=e.target.files[0]; e.target.value=''; if(!f||!selected) return; const lot=selected.lot;
+  try{ const blob=await shrink(f); const id=Date.now()+'-'+Math.random().toString(36).slice(2,7); await dbTx('readwrite',st=>st.put({id,lot,src:'import',t:Date.now(),taken:f.lastModified||null,blob,lat:null,lng:null,heading:null,title:'Photo du lot'})); heroId=id; saveNow(); heroFor(lot); renderThumbs(lot); toast('Photo du lot changée'); log('hero',{via:'gallery'}); }
+  catch{ toast('Photo non enregistrée : stockage indisponible'); } $('heroModal').hidden=true; });
 /* ---- Aperçu : garder dans le journal sans ouvrir la fiche ---- */
 $('peekKeep').onclick=()=>{ if(!peek.f) return; const f=peek.f, no=f.properties.NO_LOT; const i=carnet.findIndex(x=>x.lot===no);
   if(i>=0){ carnet[i].fav=!carnet[i].fav; } else { const b=L.geoJSON(f).getBounds(), c=b.getCenter(), today=new Date().toISOString().slice(0,10); carnet.unshift({lot:no,muni:peek.m?.MUS_NM_MUN||'',mrc:peek.m?.MUS_NM_MRC||'',lat:c.lat,lng:c.lng,ha:polyArea(f.geometry)/10000,geom:f.geometry,tags:[],fav:true,date:today,updated:today}); }
@@ -1392,19 +1439,19 @@ async function openLot(f,m){
   selected={lot:no,muni:m?.MUS_NM_MUN||'',mrc:m?.MUS_NM_MRC||'',lat:c.lat,lng:c.lng,ha:area/10000,geom:f.geometry}; ctx.lot=no; loading=true;
   selected.role=null; selected.built=null;
   log('lot_open',{lot:no,ha:+(area/10000).toFixed(2),muni:selected.muni});
-  $('lotNo').textContent=`Lot ${no}`; $('lotWhere').textContent=m?`${m.MUS_NM_MUN} · MRC ${m.MUS_NM_MRC}`:'Municipalité inconnue';
-  $('sumUnits').innerHTML=unitsLine(area/10000); $('sumProv').textContent=`Superficie calculée sur le contour du cadastre (Gouv. du Québec), consulté le ${new Date().toLocaleDateString('fr-CA',{day:'numeric',month:'long',year:'numeric'})} · à vérifier sur place`;
-  $('lnkInfolot').href=CONFIG.infolot; $('chkCadastre').href=CONFIG.infolot; $('chkRole').href=roleUrl(m,no,b); $('opRoleLink').href=$('chkRole').href; $('opRegistre').href=CONFIG.registre;
+  $('lotNo').textContent=`Lot ${no}`; $('lotWhere').textContent=m?(m.MUS_NM_MRC&&m.MUS_NM_MRC!==m.MUS_NM_MUN?`${m.MUS_NM_MUN} · MRC ${m.MUS_NM_MRC}`:m.MUS_NM_MUN):'Municipalité inconnue';
+  $('sumProv').textContent=`Superficie calculée sur le contour du cadastre (Gouv. du Québec), consulté le ${new Date().toLocaleDateString('fr-CA',{day:'numeric',month:'long',year:'numeric'})} · à vérifier sur place`;
+  $('lnkInfolot').href=CONFIG.infolot; $('chkCadastre').href=CONFIG.infolot; $('opRoleLink').href=roleUrl(m,no,b); $('opRegistre').href=CONFIG.registre;
   $('chkAccess').href=`https://www.google.com/maps/search/?api=1&query=${c.lat.toFixed(6)},${c.lng.toFixed(6)}`; $('opLot').textContent=`Lot ${no}`;
   heroFor(no); $('lnkRegistre').href=CONFIG.registre; $('lnkRole').href=roleUrl(m,no,b);
-  const tel=(m?.TELEPHONE||'').replace(/[^+\d]/g,''); $('lnkCall').href=tel?'tel:'+tel:'#'; $('lnkCall').textContent=m?.TELEPHONE?'Appeler · '+m.TELEPHONE:'Appeler la municipalité'; $('lnkCall').classList.toggle('disabled',!tel);
+  const tel=(m?.TELEPHONE||'').replace(/[^+\d]/g,''); $('lnkCall').href=tel?'tel:'+tel:'#'; $('chkCall').href=tel?'tel:'+tel:'#'; $('chkCallSub').textContent=tel?`${m.MUS_NM_MUN} · ${m.TELEPHONE}`:'Numéro inconnu — voir le site de la municipalité'; $('lnkCall').textContent=m?.TELEPHONE?'Appeler · '+m.TELEPHONE:'Appeler la municipalité'; $('lnkCall').classList.toggle('disabled',!tel);
   const site=m?.SITE_WEB?(m.SITE_WEB.startsWith('http')?m.SITE_WEB:'https://'+m.SITE_WEB):null; $('lnkMuni').href=site||CONFIG.infolot; $('chkZoning').href=site||CONFIG.infolot; $('chkZoningSub').textContent=site?`Règlement de zonage de ${m.MUS_NM_MUN}`:'Municipalité inconnue — ouvre Infolot'; $('lnkMuni').textContent=site?`Site de ${m.MUS_NM_MUN}`:'Site web';
   const saved=carnet.find(x=>x.lot===no);
   $('lotOwner').value=saved?.owner||''; $('lotEmail').value=saved?.email||''; $('lotPhone').value=saved?.phone||''; $('lotAddrPost').value=saved?.addrPost||''; $('lotNote').value=saved?.note||'';
-  $('lotOStatus').value=saved?.ownerStatus||''; $('lotNextDate').value=saved?.nextDate||''; $('opIcs').hidden=!saved?.nextDate; $('lotVisited').checked=!!saved?.visited; $('lotContacted').checked=!!(saved?.tags||[]).includes('c'); setFav(!!saved?.fav);
+  heroId=saved?.heroId||null; heroNext=false; $('lotOStatus').value=saved?.ownerStatus||''; $('lotNextDate').value=saved?.nextDate||''; $('opIcs').hidden=!saved?.nextDate; $('lotVisited').checked=!!saved?.visited; $('lotContacted').checked=!!(saved?.tags||[]).includes('c'); setFav(!!saved?.fav);
   syncCentris(saved?.centris||'',saved?.centrisInfo||null); loading=false;
   renderSummary(); ownerLinks(); contactLinks(); updateFicheState(); renderThumbs(no); renderAdsLot();
-  $('secExplore').open=true; $('secOwner').open=false; $('secContact').open=!!saved?.owner&&!(saved?.tags||[]).includes('c');
+  $('secExplore').open=false; $('secOwner').open=false; $('secContact').open=!!saved?.owner&&!(saved?.tags||[]).includes('c');
   loadRole(no,f.geometry,m); loadOpenRole(no,m);
   show(sheets.lot); tip('fiche','♥ Garder ajoute ce lot au journal. Tout ce que tu écris ici s\'enregistre tout seul.');
   addrInEnvelope(b).then(r=>{ if(selected?.lot!==no) return; const inside=r.features.filter(x=>inPoly(x.geometry.coordinates,f.geometry)); selected.built=inside.length>0; selected.builtAddr=inside.slice(0,2).map(x=>addrLabel(x.properties)).filter(Boolean).join(', '); renderSummary(); })
@@ -1414,13 +1461,14 @@ async function openLot(f,m){
 function renderSummary(){ if(!selected) return; const s=selected, r=s.role, own=$('lotOwner').value.trim()||s.roleOwner||'';
   const o=$('sumOwner'); o.textContent=own||'À rechercher'; o.classList.toggle('unk',!own);
   const st={nom:'Nom trouvé',coord:'Coordonnées trouvées',lettre:'Lettre envoyée',contacte:'Contacté',reponse:'Réponse reçue',refus:'Pas intéressé'}[$('lotOStatus').value]; if(own&&st) o.textContent=own+' · '+st;
-  $('sumLotBig').textContent=`Lot ${s.lot}`; $('gArea').textContent=areaFmt(s.ha); $('gMuni').textContent=s.muni||'—'; $('gMrc').textContent=s.mrc||'—';
-  const adr=r&&r[9]&&roleDomains?adrLabel(r[9],roleDomains):''; $('sumEyebrow').textContent=(adr?adr+' · ':'')+(s.muni||'');
+  $('gArea').textContent=areaFmt(s.ha); $('sumUnits').textContent=unitsOthers(s.ha);
+  const adr=r&&r[9]&&roleDomains?adrLabel(r[9],roleDomains):''; $('sumEyebrow').textContent=adr||''; $('sumEyebrow').hidden=!adr;
+  const use=r?(roleDomains?.CODE_UTILISATION_CUBF_3||{})[r[1]]:null; $('gValueCell').hidden=$('gUseCell').hidden=!r; document.querySelector('.idgrid').classList.toggle('two',!r); if(r){ $('gValue').textContent=r[5]!=null?money(r[5]):'—'; $('gUse').textContent=use||'—'; }
   $('chkAccessSub').textContent=s.built===true?`Adresse civique sur le lot${s.builtAddr?' : '+s.builtAddr:''} · accès probable`:s.built===false?'Non confirmé · aucune adresse civique':'Vérification en cours…';
   $('chkBauxWrap').hidden=!s.baux;
-  if(r){ const use=(roleDomains?.CODE_UTILISATION_CUBF_3||{})[r[1]]; $('chkRoleSub').textContent=[use,r[5]!=null?'évalué '+money(r[5]):null].filter(Boolean).join(' · ')||'Valeurs, usage, propriétaire selon la MRC'; }
+  if(r){ const use=(roleDomains?.CODE_UTILISATION_CUBF_3||{})[r[1]];  }
   const tags=[];
-  if(r){ const use=(roleDomains?.CODE_UTILISATION_CUBF_3||{})[r[1]]; if(use) tags.push(`<span>${esc(use)}</span>`); }
+  
   if(s.built===true) tags.push(`<span class="bad">Bâti${s.builtAddr?' · '+esc(s.builtAddr):''}</span>`); else if(s.built===false) tags.push('<span class="good">Sans adresse civique connue</span>');
   if(r){ const y=roleSince(r), yrs=y?new Date().getFullYear()-y:null; if(y) tags.push(`<span class="${yrs>=25?'hot':''}">Inscrit depuis ${y}</span>`); const nb=roleNb(r); if(nb) tags.push(`<span class="${nb>=3?'hot':''}">${nb} propriétaire${nb>1?'s':''}</span>`); const t=roleType(r); if(t) tags.push(`<span>${t}</span>`); if(r[7]&&r[7]!=='0') tags.push(`<span>Zone agricole ${r[7]==='2'?'100 %':'partielle'}</span>`); }
   if(s.baux) tags.push(`<span class="bad">Bail sur terre publique</span>`);
@@ -1435,10 +1483,10 @@ function updateFicheState(){ if(!selected) return; const saved=carnet.find(x=>x.
 function setFav(on){ $('btnFav').setAttribute('aria-pressed',on); $('favLabel').textContent=on?'Gardé':'Garder'; }
 $('btnFav').onclick=()=>{ if(!selected) return; const on=$('btnFav').getAttribute('aria-pressed')!=='true'; setFav(on); navigator.vibrate?.(10); log('fav',{on}); saveNow(); toast(on?'Gardé dans ton journal':'Retiré des favoris'); };
 function collect(){ const s=selected; const tags=$('lotContacted').checked?['c']:[];
-  return {lot:s.lot,muni:s.muni,mrc:s.mrc,lat:s.lat,lng:s.lng,ha:s.ha,geom:s.geom,owner:$('lotOwner').value.trim(),email:$('lotEmail').value.trim(),phone:$('lotPhone').value.trim(),addrPost:$('lotAddrPost').value.trim(),note:$('lotNote').value.trim(),tags,visited:$('lotVisited').checked,fav:$('btnFav').getAttribute('aria-pressed')==='true',centris:centrisUrl,centrisInfo,ownerStatus:$('lotOStatus').value,nextDate:$('lotNextDate').value}; }
+  return {lot:s.lot,muni:s.muni,mrc:s.mrc,lat:s.lat,lng:s.lng,ha:s.ha,geom:s.geom,owner:$('lotOwner').value.trim(),email:$('lotEmail').value.trim(),phone:$('lotPhone').value.trim(),addrPost:$('lotAddrPost').value.trim(),note:$('lotNote').value.trim(),tags,visited:$('lotVisited').checked,fav:$('btnFav').getAttribute('aria-pressed')==='true',centris:centrisUrl,centrisInfo,heroId:heroId||undefined,ownerStatus:$('lotOStatus').value,nextDate:$('lotNextDate').value}; }
 let saveT=null;
 function saveNow(){ clearTimeout(saveT); saveT=null; if(!selected||loading) return; const rec=collect(); const i=carnet.findIndex(x=>x.lot===rec.lot);
-  const has=rec.ownerStatus||rec.nextDate||rec.fav||rec.owner||rec.email||rec.phone||rec.addrPost||rec.note||rec.visited||rec.tags.length||rec.centris;
+  const has=rec.heroId||rec.ownerStatus||rec.nextDate||rec.fav||rec.owner||rec.email||rec.phone||rec.addrPost||rec.note||rec.visited||rec.tags.length||rec.centris;
   if(i<0&&!has){ updateFicheState(); return; }
   const today=new Date().toISOString().slice(0,10);
   if(i<0){ carnet.unshift({...rec,date:today,updated:today}); toast('Ajouté à ton journal'); log('save',{new:true}); }
@@ -1745,6 +1793,7 @@ function shrink(file,max=1280){ return new Promise(res=>{ const img=new Image();
 const SRC_LABEL={infolot:'Infolot',registre:'Registre foncier',role:'Rôle',muni:'Municipalité',centris:'Centris',terrain:'Photo',marche:'Photo orientée',import:'Photo importée'};
 let pendingSrc='terrain', povTarget=null;
 $('btnPhoto').onclick=()=>{ if(!selected) return; pendingSrc='terrain'; navigator.vibrate?.(12); $('photoInput').click(); };
+document.querySelectorAll('.clip[data-src]').forEach(b=>b.onclick=e=>{ e.preventDefault(); e.stopPropagation(); if(!selected) return; pendingSrc=b.dataset.src; navigator.vibrate?.(12); log('btn',{id:'clip_'+pendingSrc}); $('docInput').click(); });
 document.querySelectorAll('.src .doc[data-src]').forEach(b=>b.onclick=()=>{ if(!selected) return; pendingSrc=b.dataset.src; navigator.vibrate?.(12); log('btn',{id:'doc_'+pendingSrc}); $('docInput').click(); });
 const isImg=f=>/^image\//.test(f.type)&&!/svg/.test(f.type);
 const kb=n=>n>=1048576?fmt(n/1048576,1)+' Mo':Math.max(1,Math.round(n/1024))+' Ko';
@@ -1771,6 +1820,7 @@ let thumbUrls=[];
 async function renderThumbs(lot){ const box=$('thumbs'); thumbUrls.forEach(u=>URL.revokeObjectURL(u)); thumbUrls=[]; box.innerHTML='';
   document.querySelectorAll('.src .st').forEach(d=>{ if(d.dataset.thumbs) d.innerHTML=''; }); document.querySelectorAll('.src .doc .n').forEach(n=>{ n.hidden=true; n.textContent=''; });
   let ph=[]; try{ ph=await listPhotos(lot); }catch{ box.innerHTML='<span class="hint">Stockage photo indisponible sur ce navigateur</span>'; $('secPhotosC').textContent=''; return; }
+  { const att=ph.filter(p=>p.src&&!['terrain','marche','import'].includes(p.src)).length; $('secExploreC').textContent=att?`${att} pièce${att>1?'s':''}`:''; $('attHint').hidden=att>0; }
   if(selected?.lot!==lot) return;
   const field=ph.filter(p=>!p.src||p.src==='terrain'||p.src==='marche'||p.src==='import'); $('secPhotosC').textContent=ph.length?`${ph.length}`:'';
   if(!field.length) box.innerHTML='<span class="hint">Chemin d\'accès, pancarte, bornes… Les captures d\'écran du Registre ou du rôle se rangent sous chaque source.</span>';
@@ -1887,6 +1937,7 @@ $('vfSave').onclick=async()=>{ const ps=pendingShot; if(!ps) return; const lotNo
   try{ await dbTx('readwrite',st=>st.put({id,lot:lotNo,lotSure:!!lotNo&&lotNo===ps.auto,src:'marche',t:ps.t,blob:ps.blob,lat:ps.pos?.[0]??null,lng:ps.pos?.[1]??null,acc:ps.acc,heading:ps.h,walk:walk?.id||null,zoom:ps.zoom,title:note.slice(0,60)||undefined,note:note||undefined})); }
   catch(e){ toast('Photo non enregistrée : stockage du téléphone plein ou indisponible'); log('photo_error',{msg:String(e.message).slice(0,80)}); return; }
   if(walk){ walk.photos.push(id); persistActiveWalk(true); }
+  if(heroNext&&selected&&lotNo===selected.lot){ heroId=id; heroNext=false; saveNow(); heroFor(lotNo); }
   log('snap',{h:ps.h!=null?Math.round(ps.h):null,lot:!!lotNo,gps:!!ps.pos,note:!!note}); toast(`Photo enregistrée${lotNo?' · lot '+lotNo:''}${walk?' · ta marche continue':''}`);
   closeVerify(); renderPov(); if(selected&&selected.lot===lotNo) renderThumbs(lotNo); povTarget=null; };
 function aimTick(){ if($('aim').hidden) return; const h=heading; $('aimDeg').textContent=h==null?'—°':Math.round(h)+'°'; $('aimRose').style.transform=`rotate(${h==null?0:-h}deg)`; const f=$('aimFlat'); f.classList.toggle('ok',tiltFlat); f.textContent=h==null?'boussole indisponible':(tiltFlat?'Téléphone à plat ✓':'Tiens le téléphone à plat'); $('aimFix').textContent=h==null?'Continuer sans direction':'Fixer le point de vue'; }
