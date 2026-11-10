@@ -510,7 +510,7 @@ body.walking .mectl{bottom:calc(var(--sab) + 224px)}
     </article>
     <article>
       <div class="ill"><svg viewBox="0 0 120 120"><rect x="15" y="12" width="90" height="96" rx="12" fill="#fff" stroke="#C9D1C4" stroke-width="2"/><rect x="26" y="24" width="50" height="10" rx="3" fill="#1F3D2B"/><rect x="26" y="42" width="68" height="18" rx="6" fill="#ECEDE8"/><rect x="26" y="68" width="68" height="8" rx="3" fill="#C9D1C4"/><rect x="26" y="82" width="68" height="8" rx="3" fill="#C9D1C4"/><path d="M90 22c-3 0-5 2-5 5 0 4 5 8 5 8s5-4 5-8c0-3-2-5-5-5z" fill="#C62828"/></svg></div>
-      <h2>La fiche trouve le propriétaire</h2>
+      <h2>La fiche : explorer, puis trouver le propriétaire</h2>
       <p>Rôle d'évaluation, Registre foncier, Canada411, Google, réseaux, Registre des entreprises. <b>♥ Garder</b> met le lot au carnet ; tout ce que tu écris s'enregistre seul.</p>
     </article>
     <article>
@@ -546,11 +546,25 @@ body.walking .mectl{bottom:calc(var(--sab) + 224px)}
       <div class="tags" id="sumTags"></div>
     </div>
 
-    <details class="sec" id="secOwner" open>
-      <summary>Trouver le propriétaire <span class="c" id="secOwnerC"></span></summary>
+    <details class="sec" id="secExplore" open>
+      <summary>Explorer ce lot <span class="c">rôle · registre · cadastre</span></summary>
       <div class="in">
         <div class="role" id="roleBox" hidden></div>
         <div class="role" id="openBox" hidden></div>
+        <h3>Ouvrir les sources officielles</h3>
+        <div class="sources">
+          <div class="src" data-src="registre"><a id="lnkRegistre" target="_blank" rel="noopener">Registre foncier (acte de vente, adresse)</a><button class="doc" data-src="registre" aria-label="Ajouter une capture du Registre"><svg viewBox="0 0 24 24"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg><b class="n" hidden></b></button><div class="st" data-thumbs="registre"></div></div>
+          <div class="src" data-src="role"><a id="lnkRole" target="_blank" rel="noopener">Rôle d'évaluation de la MRC</a><button class="doc" data-src="role" aria-label="Ajouter une capture du rôle"><svg viewBox="0 0 24 24"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg><b class="n" hidden></b></button><div class="st" data-thumbs="role"></div></div>
+          <div class="src" data-src="infolot"><a id="lnkInfolot" target="_blank" rel="noopener">Infolot (plan du cadastre)</a><button class="doc" data-src="infolot" aria-label="Ajouter une capture d'Infolot"><svg viewBox="0 0 24 24"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg><b class="n" hidden></b></button><div class="st" data-thumbs="infolot"></div></div>
+          <div class="src muni" data-src="muni"><a id="lnkCall" href="#">Appeler la municipalité</a><a id="lnkMuni" target="_blank" rel="noopener">Site web</a><button class="doc" data-src="muni" aria-label="Ajouter une capture de la municipalité"><svg viewBox="0 0 24 24"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg><b class="n" hidden></b></button><div class="st" data-thumbs="muni"></div></div>
+        </div>
+        <div class="links"><button id="copyLot" class="wide">Copier le n° de lot</button></div>
+      </div>
+    </details>
+
+    <details class="sec" id="secOwner">
+      <summary>Trouver le propriétaire <span class="c" id="secOwnerC"></span></summary>
+      <div class="in">
         <label class="fine" for="lotOwner">Nom du propriétaire (tel qu'au rôle ou au Registre)</label>
         <input class="f" id="lotOwner" placeholder="Prénom Nom ou nom de l'entreprise" autocomplete="off">
         <div class="links" id="ownerLinks">
@@ -563,14 +577,6 @@ body.walking .mectl{bottom:calc(var(--sab) + 224px)}
           <a id="lnkNoms" target="_blank" rel="noopener" class="wide">Registre foncier : autres terres de ce nom</a>
         </div>
         <p class="fine" id="ownerHint">Inscris le nom pour activer les recherches. Elles s'ouvrent préremplies ; l'app ne collecte rien elle-même.</p>
-        <h3>Sources officielles</h3>
-        <div class="sources">
-          <div class="src" data-src="registre"><a id="lnkRegistre" target="_blank" rel="noopener">Registre foncier (acte de vente, adresse)</a><button class="doc" data-src="registre" aria-label="Ajouter une capture du Registre"><svg viewBox="0 0 24 24"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg><b class="n" hidden></b></button><div class="st" data-thumbs="registre"></div></div>
-          <div class="src" data-src="role"><a id="lnkRole" target="_blank" rel="noopener">Rôle d'évaluation de la MRC</a><button class="doc" data-src="role" aria-label="Ajouter une capture du rôle"><svg viewBox="0 0 24 24"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg><b class="n" hidden></b></button><div class="st" data-thumbs="role"></div></div>
-          <div class="src" data-src="infolot"><a id="lnkInfolot" target="_blank" rel="noopener">Infolot (plan du cadastre)</a><button class="doc" data-src="infolot" aria-label="Ajouter une capture d'Infolot"><svg viewBox="0 0 24 24"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg><b class="n" hidden></b></button><div class="st" data-thumbs="infolot"></div></div>
-          <div class="src muni" data-src="muni"><a id="lnkCall" href="#">Appeler la municipalité</a><a id="lnkMuni" target="_blank" rel="noopener">Site web</a><button class="doc" data-src="muni" aria-label="Ajouter une capture de la municipalité"><svg viewBox="0 0 24 24"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg><b class="n" hidden></b></button><div class="st" data-thumbs="muni"></div></div>
-        </div>
-        <div class="links"><button id="copyLot" class="wide">Copier le n° de lot</button></div>
       </div>
     </details>
 
@@ -689,7 +695,7 @@ body.walking .mectl{bottom:calc(var(--sab) + 224px)}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script>
 /* ============================ CONFIG ============================ */
-const APP_VERSION='v36';
+const APP_VERSION='v37';
 const CONFIG = {
   ringFraction: 0.70, maxRadius: 1500, coneLength: 150, coneHalfAngle: 25,
   cadastre: 'https://geo.environnement.gouv.qc.ca/donnees/rest/services/Reference/Cadastre_allege/MapServer',
@@ -1019,7 +1025,7 @@ async function openLot(f,m){
   $('lotVisited').checked=!!saved?.visited; $('lotContacted').checked=!!(saved?.tags||[]).includes('c'); setFav(!!saved?.fav);
   syncCentris(saved?.centris||'',saved?.centrisInfo||null); loading=false;
   renderSummary(); ownerLinks(); contactLinks(); updateFicheState(); renderThumbs(no); renderAdsLot();
-  $('secOwner').open=!saved?.owner; $('secContact').open=!!saved?.owner&&!(saved?.tags||[]).includes('c');
+  $('secExplore').open=true; $('secOwner').open=false; $('secContact').open=!!saved?.owner&&!(saved?.tags||[]).includes('c');
   loadRole(no,f.geometry,m); loadOpenRole(no,m);
   show(sheets.lot); tip('fiche','♥ Garder ajoute ce lot au carnet. Tout ce que tu écris ici s\'enregistre tout seul.');
   addrInEnvelope(b).then(r=>{ if(selected?.lot!==no) return; const inside=r.features.filter(x=>inPoly(x.geometry.coordinates,f.geometry)); selected.built=inside.length>0; selected.builtAddr=inside.slice(0,2).map(x=>addrLabel(x.properties)).filter(Boolean).join(', '); renderSummary(); })
@@ -1074,7 +1080,7 @@ function ownerLinks(){ const n=$('lotOwner').value.trim(), where=selected?.muni|
   set('lnkNoms', n?CONFIG.registre:null);
   const isCorp=(r&&roleStatut(r).includes('2'))||corp.test(n); $('lnkReq').hidden=!isCorp; set('lnkReq', n?CONFIG.req:null);
   const y=roleSince(r); const old=y&&new Date().getFullYear()-y>=30; $('lnkDeces').hidden=!old; set('lnkDeces', n?`https://www.google.com/search?q=${enc(`"${n}" avis de décès ${where}`)}`:null);
-  const h=$('ownerHint'); h.hidden=false; h.textContent=n?'Les recherches s\'ouvrent préremplies ; l\'app ne collecte rien elle-même.':(/argenteuil/i.test(selected?.mrc||'')?'Pas de nom ? Le rôle de la MRC ci-dessus l\'affiche quand il est publié. Sinon : Registre foncier, index des immeubles (environ 1 $).':'Pas de nom ? Ouvre le rôle de la MRC (gratuit, souvent nominatif) ou le Registre foncier, index des immeubles (environ 1 $). Le n° de lot est copié automatiquement.'); }
+  const h=$('ownerHint'); h.hidden=false; h.textContent=n?'Les recherches s\'ouvrent préremplies ; l\'app ne collecte rien elle-même.':(/argenteuil/i.test(selected?.mrc||'')?'Pas de nom ? Le rôle de la MRC, dans « Explorer ce lot », l\'affiche quand il est publié. Sinon : Registre foncier, index des immeubles (environ 1 $).':'Pas de nom ? Dans « Explorer ce lot » : le rôle de la MRC (gratuit, souvent nominatif) ou le Registre foncier, index des immeubles (environ 1 $). Le n° de lot est copié en ouvrant.'); }
 ['lnkC411','lnkGoogle','lnkFacebook','lnkLinkedin','lnkReq','lnkDeces','lnkNoms','lnkInfolot','lnkRegistre','lnkRole','lnkMuni','lnkCall'].forEach(id=>$(id).addEventListener('click',()=>log('btn',{id})));
 $('lnkReq').addEventListener('click',()=>{ const n=$('lotOwner').value.trim(); if(n) copy(n,'Nom copié — colle-le dans la recherche du Registre des entreprises'); });
 $('lnkNoms').addEventListener('click',()=>{ const n=$('lotOwner').value.trim(); if(n) copy(n,'Nom copié — Registre foncier → Index des noms'); });
