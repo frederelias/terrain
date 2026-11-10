@@ -473,6 +473,15 @@ body.walking .mectl{bottom:calc(var(--sab) + 224px)}
 .jempty{list-style:none;background:var(--field);border-radius:14px;padding:16px;font-size:14px;line-height:1.45;color:var(--ink-2);display:flex;flex-direction:column;gap:4px}
 .jempty b{color:var(--ink);font-size:15px} .jempty button{color:var(--bark);font-weight:700;text-decoration:underline;padding:0;min-height:36px;align-self:flex-start}
 #jTools{margin-top:6px}
+/* v42 : pièces jointes */
+.viewer .vdoc{flex:1 1 auto;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:#fff;padding:20px;text-align:center}
+.viewer .vdoc[hidden]{display:none}
+.viewer .vdoc b{font-size:17px;word-break:break-word} .viewer .vdoc span{font-size:13px;color:#C7CDC8}
+.viewer .vdocb{display:flex;gap:10px;margin-top:8px}
+.viewer .vdocb a{min-height:48px;padding:0 20px;border-radius:12px;display:flex;align-items:center;font-weight:700;text-decoration:none;background:#fff;color:#141A16}
+.viewer .vdocb a+a{background:rgba(255,255,255,.16);color:#fff}
+.src .st .att{display:inline-flex;align-items:center;gap:6px;max-width:100%;min-height:44px;padding:0 12px;border-radius:10px;background:var(--field);border:1.5px solid var(--line);font-size:13px;font-weight:700;color:var(--ink)}
+.src .st .att span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:170px}
 /* Éléments retirés de l'ancienne interface */
 .bottom,.mode,.mapbtn,.walkpill,.clearbtn,.legend{display:none !important}
 
@@ -610,11 +619,12 @@ body.walking .mectl{bottom:calc(var(--sab) + 224px)}
         <div class="role" id="roleBox" hidden></div>
         <div class="role" id="openBox" hidden></div>
         <h3>Ouvrir les sources officielles</h3>
+        <p class="fine">Le trombone joint à chaque source une capture d'écran ou un document (PDF du Registre, fiche du rôle…), gardé dans ton téléphone.</p>
         <div class="sources">
-          <div class="src" data-src="registre"><a id="lnkRegistre" target="_blank" rel="noopener">Registre foncier (acte de vente, adresse)</a><button class="doc" data-src="registre" aria-label="Ajouter une capture du Registre"><svg viewBox="0 0 24 24"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg><b class="n" hidden></b></button><div class="st" data-thumbs="registre"></div></div>
-          <div class="src" data-src="role"><a id="lnkRole" target="_blank" rel="noopener">Rôle d'évaluation de la MRC</a><button class="doc" data-src="role" aria-label="Ajouter une capture du rôle"><svg viewBox="0 0 24 24"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg><b class="n" hidden></b></button><div class="st" data-thumbs="role"></div></div>
-          <div class="src" data-src="infolot"><a id="lnkInfolot" target="_blank" rel="noopener">Infolot (plan du cadastre)</a><button class="doc" data-src="infolot" aria-label="Ajouter une capture d'Infolot"><svg viewBox="0 0 24 24"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg><b class="n" hidden></b></button><div class="st" data-thumbs="infolot"></div></div>
-          <div class="src muni" data-src="muni"><a id="lnkCall" href="#">Appeler la municipalité</a><a id="lnkMuni" target="_blank" rel="noopener">Site web</a><button class="doc" data-src="muni" aria-label="Ajouter une capture de la municipalité"><svg viewBox="0 0 24 24"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg><b class="n" hidden></b></button><div class="st" data-thumbs="muni"></div></div>
+          <div class="src" data-src="registre"><a id="lnkRegistre" target="_blank" rel="noopener">Registre foncier (acte de vente, adresse)</a><button class="doc" data-src="registre" aria-label="Joindre une capture ou un document"><svg viewBox="0 0 24 24"><path d="M20.5 11.5l-8.2 8.2a5 5 0 0 1-7.1-7.1l8.6-8.6a3.4 3.4 0 0 1 4.8 4.8l-8.5 8.5a1.7 1.7 0 0 1-2.4-2.4l7.8-7.8"/></svg><b class="n" hidden></b></button><div class="st" data-thumbs="registre"></div></div>
+          <div class="src" data-src="role"><a id="lnkRole" target="_blank" rel="noopener">Rôle d'évaluation de la MRC</a><button class="doc" data-src="role" aria-label="Joindre une capture ou un document"><svg viewBox="0 0 24 24"><path d="M20.5 11.5l-8.2 8.2a5 5 0 0 1-7.1-7.1l8.6-8.6a3.4 3.4 0 0 1 4.8 4.8l-8.5 8.5a1.7 1.7 0 0 1-2.4-2.4l7.8-7.8"/></svg><b class="n" hidden></b></button><div class="st" data-thumbs="role"></div></div>
+          <div class="src" data-src="infolot"><a id="lnkInfolot" target="_blank" rel="noopener">Infolot (plan du cadastre)</a><button class="doc" data-src="infolot" aria-label="Joindre une capture ou un document"><svg viewBox="0 0 24 24"><path d="M20.5 11.5l-8.2 8.2a5 5 0 0 1-7.1-7.1l8.6-8.6a3.4 3.4 0 0 1 4.8 4.8l-8.5 8.5a1.7 1.7 0 0 1-2.4-2.4l7.8-7.8"/></svg><b class="n" hidden></b></button><div class="st" data-thumbs="infolot"></div></div>
+          <div class="src muni" data-src="muni"><a id="lnkCall" href="#">Appeler la municipalité</a><a id="lnkMuni" target="_blank" rel="noopener">Site web</a><button class="doc" data-src="muni" aria-label="Joindre une capture ou un document"><svg viewBox="0 0 24 24"><path d="M20.5 11.5l-8.2 8.2a5 5 0 0 1-7.1-7.1l8.6-8.6a3.4 3.4 0 0 1 4.8 4.8l-8.5 8.5a1.7 1.7 0 0 1-2.4-2.4l7.8-7.8"/></svg><b class="n" hidden></b></button><div class="st" data-thumbs="muni"></div></div>
         </div>
         <div class="links"><button id="copyLot" class="wide">Copier le n° de lot</button></div>
       </div>
@@ -662,6 +672,7 @@ body.walking .mectl{bottom:calc(var(--sab) + 224px)}
       <div class="in">
         <div class="links"><button id="btnPhotoLot">Photo orientée</button><button id="btnPhoto">Depuis la galerie</button></div>
         <input type="file" id="photoInput" accept="image/*" multiple hidden>
+        <input type="file" id="docInput" accept="image/*,application/pdf,.pdf,.doc,.docx,.xls,.xlsx,.csv,.txt,.rtf,.html,.htm,.mht,.mhtml" multiple hidden>
         <div class="thumbs" id="thumbs"></div>
       </div>
     </details>
@@ -752,7 +763,7 @@ body.walking .mectl{bottom:calc(var(--sab) + 224px)}
   </div>
 </section>
 
-<div class="viewer" id="viewer" hidden><img id="viewerImg" alt=""><button class="close" id="viewerClose" aria-label="Fermer">×</button><div class="vbar"><label class="vlab" for="viewerTitle">Titre de la photo</label><div class="vtitle"><input id="viewerTitle" placeholder="Ex. : chemin d'accès, côté nord" autocomplete="off" enterkeyhint="done"><button id="viewerRename">Renommer</button></div><button class="del" id="viewerDel">Supprimer la photo</button></div></div>
+<div class="viewer" id="viewer" hidden><img id="viewerImg" alt=""><div class="vdoc" id="viewerDoc" hidden><svg viewBox="0 0 24 24" width="64" height="64" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4M9 12h6M9 16h6"/></svg><b id="viewerDocName"></b><span id="viewerDocMeta"></span><div class="vdocb"><a id="viewerDocOpen" target="_blank" rel="noopener">Ouvrir</a><a id="viewerDocSave">Enregistrer</a></div></div><button class="close" id="viewerClose" aria-label="Fermer">×</button><div class="vbar"><label class="vlab" for="viewerTitle">Titre</label><div class="vtitle"><input id="viewerTitle" placeholder="Ex. : chemin d'accès, côté nord" autocomplete="off" enterkeyhint="done"><button id="viewerRename">Renommer</button></div><button class="del" id="viewerDel">Supprimer</button></div></div>
 
 <div class="modal" id="shareModal" hidden role="dialog" aria-modal="true" aria-labelledby="shareTitle">
   <div class="mbox">
@@ -769,7 +780,7 @@ body.walking .mectl{bottom:calc(var(--sab) + 224px)}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script>
 /* ============================ CONFIG ============================ */
-const APP_VERSION='v41';
+const APP_VERSION='v42';
 const CONFIG = {
   ringFraction: 0.70, maxRadius: 1500, coneLength: 150, coneHalfAngle: 25,
   cadastre: 'https://geo.environnement.gouv.qc.ca/donnees/rest/services/Reference/Cadastre_allege/MapServer',
@@ -1363,7 +1374,7 @@ function makeZip(files){ // [{name, data:Uint8Array}] — ZIP sans compression, 
 const xmlEsc=t=>String(t??'').replace(/[<>&'"]/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;',"'":'&apos;','"':'&quot;'}[c]));
 async function blobBytes(b){ if(b.arrayBuffer) return new Uint8Array(await b.arrayBuffer()); return new Uint8Array(await new Response(b).arrayBuffer()); }
 async function buildLotZip(){ const s=selected, d=s.lot.replace(/\s/g,''), base=`lot-${d}`, enc=new TextEncoder(), out=[];
-  let ph=[]; try{ ph=await listPhotos(s.lot); }catch{}
+  let ph=[]; try{ ph=(await listPhotos(s.lot)).filter(p=>p.kind!=='doc'&&(!p.src||p.src==='terrain'||p.src==='marche')); }catch{}
   const rows=[['fichier','titre','source','date','latitude','longitude','direction_deg']];
   const feats=[{type:'Feature',properties:{type:'lot',no_lot:s.lot,municipalite:s.muni,mrc:s.mrc,superficie_pi2:Math.round(s.ha*107639.1),superficie_m2:Math.round(s.ha*10000),superficie_acres:+acres(s.ha).toFixed(2),superficie_ha:+s.ha.toFixed(3)},geometry:s.geom}];
   const kmlP=[]; const ring=(s.geom.type==='Polygon'?s.geom.coordinates[0]:s.geom.coordinates[0][0]).map(c=>c.join(',')).join(' ');
@@ -1409,7 +1420,16 @@ function shrink(file,max=1280){ return new Promise(res=>{ const img=new Image();
 const SRC_LABEL={infolot:'Infolot',registre:'Registre foncier',role:'Rôle',muni:'Municipalité',centris:'Centris',terrain:'Photo',marche:'Photo orientée'};
 let pendingSrc='terrain', povTarget=null;
 $('btnPhoto').onclick=()=>{ if(!selected) return; pendingSrc='terrain'; navigator.vibrate?.(12); $('photoInput').click(); };
-document.querySelectorAll('.src .doc[data-src]').forEach(b=>b.onclick=()=>{ if(!selected) return; pendingSrc=b.dataset.src; navigator.vibrate?.(12); log('btn',{id:'doc_'+pendingSrc}); $('photoInput').click(); });
+document.querySelectorAll('.src .doc[data-src]').forEach(b=>b.onclick=()=>{ if(!selected) return; pendingSrc=b.dataset.src; navigator.vibrate?.(12); log('btn',{id:'doc_'+pendingSrc}); $('docInput').click(); });
+const isImg=f=>/^image\//.test(f.type)&&!/svg/.test(f.type);
+const kb=n=>n>=1048576?fmt(n/1048576,1)+' Mo':Math.max(1,Math.round(n/1024))+' Ko';
+$('docInput').addEventListener('change',async e=>{ const files=[...e.target.files]; e.target.value=''; if(!files.length||!selected) return; const lot=selected.lot, src=pendingSrc; let n=0;
+  for(const f of files){ try{ if(f.size>25*1048576){ toast(`${f.name} dépasse 25 Mo — non joint`); continue; }
+      const rec={id:Date.now()+'-'+Math.random().toString(36).slice(2,7),lot,src,t:Date.now(),title:f.name.replace(/\.[^.]+$/,'')};
+      if(isImg(f)){ rec.blob=await shrink(f,1800); rec.kind='img'; } else { rec.blob=f; rec.kind='doc'; rec.name=f.name; rec.type=f.type||'application/octet-stream'; rec.size=f.size; }
+      await dbTx('readwrite',st=>st.put(rec)); n++; }catch(err){ log('attach_error',{msg:String(err.message).slice(0,80)}); } }
+  log('attach',{n,src}); if(n) toast(`${n} pièce${n>1?'s':''} jointe${n>1?'s':''} · ${SRC_LABEL[src]||src}`); renderThumbs(lot);
+  if(n&&!carnet.find(x=>x.lot===lot)){ setFav(true); saveNow(); } });
 $('photoInput').addEventListener('change',async e=>{ const files=[...e.target.files]; e.target.value=''; if(!files.length) return;
   if(pendingSrc==='marche'){ const pos=me?[me[0],me[1]]:null; let lotNo=povTarget; if(!lotNo&&pos){ try{ const j=await lotAt(pos[0],pos[1]); lotNo=j.features?.[0]?.properties?.NO_LOT||null; }catch{} } let n=0;
     for(const f of files){ try{ const blob=await shrink(f); const id=Date.now()+'-'+Math.random().toString(36).slice(2,7); await dbTx('readwrite',st=>st.put({id,lot:lotNo,src:'marche',t:Date.now(),blob,lat:pos?.[0]??null,lng:pos?.[1]??null,heading:aimHeading,walk:walk?.id||null})); if(walk) walk.photos.push(id); n++; }catch(err){ log('photo_error',{msg:String(err.message).slice(0,100)}); } }
@@ -1425,15 +1445,19 @@ async function renderThumbs(lot){ const box=$('thumbs'); thumbUrls.forEach(u=>UR
   if(selected?.lot!==lot) return;
   const field=ph.filter(p=>!p.src||p.src==='terrain'||p.src==='marche'); $('secPhotosC').textContent=ph.length?`${ph.length}`:'';
   if(!field.length) box.innerHTML='<span class="hint">Chemin d\'accès, pancarte, bornes… Les captures d\'écran du Registre ou du rôle se rangent sous chaque source.</span>';
-  ph.forEach(p=>{ const u=URL.createObjectURL(p.blob); thumbUrls.push(u); const im=document.createElement('img'); im.src=u; im.alt=p.title||'Photo du lot'; im.onclick=()=>openViewer(p,u);
+  ph.forEach(p=>{ const u=URL.createObjectURL(p.blob); thumbUrls.push(u); let im;
+    if(p.kind==='doc'){ im=document.createElement('button'); im.type='button'; im.className='att'; im.innerHTML=`${icoSvg('doc',16)}<span>${esc(p.title||p.name||'Document')}</span>`; im.setAttribute('aria-label','Document : '+(p.title||p.name||'')); }
+    else { im=document.createElement('img'); im.src=u; im.alt=p.title||'Photo du lot'; }
+    im.onclick=()=>openViewer(p,u);
     const src=p.src&&p.src!=='terrain'&&p.src!=='marche'?p.src:null; if(src){ const d=document.querySelector(`.src .st[data-thumbs="${src}"]`); if(d){ d.appendChild(im); const n=document.querySelector(`.src .doc[data-src="${src}"] .n`); if(n){ n.hidden=false; n.textContent=String(+n.textContent+1); } return; } }
     box.appendChild(im); }); }
 let viewing=null;
-function openViewer(p,u){ viewing=p; $('viewerImg').src=u; $('viewerTitle').value=p.title||''; $('viewer').hidden=false; log('photo_view'); }
+function openViewer(p,u){ viewing=p; const doc=p.kind==='doc'; $('viewerImg').hidden=doc; $('viewerDoc').hidden=!doc;
+  if(doc){ $('viewerDocName').textContent=p.name||p.title||'Document'; $('viewerDocMeta').textContent=`${(p.name||'').split('.').pop().toUpperCase()} · ${kb(p.size||p.blob.size||0)} · joint le ${new Date(p.t).toLocaleDateString('fr-CA')}`; $('viewerDocOpen').href=u; $('viewerDocSave').href=u; $('viewerDocSave').download=p.name||'document'; } else $('viewerImg').src=u; $('viewerTitle').value=p.title||''; $('viewer').hidden=false; log('photo_view'); }
 $('viewerTitle').addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); $('viewerRename').click(); } });
 $('viewerRename').onclick=async()=>{ if(!viewing) return; const t=$('viewerTitle').value.trim(); viewing.title=t; await dbTx('readwrite',st=>st.put(viewing)); $('viewerTitle').blur(); log('photo_rename',{len:t.length}); toast(t?'Renommée : '+t:'Titre effacé'); if(viewing.lot) renderThumbs(viewing.lot); renderPov(); };
 $('viewerClose').onclick=()=>{ $('viewer').hidden=true; viewing=null; };
-$('viewerDel').onclick=async()=>{ if(!viewing) return; if(!confirm('Supprimer cette image ?')) return; await dbTx('readwrite',st=>st.delete(viewing.id)); log('photo_delete'); $('viewer').hidden=true; if(viewing.lot) renderThumbs(viewing.lot); renderPov(); viewing=null; };
+$('viewerDel').onclick=async()=>{ if(!viewing) return; if(!confirm(viewing.kind==='doc'?'Supprimer ce document ?':'Supprimer cette image ?')) return; await dbTx('readwrite',st=>st.delete(viewing.id)); log('photo_delete'); $('viewer').hidden=true; if(viewing.lot) renderThumbs(viewing.lot); renderPov(); viewing=null; };
 
 /* ============================ Marcher le terrain (+ alerte de limite) ============================ */
 let walk=null, walkLayer=L.layerGroup().addTo(map), stepsLayer=L.layerGroup().addTo(map), povLayer=L.layerGroup().addTo(map), aimHeading=null;

@@ -1,6 +1,6 @@
 // Terrain — coquille hors ligne. Les tuiles de carte et les services
 // gouvernementaux passent toujours par le réseau.
-const CACHE = 'terrain-v41';
+const CACHE = 'terrain-v42';
 const SHELL = [
   './', './index.html', './manifest.webmanifest', './icon.svg','./icon-192.png','./confidentialite.html',
   'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js',
