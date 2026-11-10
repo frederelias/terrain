@@ -418,6 +418,17 @@ body.isoff .mapctl{top:calc(var(--sat) + 164px)}
 .mectl .ctl{margin:0;width:56px;height:56px}
 body.walking .mectl{bottom:calc(var(--sab) + 224px)}
 .measure{right:74px}
+/* v38 : visionneuse — image en haut, barre d'édition en bas, rien ne se chevauche */
+.viewer{display:flex;flex-direction:column;align-items:stretch;justify-content:flex-start;height:100dvh;padding-top:calc(var(--sat) + 60px);box-sizing:border-box}
+.viewer[hidden]{display:none}
+.viewer img{flex:1 1 auto;min-height:0;width:100%;max-height:none;object-fit:contain}
+.viewer .close{position:absolute;top:calc(var(--sat) + 10px);right:12px;width:44px;height:44px;background:rgba(255,255,255,.18);color:#fff}
+.viewer .vbar{flex:none;background:#141A16;padding:12px 14px calc(var(--sab) + 12px);display:flex;flex-direction:column;gap:8px}
+.viewer .vlab{font-size:12.5px;color:#C7CDC8}
+.viewer .vtitle{position:static;left:auto;right:auto;bottom:auto;display:flex;gap:8px}
+.viewer .vtitle input{min-height:46px}
+.viewer .vtitle button{min-height:46px}
+.viewer .del{position:static;left:auto;bottom:auto;transform:none;align-self:flex-start;background:transparent;color:#FF9C8F;padding:0;min-height:44px;font-weight:700}
 /* Éléments retirés de l'ancienne interface */
 .bottom,.mode,.mapbtn,.walkpill,.clearbtn,.legend{display:none !important}
 
@@ -688,14 +699,14 @@ body.walking .mectl{bottom:calc(var(--sab) + 224px)}
   </div>
 </section>
 
-<div class="viewer" id="viewer" hidden><img id="viewerImg" alt=""><button class="close" id="viewerClose" aria-label="Fermer">×</button><div class="vtitle"><input id="viewerTitle" placeholder="Titre de la photo" autocomplete="off" aria-label="Titre de la photo"><button id="viewerRename">Renommer</button></div><button class="del" id="viewerDel">Supprimer</button></div>
+<div class="viewer" id="viewer" hidden><img id="viewerImg" alt=""><button class="close" id="viewerClose" aria-label="Fermer">×</button><div class="vbar"><label class="vlab" for="viewerTitle">Titre de la photo</label><div class="vtitle"><input id="viewerTitle" placeholder="Ex. : chemin d'accès, côté nord" autocomplete="off" enterkeyhint="done"><button id="viewerRename">Renommer</button></div><button class="del" id="viewerDel">Supprimer la photo</button></div></div>
 
 <div class="toast" id="toast" role="status"></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script>
 /* ============================ CONFIG ============================ */
-const APP_VERSION='v37';
+const APP_VERSION='v38';
 const CONFIG = {
   ringFraction: 0.70, maxRadius: 1500, coneLength: 150, coneHalfAngle: 25,
   cadastre: 'https://geo.environnement.gouv.qc.ca/donnees/rest/services/Reference/Cadastre_allege/MapServer',
@@ -1274,6 +1285,7 @@ async function renderThumbs(lot){ const box=$('thumbs'); thumbUrls.forEach(u=>UR
     box.appendChild(im); }); }
 let viewing=null;
 function openViewer(p,u){ viewing=p; $('viewerImg').src=u; $('viewerTitle').value=p.title||''; $('viewer').hidden=false; log('photo_view'); }
+$('viewerTitle').addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); $('viewerRename').click(); } });
 $('viewerRename').onclick=async()=>{ if(!viewing) return; const t=$('viewerTitle').value.trim(); viewing.title=t; await dbTx('readwrite',st=>st.put(viewing)); $('viewerTitle').blur(); log('photo_rename',{len:t.length}); toast(t?'Renommée : '+t:'Titre effacé'); if(viewing.lot) renderThumbs(viewing.lot); renderPov(); };
 $('viewerClose').onclick=()=>{ $('viewer').hidden=true; viewing=null; };
 $('viewerDel').onclick=async()=>{ if(!viewing) return; if(!confirm('Supprimer cette image ?')) return; await dbTx('readwrite',st=>st.delete(viewing.id)); log('photo_delete'); $('viewer').hidden=true; if(viewing.lot) renderThumbs(viewing.lot); renderPov(); viewing=null; };
