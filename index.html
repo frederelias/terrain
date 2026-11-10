@@ -783,7 +783,9 @@ const CONFIG = {
   registre: 'https://www.registrefoncier.gouv.qc.ca',
   req:      'https://www.registreentreprises.gouv.qc.ca',
   centris:  'https://www.centris.ca/fr/a-vendre',
-  roles: { 'argenteuil':'https://experience.arcgis.com/experience/5f786b7891884c1ebb5e929e7d881bf6/', "pays-d'en-haut":'', 'matawinie':'', "d'autray":'' }
+  roles: { 'argenteuil':'https://experience.arcgis.com/experience/5f786b7891884c1ebb5e929e7d881bf6/', "pays-d'en-haut":'', 'matawinie':'', "d'autray":'' },
+  // Rôle par municipalité (prioritaire sur la MRC) : nom exact en minuscules → URL publique du rôle
+  rolesMuni: { 'laval':'https://pdi.pgmunicipal.com/immosoft/controller/ImmoNetPub/U4051/trouverParAdresse?init_mapping=&fourn_seq=173' }
 };
 const $=id=>document.getElementById(id);
 function esc(s){ return String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
@@ -1080,7 +1082,8 @@ $('peekGo').onclick=()=>{ if(!peek.f) return; log('peek_open'); highlightOne(pee
 
 /* ============================ Fiche ============================ */
 let selected=null, loading=false;
-function roleUrl(m,lot){ const mrc=(m?.MUS_NM_MRC||'').toLowerCase();
+function roleUrl(m,lot){ const mrc=(m?.MUS_NM_MRC||'').toLowerCase(), mun=(m?.MUS_NM_MUN||'').toLowerCase().trim();
+  if(CONFIG.rolesMuni?.[mun]) return CONFIG.rolesMuni[mun];
   for(const k in CONFIG.roles){ if(mrc.includes(k)&&CONFIG.roles[k]) return CONFIG.roles[k].replace('{lot}',encodeURIComponent(lot||'')); }
   const site=m?.SITE_WEB?(m.SITE_WEB.startsWith('http')?m.SITE_WEB:'https://'+m.SITE_WEB):null; return site||CONFIG.infolot; }
 async function openLot(f,m){
