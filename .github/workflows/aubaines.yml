@@ -1,0 +1,27 @@
+name: aubaines
+on:
+  workflow_dispatch:
+  push:
+    paths: ['tools/build_aubaines.py', 'tools/aubaines_sources.json']
+  schedule:
+    - cron: '0 9 * * 1'
+permissions:
+  contents: write
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - name: Outils PDF
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq poppler-utils > /dev/null
+      - name: Lire les avis publics et placer les lots
+        run: python3 tools/build_aubaines.py
+      - name: Publier sur la branche aubaines-data
+        run: |
+          git config user.name "terrain-bot"; git config user.email "terrain-bot@users.noreply.github.com"
+          git checkout --orphan aubaines-data-new
+          git rm -rfq --cached .
+          git add -f out/aubaines.json out/rapport.json
+          git commit -qm "aubaines: $(date +%Y-%m-%d)"
+          git push -f origin aubaines-data-new:aubaines-data
