@@ -22,6 +22,11 @@ def sale_date(t):
     after=[c for c in cands if c[0]>=anchor and c[2] in (5,6,7)] or [c for c in cands if c[2] in (5,6,7)] or cands
     if not after: return None
     c=after[0]; return f'{c[3]:04d}-{c[2]:02d}-{c[1]:02d}'
+def sale_date_words(t):
+    low=' '.join(t.lower().split())
+    m=re.search(r'([a-zéèêû-]+)\s+(?:\(\d{1,2}\)\s+)?jour du mois de\s+(janvier|f[ée]vrier|mars|avril|mai|juin|juillet|ao[uû]t|septembre|octobre|novembre|d[ée]cembre)[^0-9]{0,80}?(20\d\d)',low)
+    if m and m.group(1) in ORD: return f'{int(m.group(3)):04d}-{MOIS.get(m.group(2),MOIS.get(m.group(2).replace("e","é",1),6)):02d}-{ORD[m.group(1)]:02d}'
+    return None
 def sale_place(t):
     one=' '.join(t.split()); m=re.search(r'(?:enchère publique|seront vendus[^,]{0,80}),?\s*(?:au|à la|à l.|en la)\s+(.{10,140}?),\s*(?:le\s|province|\()',one,re.I)
     return m.group(1).strip() if m else ''
@@ -68,7 +73,9 @@ def cadastre(lots):
         try: j=json.loads(get(CAD+'?'+q))
         except Exception as e: print('  cadastre erreur',e); continue
         for f in j.get('features',[]):
-            g=f['geometry']; ring=g['coordinates'][0] if g['type']=='Polygon' else g['coordinates'][0][0]
+            g=f.get('geometry')
+            if not g or not g.get('coordinates'): continue
+            ring=g['coordinates'][0] if g['type']=='Polygon' else g['coordinates'][0][0]
             xs=[c[0] for c in ring]; ys=[c[1] for c in ring]
             geo[f['properties']['NO_LOT']]={'lat':round(sum(ys)/len(ys),6),'lng':round(sum(xs)/len(xs),6),'bbox':[round(min(xs),6),round(min(ys),6),round(max(xs),6),round(max(ys),6)]}
         time.sleep(0.5)
@@ -89,7 +96,7 @@ def process_source(s):
         print('—',s['mrc'],u)
         try: t=pdf_text(get(u))
         except Exception as e: report.append({'mrc':s['mrc'],'url':u,'statut':'injoignable','detail':str(e)[:80]}); print('  injoignable',e); continue
-        lots=parse_lots(t); d=sale_date(t); place=sale_place(t)
+        lots=parse_lots(t); d=sale_date_words(t) or sale_date(t); place=sale_place(t)
         if not lots: report.append({'mrc':s['mrc'],'url':u,'statut':'aucun lot trouvé (liste absente ou format non lu)','date':d}); print('  aucun lot'); continue
         if any(e['mrc']==s['mrc'] and e['date']==d for e in events): report.append({'mrc':s['mrc'],'url':u,'statut':'version antérieure ignorée','date':d}); print('  version antérieure, ignorée'); continue
         geo=cadastre([l['lot'] for l in lots]); ev=len(events)
@@ -105,6 +112,15 @@ for s in src:
     try: process_source(s)
     except Exception as e:
         tb=traceback.format_exc()[-600:]; print('ERREUR',s.get('mrc'),tb); report.append({'mrc':s.get('mrc'),'statut':'erreur du robot','detail':tb})
+import datetime as _dt
+latest={}
+for e in events:
+    if e['date']: latest[e['mrc']]=max(latest.get(e['mrc'],''),e['date'])
+keep=[i for i,e in enumerate(events) if not e['date'] or not latest.get(e['mrc']) or (_dt.date.fromisoformat(latest[e['mrc']])-_dt.date.fromisoformat(e['date'])).days<=60]
+remap={old:new for new,old in enumerate(keep)}
+for i,e in enumerate(events):
+    if i not in remap: report.append({'mrc':e['mrc'],'url':e['url'],'statut':'vente plus ancienne écartée','date':e['date']})
+events=[events[i] for i in keep]; lots_out=[{**l,'e':remap[l['e']]} for l in lots_out if l['e'] in remap]
 os.makedirs('out',exist_ok=True)
 json.dump({'built':time.strftime('%Y-%m-%d'),'note':"Avis publics de vente pour défaut de paiement de taxes (Code municipal, art. 1022 et suiv.). Aucun nom de propriétaire n'est conservé. La liste change jusqu'au jour de la vente : vérifier auprès de la MRC.",'events':events,'lots':lots_out},open('out/aubaines.json','w',encoding='utf-8'),ensure_ascii=False,separators=(',',':'))
 json.dump(report,open('out/rapport.json','w',encoding='utf-8'),ensure_ascii=False,indent=1)
