@@ -1,15 +1,157 @@
-{"sources":[
- {"mrc":"MRC des Laurentides","page":"https://mrclaurentides.qc.ca/autres-informations/","pdfs":["https://mrclaurentides.qc.ca/wp-content/uploads/2026/06/Avis_Public_VPT2026_V2026-06-04.pdf"]},
- {"mrc":"MRC de La Rivière-du-Nord","page":"","pdfs":["https://saint-hippolyte.ca/wp-content/uploads/2026/04/AVPU-preavis-defaut-taxes.pdf"]},
- {"mrc":"MRC du Haut-Saint-Laurent","page":"https://mrchsl.com/services/vente-immeubles-taxes","pdfs":["https://mrchsl.com/assets/pdfs/20260505-Avis-vente-pour-taxes-Web-v1.pdf"]},
- {"mrc":"MRC de Roussillon","page":"","pdfs":["https://www.lery.ca/images/Avis_public_2026_signe_M.Marcoux.pdf"]},
- {"mrc":"MRC de Lotbinière","page":"","pdfs":["https://www.mrclotbiniere.org/wp-content/uploads/2026/05/Liste-Ventes-pour-taxes_MRC-Lotbiniere_Avis-Public_20260525.pdf"]},
- {"mrc":"MRC des Appalaches","page":"","pdfs":["https://www.mrcdesappalaches.ca/fichiersUpload/fichiers/20260410092831-1er-avis-public-vente-pour-taxes-2026-04-08-v2-003.pdf"]},
- {"mrc":"MRC des Chenaux","page":"","pdfs":["https://www.mrcdeschenaux.ca/app/uploads/2026/05/2026-Liste-encadree-WEB-MAJ-2026-05-01.pdf"]},
- {"mrc":"MRC d'Arthabaska","page":"","pdfs":["https://steclotildehorton.ca/wp-content/uploads/2026/04/Avis_public_original_signe_MunLoc_SigneOM.pdf"]},
- {"mrc":"MRC de Nicolet-Yamaska","page":"","pdfs":["https://www.saint-zephirin.ca/upload/avis-public/avis_public_2026__15-04-2026_.pdf"]},
- {"mrc":"MRC de Manicouagan","page":"","pdfs":["https://www.mrcmanicouagan.qc.ca/images/Upload/avis_public_-_vente_pour_taxes_journal_2026.pdf"]},
- {"mrc":"MRC de La Haute-Côte-Nord","page":"","pdfs":["https://www.mrchcn.qc.ca/fichiersUpload/fichiers/20260420083342-20260416-preavis-vente-2026-journal.pdf"]},
- {"mrc":"MRC du Fjord-du-Saguenay","page":"","pdfs":["https://mrc-fjord.qc.ca/app/uploads/2025/05/avis-public-vpt.pdf"]},
- {"mrc":"MRC de Minganie","page":"","pdfs":["https://www.natashquan.org/app/uploads/2026/04/personnes-endettees.pdf"]}
-]}
+{
+ "sources": [
+  {
+   "mrc": "MRC d'Argenteuil",
+   "wp": [
+    "https://argenteuil.qc.ca",
+    "https://mrc.argenteuil.qc.ca"
+   ],
+   "pdfs": [
+    "https://mrc.argenteuil.qc.ca/wp-content/uploads/2025/05/2025-05-07_Avis-public_vente_non-paiement_taxes_affichage.pdf"
+   ]
+  },
+  {
+   "mrc": "MRC des Pays-d'en-Haut",
+   "wp": [
+    "https://lespaysdenhaut.com"
+   ],
+   "pdfs": [
+    "https://lespaysdenhaut.com/wp-content/uploads/2025/06/Liste_17juin2025_WEB.pdf"
+   ]
+  },
+  {
+   "mrc": "MRC des Laurentides",
+   "page": "https://mrclaurentides.qc.ca/autres-informations/",
+   "pdfs": [
+    "https://mrclaurentides.qc.ca/wp-content/uploads/2026/06/Avis_Public_VPT2026_V2026-06-04.pdf"
+   ],
+   "wp": [
+    "https://mrclaurentides.qc.ca"
+   ]
+  },
+  {
+   "mrc": "MRC de Pontiac",
+   "page": "https://mrcpontiac.qc.ca/en/residents/sale-for-taxes/",
+   "pdfs": []
+  },
+  {
+   "mrc": "MRC de La Haute-Yamaska",
+   "wp": [
+    "https://haute-yamaska.ca"
+   ],
+   "pdfs": [
+    "https://haute-yamaska.ca/wp-content/uploads/2026/05/15-avis_public_2026-04-29_abrege-VA-2026-05-13.pdf"
+   ]
+  },
+  {
+   "mrc": "MRC de Vaudreuil-Soulanges",
+   "wp": [
+    "https://mrcvs.ca"
+   ],
+   "pdfs": [
+    "https://www.vsll.ca/fichiersUpload/fichiers/20260729170043-04-certificat-de-publication-vente-pour-taxes-de-la-mrcweb.pdf"
+   ]
+  },
+  {
+   "mrc": "MRC de Portneuf",
+   "pdfs": [
+    "https://villededonnacona.com/upload/avis-public/avispub_vente_taxes2026_2026-06-18.pdf"
+   ]
+  },
+  {
+   "mrc": "MRC de Mékinac",
+   "wp": [
+    "https://mrcmekinac.com"
+   ],
+   "pdfs": []
+  },
+  {
+   "mrc": "MRC de La Rivière-du-Nord",
+   "page": "",
+   "pdfs": [
+    "https://saint-hippolyte.ca/wp-content/uploads/2026/04/AVPU-preavis-defaut-taxes.pdf"
+   ]
+  },
+  {
+   "mrc": "MRC du Haut-Saint-Laurent",
+   "page": "https://mrchsl.com/services/vente-immeubles-taxes",
+   "pdfs": [
+    "https://mrchsl.com/assets/pdfs/20260505-Avis-vente-pour-taxes-Web-v1.pdf"
+   ]
+  },
+  {
+   "mrc": "MRC de Roussillon",
+   "page": "",
+   "pdfs": [
+    "https://www.lery.ca/images/Avis_public_2026_signe_M.Marcoux.pdf"
+   ]
+  },
+  {
+   "mrc": "MRC de Lotbinière",
+   "page": "",
+   "pdfs": [
+    "https://www.mrclotbiniere.org/wp-content/uploads/2026/05/Liste-Ventes-pour-taxes_MRC-Lotbiniere_Avis-Public_20260525.pdf"
+   ]
+  },
+  {
+   "mrc": "MRC des Appalaches",
+   "page": "",
+   "pdfs": [
+    "https://www.mrcdesappalaches.ca/fichiersUpload/fichiers/20260410092831-1er-avis-public-vente-pour-taxes-2026-04-08-v2-003.pdf"
+   ]
+  },
+  {
+   "mrc": "MRC des Chenaux",
+   "page": "",
+   "pdfs": [
+    "https://www.mrcdeschenaux.ca/app/uploads/2026/05/2026-Liste-encadree-WEB-MAJ-2026-05-01.pdf"
+   ]
+  },
+  {
+   "mrc": "MRC d'Arthabaska",
+   "page": "",
+   "pdfs": [
+    "https://steclotildehorton.ca/wp-content/uploads/2026/04/Avis_public_original_signe_MunLoc_SigneOM.pdf"
+   ]
+  },
+  {
+   "mrc": "MRC de Nicolet-Yamaska",
+   "page": "",
+   "pdfs": [
+    "https://www.saint-zephirin.ca/upload/avis-public/avis_public_2026__15-04-2026_.pdf"
+   ]
+  },
+  {
+   "mrc": "MRC de Manicouagan",
+   "page": "",
+   "pdfs": [
+    "https://www.mrcmanicouagan.qc.ca/images/Upload/avis_public_-_vente_pour_taxes_journal_2026.pdf"
+   ]
+  },
+  {
+   "mrc": "MRC de La Haute-Côte-Nord",
+   "page": "",
+   "pdfs": [
+    "https://www.mrchcn.qc.ca/fichiersUpload/fichiers/20260420083342-20260416-preavis-vente-2026-journal.pdf"
+   ]
+  },
+  {
+   "mrc": "MRC du Fjord-du-Saguenay",
+   "page": "",
+   "pdfs": [
+    "https://mrc-fjord.qc.ca/app/uploads/2025/05/avis-public-vpt.pdf"
+   ]
+  },
+  {
+   "mrc": "MRC de Minganie",
+   "page": "",
+   "pdfs": [
+    "https://www.natashquan.org/app/uploads/2026/04/personnes-endettees.pdf"
+   ]
+  }
+ ],
+ "sans_publication_en_ligne": [
+  "MRC de Matawinie",
+  "MRC de D'Autray"
+ ]
+}

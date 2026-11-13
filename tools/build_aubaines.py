@@ -48,6 +48,18 @@ def discover(page):
         u=urllib.parse.urljoin(page,html.unescape(l))
         if re.search(r'vente|taxe|vpt|d[ée]faut|impay|non.?paiement|ench',u,re.I): res.append(u)
     return res
+WP_TERMS=['vente pour taxes','vente taxes','VPT','défaut de paiement','non-paiement','non paiement des taxes']
+def wp_discover(base,min_year):
+    found={}
+    for term in WP_TERMS:
+        u=base.rstrip('/')+'/wp-json/wp/v2/media?'+urllib.parse.urlencode({'search':term,'per_page':50,'_fields':'source_url,date,mime_type,title'})
+        try: items=json.loads(get(u,binary=False))
+        except Exception as e: print('  wp injoignable',base,str(e)[:60]); return []
+        for it in items if isinstance(items,list) else []:
+            url=it.get('source_url',''); d=it.get('date','')[:10]
+            if url.lower().endswith('.pdf') and d[:4].isdigit() and int(d[:4])>=min_year and not re.search(r'guide|faq|reglement|règlement|procedurier',url,re.I): found[url]=d
+        time.sleep(0.4)
+    return [u for u,_ in sorted(found.items(),key=lambda x:x[1],reverse=True)]
 def cadastre(lots):
     geo={}
     for k in range(0,len(lots),40):
@@ -71,13 +83,15 @@ def muni(lat,lng,cache={}):
 src=json.load(open('tools/aubaines_sources.json',encoding='utf-8'))['sources']
 events=[]; lots_out=[]; report=[]
 for s in src:
-    urls=list(dict.fromkeys(s.get('pdfs',[])+(discover(s['page']) if s.get('page') else [])))
+    wp=[u for b in s.get('wp',[]) for u in wp_discover(b,int(time.strftime('%Y'))-1)]
+    urls=list(dict.fromkeys(wp+s.get('pdfs',[])+(discover(s['page']) if s.get('page') else [])))
     for u in urls:
         print('—',s['mrc'],u)
         try: t=pdf_text(get(u))
         except Exception as e: report.append({'mrc':s['mrc'],'url':u,'statut':'injoignable','detail':str(e)[:80]}); print('  injoignable',e); continue
         lots=parse_lots(t); d=sale_date(t); place=sale_place(t)
         if not lots: report.append({'mrc':s['mrc'],'url':u,'statut':'aucun lot trouvé (liste absente ou format non lu)','date':d}); print('  aucun lot'); continue
+        if any(e['mrc']==s['mrc'] and e['date']==d for e in events): report.append({'mrc':s['mrc'],'url':u,'statut':'version antérieure ignorée','date':d}); print('  version antérieure, ignorée'); continue
         geo=cadastre([l['lot'] for l in lots]); ev=len(events)
         found=0
         for l in lots:
