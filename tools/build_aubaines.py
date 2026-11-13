@@ -1,12 +1,12 @@
 # Ventes pour défaut de paiement de taxes (avis publics des MRC, documents publics en vertu du Code municipal).
 # Ne conserve AUCUN nom de propriétaire : seulement lot, montant, type d'immeuble, date et lieu de la vente, lien vers l'avis officiel.
-import json, re, subprocess, time, urllib.request, urllib.parse, os, sys, html
+import json, re, subprocess, time, urllib.request, urllib.parse, os, sys, html, traceback
 UA={'User-Agent':'LOTS-aubaines/1.0 (+https://lots.quebec; robot hebdomadaire, avis publics seulement)'}
 CAD='https://geo.environnement.gouv.qc.ca/donnees/rest/services/Reference/Cadastre_allege/MapServer/0/query'
 SDA='https://servicescarto.mrnf.gouv.qc.ca/pes/rest/services/Territoire/SDA_WMS/MapServer/2/query'
 MOIS={'janvier':1,'février':2,'fevrier':2,'mars':3,'avril':4,'mai':5,'juin':6,'juillet':7,'août':8,'aout':8,'septembre':9,'octobre':10,'novembre':11,'décembre':12,'decembre':12}
 ORD={'premier':1,'deuxième':2,'troisième':3,'quatrième':4,'cinquième':5,'sixième':6,'septième':7,'huitième':8,'neuvième':9,'dixième':10,'onzième':11,'douzième':12,'treizième':13,'quatorzième':14,'quinzième':15,'seizième':16,'dix-septième':17,'dix-huitième':18,'dix-neuvième':19,'vingtième':20}
-def get(url,binary=True,timeout=40):
+def get(url,binary=True,timeout=int(os.environ.get("TO","40"))):
     req=urllib.request.Request(url,headers=UA)
     with urllib.request.urlopen(req,timeout=timeout) as r: d=r.read(); return d if binary else d.decode('utf-8','replace')
 def pdf_text(data):
@@ -82,7 +82,7 @@ def muni(lat,lng,cache={}):
     cache[k]=v; time.sleep(0.2); return v
 src=json.load(open('tools/aubaines_sources.json',encoding='utf-8'))['sources']
 events=[]; lots_out=[]; report=[]
-for s in src:
+def process_source(s):
     wp=[u for b in s.get('wp',[]) for u in wp_discover(b,int(time.strftime('%Y'))-1)]
     urls=list(dict.fromkeys(wp+s.get('pdfs',[])+(discover(s['page']) if s.get('page') else [])))
     for u in urls:
@@ -100,6 +100,11 @@ for s in src:
             found+=1; lots_out.append({**l,'e':ev,**g,'muni':muni(g['lat'],g['lng'])})
         events.append({'mrc':s['mrc'],'date':d,'lieu':place,'url':u,'lots':found,'lus':len(lots)})
         report.append({'mrc':s['mrc'],'url':u,'statut':'ok','date':d,'lots_lus':len(lots),'lots_places':found}); print(f'  {len(lots)} lots lus, {found} placés, vente {d}')
+
+for s in src:
+    try: process_source(s)
+    except Exception as e:
+        tb=traceback.format_exc()[-600:]; print('ERREUR',s.get('mrc'),tb); report.append({'mrc':s.get('mrc'),'statut':'erreur du robot','detail':tb})
 os.makedirs('out',exist_ok=True)
 json.dump({'built':time.strftime('%Y-%m-%d'),'note':"Avis publics de vente pour défaut de paiement de taxes (Code municipal, art. 1022 et suiv.). Aucun nom de propriétaire n'est conservé. La liste change jusqu'au jour de la vente : vérifier auprès de la MRC.",'events':events,'lots':lots_out},open('out/aubaines.json','w',encoding='utf-8'),ensure_ascii=False,separators=(',',':'))
 json.dump(report,open('out/rapport.json','w',encoding='utf-8'),ensure_ascii=False,indent=1)
