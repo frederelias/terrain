@@ -1,6 +1,6 @@
 // LOTS — Terre de rang. Coquille hors ligne. Nettoie les caches des versions précédentes,
 // sans toucher à celui de l'archive /ancien/.
-const CACHE = 'lots-5.0';
+const CACHE = 'lots-5.1';
 const SHELL = ['./', './index.html', './manifest.webmanifest', './brand/enseigne-360.png', './brand/enseigne-800.png', './brand/paysage.jpg',
   './icon-192.png', './favicon-32.png', './confidentialite.html',
   'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js', 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css'];

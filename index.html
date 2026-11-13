@@ -647,6 +647,37 @@ body.walking .peek{bottom:calc(var(--sab) + 170px)}
 .opcoords .row{display:flex;flex-direction:column;gap:6px}
 .ownerpage .ctedit{margin-top:10px}
 
+
+/* ---- 5.1 ---- */
+.lotline{display:flex;align-items:center;gap:6px}
+.copylot{flex:none;width:40px;height:40px;border-radius:10px;background:var(--field);color:var(--ink);display:flex;align-items:center;justify-content:center}
+.copylot:active{background:var(--act);color:var(--act-ink)}
+.aimgps{font-size:14px;font-weight:700;padding:6px 12px;border-radius:999px;background:#E1EDE3;color:#1F4A2C}
+.aimgps.bad{background:#F6E7C8;color:#6B4B12}
+.pov-label{display:none;background:rgba(251,247,238,.95);color:#16140F;border:1px solid #D8CCB4;border-radius:8px;font:700 12px/1.25 "Atkinson Hyperlegible",system-ui,sans-serif;padding:3px 7px;box-shadow:0 1px 4px rgba(0,0,0,.25);white-space:nowrap}
+.z16 .pov-label{display:block}
+.pov-label::before{display:none}
+.jfrom{display:inline-block;margin-top:3px;font-size:11.5px;font-weight:700;padding:2px 8px;border-radius:999px;background:#DCE6EA;color:#2C4A54}
+#vfCount{float:right;font-weight:700}
+
+
+/* ---- 5.1 : la mise en page est calculée (doLayout) ; ces règles ne servent qu'avant le premier calcul ---- */
+body.searchopen .chips{display:none}
+.lay-hide{display:none!important}
+.mapctl.compact{gap:6px}.mapctl.compact .ctl{width:44px;height:44px}.mapctl.compact .compass{width:44px;height:44px}
+.mapctl.tight .compass{display:none}
+.walkstrip{transition:none}
+
+
+.jshare{display:flex;gap:8px;margin:0 0 10px}
+.jshare button{flex:1;min-height:46px;border-radius:12px;background:var(--field);color:var(--ink);font-weight:700;font-size:14px}
+.sjbox{max-height:88vh;overflow-y:auto}
+.sjh{display:flex;align-items:center;justify-content:space-between;margin:12px 0 4px} .sjh button{min-height:36px;padding:0 10px;border-radius:999px;background:var(--field);font-weight:700;font-size:13px}
+.sjlist{list-style:none;margin:0;padding:0;border:1px solid var(--line);border-radius:12px;max-height:180px;overflow-y:auto}
+.sjlist li{border-bottom:1px solid var(--line)} .sjlist li:last-child{border-bottom:0}
+.sjlist label{display:flex;align-items:center;gap:10px;min-height:46px;padding:0 12px;font-size:14.5px;font-weight:700} .sjlist label span{font-weight:400;color:var(--ink-2);font-size:13px}
+.sjlist input{width:20px;height:20px} .sjlist .empty{padding:10px 12px;font-size:13.5px;color:var(--ink-2)}
+
 /* Éléments retirés de l'ancienne interface */
 .bottom,.mode,.mapbtn,.walkpill,.clearbtn,.legend{display:none !important}
 
@@ -715,6 +746,7 @@ body.walking .peek{bottom:calc(var(--sab) + 170px)}
     <svg viewBox="0 0 200 200" class="arrow"><path d="M100 185 V45" stroke="#FF5A1F" stroke-width="18" stroke-linecap="round"/><path d="M48 92 L100 22 L152 92" fill="none" stroke="#FF5A1F" stroke-width="18" stroke-linecap="round" stroke-linejoin="round"/></svg>
   </div>
   <div class="aimstep">Photo orientée · étape 1 sur 3</div><h2>Où regardes-tu ?</h2><p class="aimhelp">Tiens le téléphone à plat, pointe la direction, puis fixe le cap. Tu pourras ensuite le redresser pour photographier.</p>
+  <span class="aimgps" id="aimGps">📍 Localisation en cours…</span>
   <span class="flat" id="aimFlat">à plat</span>
   <div class="dial"><svg viewBox="0 0 120 120"><circle cx="60" cy="60" r="54" fill="none" stroke="currentColor" stroke-width="2"/><g id="aimRose"><path d="M60 10 L66 60 L60 54 L54 60 Z" fill="#FF5A1F"/><path d="M60 110 L66 60 L60 66 L54 60 Z" fill="currentColor" opacity=".35"/><text x="60" y="26" text-anchor="middle" font-size="11" font-weight="700" fill="currentColor">N</text></g><path d="M60 2 L66 12 L54 12 Z" fill="currentColor"/></svg><b id="aimDeg">—°</b></div>
   <button class="fix" id="aimFix">Fixer le point de vue</button>
@@ -783,7 +815,7 @@ body.walking .peek{bottom:calc(var(--sab) + 170px)}
 
 <section class="sheet" id="sheetLot" aria-hidden="true" aria-labelledby="lotNo">
   <div class="grip"></div>
-  <header><div class="t"><h2 id="lotNo">—</h2><p id="lotWhere">—</p></div><button class="keep" id="btnFav" aria-pressed="false"><span class="h" aria-hidden="true">♥</span><span id="favLabel">Garder</span></button><button class="close" id="btnShare" aria-label="Partager ce lot"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="M7.5 7.5L12 3l4.5 4.5"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></svg></button><button class="close" id="closeLot" aria-label="Fermer">×</button></header>
+  <header><div class="t"><div class="lotline"><h2 id="lotNo">—</h2><button class="copylot" id="copyLotTop" aria-label="Copier le numéro de lot sans espaces"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg></button></div><p id="lotWhere">—</p></div><button class="keep" id="btnFav" aria-pressed="false"><span class="h" aria-hidden="true">♥</span><span id="favLabel">Garder</span></button><button class="close" id="btnShare" aria-label="Partager ce lot"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="M7.5 7.5L12 3l4.5 4.5"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></svg></button><button class="close" id="closeLot" aria-label="Fermer">×</button></header>
   <div class="body">
     <div class="hero"><img id="heroImg" src="brand/paysage.jpg" alt="Photo du lot"><button class="heroedit" id="heroEdit" aria-label="Changer la photo du lot">✎ Photo</button></div>
     <div class="sum2">
@@ -804,7 +836,6 @@ body.walking .peek{bottom:calc(var(--sab) + 170px)}
       <div class="prowwrap"><a class="prow" id="chkZoning" target="_blank" rel="noopener"><span class="pic" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 7h14l-2 10H4z"/></svg></span><span class="pt"><b>Zonage et usages</b><span id="chkZoningSub">Ouvrir la source municipale</span></span><span class="chev" aria-hidden="true">›</span></a><button class="clip" data-src="muni" aria-label="Joindre une capture ou un document (municipalité)"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.5 11.5l-8.2 8.2a5 5 0 0 1-7.1-7.1l8.6-8.6a3.4 3.4 0 0 1 4.8 4.8l-8.5 8.5a1.7 1.7 0 0 1-2.4-2.4l7.8-7.8"/></svg></button></div>
       <div class="prowwrap"><a class="prow" id="chkCadastre" target="_blank" rel="noopener"><span class="pic" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="4" width="14" height="16" rx="1"/><path d="M8 8h8M8 12h8M8 16h5"/></svg></span><span class="pt"><b>Cadastre et superficie</b><span id="chkCadastreSub">Ouvrir Infolot</span></span><span class="chev" aria-hidden="true">›</span></a><button class="clip" data-src="infolot" aria-label="Joindre une capture ou un document (Infolot)"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.5 11.5l-8.2 8.2a5 5 0 0 1-7.1-7.1l8.6-8.6a3.4 3.4 0 0 1 4.8 4.8l-8.5 8.5a1.7 1.7 0 0 1-2.4-2.4l7.8-7.8"/></svg></button></div>
       <a class="prow" id="chkCall" href="#"><span class="pic" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/></svg></span><span class="pt"><b>Appeler la municipalité</b><span id="chkCallSub">Confirmer le zonage, l'accès, un permis</span></span><span class="chev" aria-hidden="true">›</span></a>
-      <span id="chkBauxWrap" hidden><button class="prow" id="chkBaux"><span class="pic" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 20h18L12 4z"/></svg></span><span class="pt"><b>Terre publique louée</b><span id="chkBauxSub">Un bail public touche ce lot : à vérifier</span></span><span class="chev" aria-hidden="true">›</span></button></span>
     </div>
 
     
@@ -933,6 +964,8 @@ body.walking .peek{bottom:calc(var(--sab) + 170px)}
   <div class="body">
     <h3>Apparence</h3>
     <div class="seg" id="themeSeg" role="group" aria-label="Apparence"><button data-v="auto">Auto</button><button data-v="jour">Jour</button><button data-v="nuit">Nuit</button></div>
+    <h3>Ton nom</h3>
+    <input class="f" id="toolName" placeholder="Affiché quand tu partages des entrées" autocomplete="name">
     <h3>Unité de superficie</h3>
     <div class="seg" id="unitSeg" role="group" aria-label="Unité de superficie"><button data-v="pi2">pi²</button><button data-v="ac">acres</button><button data-v="ha">hectares</button></div>
     <h3>Carte</h3>
@@ -961,6 +994,7 @@ body.walking .peek{bottom:calc(var(--sab) + 170px)}
   <header><div class="t"><h2 id="jTitle">Journal</h2><p id="jSub">Dans ce téléphone seulement</p></div><button class="close" id="closeCarnet" aria-label="Fermer">×</button></header>
   <div class="body">
     <div class="jbackup" id="jBackup" hidden><span id="jBackupText"></span><button id="jBackupGo">Sauvegarder</button></div>
+    <div class="jshare"><button id="shareEntries">Partager des entrées</button><button id="importShare">Importer un partage</button><input type="file" id="importInput" accept=".zip,application/zip" hidden></div>
     <div class="seg jtabs" role="group" aria-label="Contenu du journal"><button id="jTabLots" aria-pressed="true">Lots <b id="jNLots"></b></button><button id="jTabWalks" aria-pressed="false">Marches <b id="jNWalks"></b></button></div>
     <div id="jLots">
       <input class="f" id="jSearch" type="search" placeholder="Chercher : n° de lot, ville, propriétaire, note" aria-label="Chercher dans le journal" autocomplete="off">
@@ -1000,6 +1034,18 @@ body.walking .peek{bottom:calc(var(--sab) + 170px)}
     <div id="hmPickWrap" hidden><h3>Parmi les photos du lot</h3><div class="hmpick" id="hmPick"></div></div>
     <input type="file" id="heroInput" accept="image/*" hidden>
     <button class="cancel" id="hmClose">Fermer</button>
+  </div>
+</div>
+<div class="modal" id="shareJ" hidden role="dialog" aria-modal="true" aria-labelledby="sjTitle">
+  <div class="mbox sjbox">
+    <div class="aimstep">Partager des entrées</div><h2 id="sjTitle">Que veux-tu envoyer ?</h2>
+    <label class="fine" for="sjName">Ton nom (affiché chez la personne qui importe)</label><input class="f" id="sjName" placeholder="Prénom Nom" autocomplete="name">
+    <div class="sjh"><b>Lots</b><button type="button" id="sjAllLots">Tout cocher</button></div><ul class="sjlist" id="sjLots"></ul>
+    <div class="sjh"><b>Marches</b><button type="button" id="sjAllWalks">Tout cocher</button></div><ul class="sjlist" id="sjWalks"></ul>
+    <div class="trow"><div class="t">Inclure les photos de terrain<small>Position et direction comprises</small></div><label class="switch"><input type="checkbox" id="sjPhotos" checked><span class="track"></span></label></div>
+    <div class="trow"><div class="t">Inclure noms et coordonnées<small>Propriétaires, adresses, courriels, téléphones</small></div><label class="switch"><input type="checkbox" id="sjOwner"><span class="track"></span></label></div>
+    <p class="fine">Les pièces jointes des sources (captures, PDF) ne sont jamais incluses.</p>
+    <button class="primary" id="sjGo">Créer le fichier et partager</button><button class="cancel" id="sjClose">Annuler</button>
   </div>
 </div>
 <div class="modal" id="walkPrep" hidden role="dialog" aria-modal="true" aria-labelledby="wpTitle">
@@ -1046,7 +1092,7 @@ body.walking .peek{bottom:calc(var(--sab) + 170px)}
   <div class="vbody">
     <img id="vfImg" alt="Photo à vérifier">
     <div class="vgrid"><div><small>Position GPS</small><b id="vfPos">—</b></div><div><small>Direction</small><b id="vfDir">—</b></div><div class="wide"><small>Lot associé</small><select id="vfLot" aria-label="Lot associé"></select><span class="fine" id="vfLotNote"></span></div><div><small>Heure</small><b id="vfTime">—</b></div></div>
-    <label class="fine" for="vfNote">Note facultative</label><textarea id="vfNote" rows="2" placeholder="Vue sur le versant nord. Accès à confirmer."></textarea>
+    <label class="fine" for="vfNote">Légende courte (affichée sur la carte) <span id="vfCount">0/60</span></label><input class="f" id="vfNote" maxlength="60" placeholder="Ex. : Ruisseau, accès au nord" autocomplete="off">
     <p class="vwarn">Ces métadonnées décrivent une mesure de terrain, pas une preuve cadastrale.</p>
   </div>
   <div class="vfoot"><button class="primary" id="vfSave">Enregistrer la photo</button></div>
@@ -1065,7 +1111,7 @@ body.walking .peek{bottom:calc(var(--sab) + 170px)}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script>
 /* ============================ CONFIG ============================ */
-const APP_VERSION='5.0';
+const APP_VERSION='5.1';
 const CONFIG = {
   ringFraction: 0.70, maxRadius: 1500, coneLength: 150, coneHalfAngle: 25,
   cadastre: 'https://geo.environnement.gouv.qc.ca/donnees/rest/services/Reference/Cadastre_allege/MapServer',
@@ -1086,6 +1132,8 @@ const CONFIG = {
 const $=id=>document.getElementById(id);
 function esc(s){ return String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
 var toastT; function toast(m){ const t=$('toast'); if(!t) return; t.textContent=m; t.classList.add('show'); clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove('show'),4500); }
+const lotRaw=no=>String(no||'').replace(/\D/g,'');
+const copyLot=(no,msg)=>copy(lotRaw(no),msg||`N° de lot copié : ${lotRaw(no)}`);
 async function copy(t,msg){ try{ await navigator.clipboard.writeText(t); if(msg) toast(msg); }catch{ if(msg) toast('Copie impossible — note : '+t); } }
 const store={ get(k,d){ try{ const v=localStorage.getItem(k); return v==null?d:JSON.parse(v); }catch{ return d; } }, set(k,v){ try{ localStorage.setItem(k,JSON.stringify(v)); }catch{} } };
 
@@ -1240,8 +1288,8 @@ $('opBack').onclick=()=>{ $('ownerPage').hidden=true; flushSave(); renderSummary
 $('gOwner').onclick=openOwnerPage;
 $('opWebBtn').onclick=()=>{ const open=$('opWeb').hidden; $('opWeb').hidden=!open; $('opWebBtn').setAttribute('aria-expanded',open); if(open&&!$('lotOwner').value.trim()) $('lotOwner').focus(); };
 $('lotOwner').addEventListener('input',()=>{ const has=!!$('lotOwner').value.trim(); $('opWebBtnSub').textContent=has?'Google, Canada411, Facebook, LinkedIn, registres…':'Inscris d\'abord le nom ci-dessus'; if(has&&!$('lotOStatus').value){ $('lotOStatus').value='nom'; } });
-$('opRegistre').addEventListener('click',()=>{ if(selected) copy(selected.lot,'N° de lot copié — Registre foncier'); log('btn',{id:'opRegistre'}); });
-$('opRoleLink').addEventListener('click',()=>{ if(selected) copy(selected.lot,'N° de lot copié'); log('btn',{id:'opRoleLink'}); });
+$('opRegistre').addEventListener('click',()=>{ if(selected) copyLot(selected.lot,`N° de lot copié (${lotRaw(selected.lot)}) — Registre foncier`); log('btn',{id:'opRegistre'}); });
+$('opRoleLink').addEventListener('click',()=>{ if(selected) copyLot(selected.lot); log('btn',{id:'opRoleLink'}); });
 $('lotOStatus').addEventListener('change',e=>{ const v=e.target.value; if(v==='lettre'||v==='contacte'||v==='reponse') $('lotContacted').checked=true; log('owner_status',{v}); saveNow(); renderSummary(); });
 $('lotNextDate').addEventListener('change',()=>{ saveNow(); $('opIcs').hidden=!$('lotNextDate').value; });
 $('opTask').onclick=()=>{ if(!selected) return; if(!$('lotNextDate').value){ const d=new Date(Date.now()+14*864e5); $('lotNextDate').value=d.toISOString().slice(0,10); }
@@ -1250,7 +1298,6 @@ $('opIcs').onclick=e=>{ e.preventDefault(); if(!selected||!$('lotNextDate').valu
   const who=$('lotOwner').value.trim(), st=$('lotOStatus').selectedOptions[0]?.textContent||'';
   const ics=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//LOTS//Terre de rang//FR','BEGIN:VEVENT',`UID:${Date.now()}@lots.quebec`,`DTSTAMP:${new Date().toISOString().replace(/[-:]/g,'').slice(0,15)}Z`,`DTSTART;VALUE=DATE:${d}`,`DTEND;VALUE=DATE:${d2}`,`SUMMARY:Suivi — lot ${selected.lot}${selected.muni?' ('+selected.muni+')':''}`,`DESCRIPTION:${[who,st].filter(Boolean).join(' · ').replace(/[,;]/g,' ')}`,'END:VEVENT','END:VCALENDAR'].join('\r\n');
   const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([ics],{type:'text/calendar'})); a.download=`suivi-lot-${selected.lot.replace(/\s/g,'')}.ics`; a.click(); log('owner_ics'); };
-$('chkBaux').onclick=()=>toast('Un bail sur terre publique touche ce lot : vérifie ses limites avant toute démarche (Couches → Terres publiques louées).');
 let heroId=null, heroNext=false, heroUrl=null;
 const isField=p=>p.kind!=='doc'&&(!p.src||p.src==='terrain'||p.src==='marche'||p.src==='import');
 async function heroFor(no){ const img=$('heroImg'); let ph=[]; try{ ph=(await listPhotos(no)).filter(isField); }catch{}
@@ -1283,15 +1330,18 @@ let me=null, meMarker=null, meCircle=null;
 function locate(){return new Promise((res,rej)=>{if(!navigator.geolocation)return rej(new Error('Pas de GPS dans ce navigateur'));
   navigator.geolocation.getCurrentPosition(p=>res(p.coords),e=>rej(new Error(e.code===1?'Accès à la position refusé. Autorise-le dans les réglages du navigateur.':'Position introuvable — attends un signal GPS et réessaie.')),{enableHighAccuracy:true,timeout:15000,maximumAge:5000});});}
 let meAcc=null;
-function showMe(c){ me=[c.latitude,c.longitude]; meAcc=Math.round(c.accuracy||0)||null;
+let meT=0, walkFollow=true;
+function showMe(c){ me=[c.latitude,c.longitude]; meAcc=Math.round(c.accuracy||0)||null; meT=Date.now();
   if(meMarker){meMarker.setLatLng(me);meCircle.setLatLng(me).setRadius(c.accuracy||10);}
   else{meMarker=L.marker(me,{icon:L.divIcon({className:'',html:'<div class="me"></div>',iconSize:[16,16],iconAnchor:[8,8]}),zIndexOffset:1000,interactive:false}).addTo(map);
        meCircle=L.circle(me,{radius:c.accuracy||10,color:'#1E6FD9',weight:1,fillOpacity:.08,interactive:false}).addTo(map);} }
-$('btnMe').onclick=async()=>{ const t0=Date.now(); try{ const c=await locate(); showMe(c); map.setView(me,Math.max(map.getZoom(),16)); drawCone(); log('locate',{ms:Date.now()-t0,acc:Math.round(c.accuracy||0)}); }catch(e){toast(e.message);log('locate_error',{msg:e.message});} };
+map.on('dragstart',()=>{ if(walk&&walkFollow){ walkFollow=false; toast('Suivi de ta position en pause — touche Ma position pour le reprendre'); } });
+$('btnMe').onclick=async()=>{ walkFollow=true; const t0=Date.now(); try{ const c=await locate(); showMe(c); map.setView(me,Math.max(map.getZoom(),16)); drawCone(); log('locate',{ms:Date.now()-t0,acc:Math.round(c.accuracy||0)}); }catch(e){toast(e.message);log('locate_error',{msg:e.message});} };
 let centeredOnce=false;
 if(navigator.geolocation) navigator.geolocation.watchPosition(p=>{ showMe(p.coords); drawCone();
   if(!centeredOnce){ centeredOnce=true; map.setView(me,Math.max(map.getZoom(),15)); log('auto_center',{acc:Math.round(p.coords.accuracy||0)}); }
-  walkPoint(p.coords.latitude,p.coords.longitude,p.coords.accuracy||99); },()=>{},{enableHighAccuracy:true,maximumAge:3000});
+  walkPoint(p.coords.latitude,p.coords.longitude,p.coords.accuracy||99);
+  if(walk&&walkFollow&&!walk.paused){ const now=Date.now(); if(now-(window._followT||0)>2500){ window._followT=now; map.panTo(me,{animate:true}); } } },()=>{},{enableHighAccuracy:true,maximumAge:3000});
 
 /* ============================ Boussole ============================ */
 let heading=null, compassOn=false, tiltFlat=false;
@@ -1485,7 +1535,7 @@ function renderSummary(){ if(!selected) return; const s=selected, r=s.role, own=
   const adr=r&&r[9]&&roleDomains?adrLabel(r[9],roleDomains):''; $('sumEyebrow').textContent=adr||''; $('sumEyebrow').hidden=!adr;
   const use=r?(roleDomains?.CODE_UTILISATION_CUBF_3||{})[r[1]]:null; $('gValueCell').hidden=$('gUseCell').hidden=!r; document.querySelector('.idgrid').classList.toggle('two',!r); if(r){ $('gValue').textContent=r[5]!=null?money(r[5]):'—'; $('gUse').textContent=use||'—'; }
   $('chkAccessSub').textContent=s.built===true?`Adresse civique sur le lot${s.builtAddr?' : '+s.builtAddr:''} · accès probable`:s.built===false?'Non confirmé · aucune adresse civique':'Vérification en cours…';
-  $('chkBauxWrap').hidden=!s.baux;
+  
   if(r){ const use=(roleDomains?.CODE_UTILISATION_CUBF_3||{})[r[1]];  }
   const tags=[];
   
@@ -1537,8 +1587,9 @@ function ownerLinks(){ const n=$('lotOwner').value.trim(), where=selected?.muni|
 ['lnkC411','lnkGoogle','lnkFacebook','lnkLinkedin','lnkReq','lnkDeces','lnkNoms','lnkInfolot','lnkRegistre','lnkRole','lnkMuni','lnkCall'].forEach(id=>$(id).addEventListener('click',()=>log('btn',{id})));
 $('lnkReq').addEventListener('click',()=>{ const n=$('lotOwner').value.trim(); if(n) copy(n,'Nom copié — colle-le dans la recherche du Registre des entreprises'); });
 $('lnkNoms').addEventListener('click',()=>{ const n=$('lotOwner').value.trim(); if(n) copy(n,'Nom copié — Registre foncier → Index des noms'); });
-['lnkInfolot','lnkRegistre','lnkRole'].forEach(id=>$(id).addEventListener('click',()=>{ if(selected) copy(selected.lot,'N° de lot copié'); }));
-$('copyLot').onclick=()=>copy(selected?.lot||'','Numéro de lot copié');
+['lnkInfolot','lnkRegistre','lnkRole'].forEach(id=>$(id).addEventListener('click',()=>{ if(selected) copyLot(selected.lot); }));
+$('copyLot').onclick=()=>copyLot(selected?.lot);
+$('copyLotTop').onclick=()=>{ copyLot(selected?.lot); navigator.vibrate?.(10); log('btn',{id:'copyLotTop'}); };
 
 /* ---- Rôle d'évaluation en direct : MRC d'Argenteuil (un lot à la fois) ---- */
 async function arcq(url,params){ const r=await netFetch(`${url}/query?${new URLSearchParams({f:'json',outFields:'*',returnGeometry:'false',...params})}`); if(!r.ok) throw new Error('HTTP '+r.status); const j=await r.json(); if(j.error) throw new Error(j.error.message||'erreur'); return j.features||[]; }
@@ -1702,7 +1753,7 @@ async function renderCarnet(){ renderJournalChrome(); const ul=$('carnetList'); 
   if(!rows.length){ ul.innerHTML=`<li class="jempty"><b>Aucun lot ne correspond</b>${J.q?'Essaie un autre mot, ou ':''}<button type="button" id="jReset">voir tous les lots</button></li>`; $('jReset').onclick=()=>{ J.q=''; $('jSearch').value=''; J.filter='all'; saveJ(); renderCarnet(); }; return; }
   rows.forEach(({r,n})=>{ const k=keyOf(r), col=stColor(k), li=document.createElement('li'); li.className='jcard';
     const dist=me?` · ${fmtDist(map.distance(me,[r.lat,r.lng]))}`:'';
-    li.innerHTML=`${selMode?`<input type="checkbox" class="selbox" ${selSet.has(r.lot)?'checked':''} aria-label="Sélectionner le lot ${esc(r.lot)}">`:''}<button type="button" class="jmain"><span class="jico">${pinHtml(k,col)}</span><span class="jt"><b>Lot ${esc(r.lot)}${r.fav?' <span class="jfav" aria-label="favori">♥</span>':''}</b><span>${esc(r.muni||'—')} · ${fmt(acres(r.ha),1)} acres${dist}${pc[r.lot]?` · 📷 ${pc[r.lot]}`:''}</span>${r.owner?`<span class="jo">${esc(r.owner)}</span>`:''}${r.note?`<span class="jn">${esc(r.note)}</span>`:''}</span></button><button type="button" class="jnext${n.todo?'':' wait'}">${esc(n.label)} ›</button>`;
+    li.innerHTML=`${selMode?`<input type="checkbox" class="selbox" ${selSet.has(r.lot)?'checked':''} aria-label="Sélectionner le lot ${esc(r.lot)}">`:''}<button type="button" class="jmain"><span class="jico">${pinHtml(k,col)}</span><span class="jt"><b>Lot ${esc(r.lot)}${r.fav?' <span class="jfav" aria-label="favori">♥</span>':''}</b><span>${esc(r.muni||'—')} · ${fmt(acres(r.ha),1)} acres${dist}${pc[r.lot]?` · 📷 ${pc[r.lot]}`:''}</span>${r.owner?`<span class="jo">${esc(r.owner)}</span>`:''}${r.note?`<span class="jn">${esc(r.note)}</span>`:''}${r.alsoFrom&&!r.from?`<span class="jfrom">Complété par ${esc(r.alsoFrom.name||'')}</span>`:''}${r.from?`<span class="jfrom">Importé de ${esc(r.from.name||'quelqu\'un')} · ${new Date(r.from.at).toLocaleDateString('fr-CA',{day:'numeric',month:'short'})}</span>`:''}</span></button><button type="button" class="jnext${n.todo?'':' wait'}">${esc(n.label)} ›</button>`;
     li.querySelector('.jmain').onclick=()=>{ if(selMode){ const cb=li.querySelector('.selbox'); cb.checked=!cb.checked; cb.checked?selSet.add(r.lot):selSet.delete(r.lot); return; } log('journal_open',{via:'card'}); openFromJournal(r,null); };
     li.querySelector('.jnext').onclick=()=>{ log('journal_open',{via:'next',action:n.sec}); openFromJournal(r,n.sec); };
     li.querySelector('.selbox')?.addEventListener('change',e=>{ e.target.checked?selSet.add(r.lot):selSet.delete(r.lot); });
@@ -1712,7 +1763,7 @@ function csv(){ const head=['lot','municipalite','mrc','pi2','hectares','proprie
   const rows=carnet.map(r=>[r.lot,r.muni,r.mrc,Math.round(r.ha*107639.1),r.ha.toFixed(3),r.owner||'',r.addrPost||'',r.email||'',r.phone||'',r.fav?'oui':'',labelOf(r),r.centris||'',r.centrisInfo?.id||'',r.centrisInfo?.price||'',r.centrisInfo?.broker||'',r.note||'',r.date||'',r.lat.toFixed(6),r.lng.toFixed(6)].map(v=>`"${String(v??'').replace(/"/g,'""')}"`).join(','));
   return '\ufeff'+[head.join(','),...rows].join('\n'); }
 $('exportCsv').onclick=()=>{ log('btn',{id:'exportCsv'}); if(!carnet.length) return toast('Journal vide'); const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([csv()],{type:'text/csv;charset=utf-8'})); a.download=`lots-${new Date().toISOString().slice(0,10)}.csv`; a.click(); };
-$('copyRegistre').onclick=()=>{ const l=carnet.filter(r=>r.fav&&!r.owner); if(!l.length) return toast('Aucun favori sans propriétaire'); copy(l.map(r=>`${r.lot}\t${r.muni}`).join('\n'),`${l.length} lot(s) copié(s) — à chercher au Registre`); };
+$('copyRegistre').onclick=()=>{ const l=carnet.filter(r=>r.fav&&!r.owner); if(!l.length) return toast('Aucun favori sans propriétaire'); copy(l.map(r=>`${lotRaw(r.lot)}\t${r.muni}`).join('\n'),`${l.length} lot(s) copié(s) — à chercher au Registre`); };
 $('shareCsv').onclick=async()=>{ log('btn',{id:'shareCsv'}); if(!carnet.length) return toast('Journal vide'); const file=new File([csv()],'lots.csv',{type:'text/csv'});
   if(navigator.canShare?.({files:[file]})){ try{ await navigator.share({files:[file],title:'Journal Lots'}); }catch{} } else copy(csv(),'CSV copié'); };
 
@@ -1773,7 +1824,7 @@ $('wsJournal').onclick=()=>{ $('walkSummary').hidden=true; $('btnCarnet').click(
 $('premiumNotify').onclick=e=>{ e.preventDefault(); log('premium_interest',{feature:'share_link'}); location.href='mailto:bonjour@lots.quebec?subject='+encodeURIComponent('Prévenez-moi : lots Premium (partage de fiche)'); };
 
 /* ============================ Outils ============================ */
-function renderTools(){ document.querySelectorAll('#unitSeg button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.v===UNIT())); applyTheme();
+function renderTools(){ $('toolName').value=store.get('lots.sender',''); document.querySelectorAll('#unitSeg button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.v===UNIT())); applyTheme();
   const lb=store.get('terrain.lastBackup',null); $('tBackupSub').textContent=lb?`Dernière sauvegarde : ${new Date(lb).toLocaleDateString('fr-CA')}`:'Jamais sauvegardé — fais-le avant de changer de téléphone';
   $('toolsVersion').textContent=`LOTS ${APP_VERSION} · Terre de rang · tes données restent dans ce téléphone`; }
 $('btnTools').onclick=()=>{ renderTools(); show(sheets.tools); log('btn',{id:'btnTools'}); };
@@ -1794,6 +1845,67 @@ $('tKml').onclick=()=>{ if(!carnet.length&&!walks.length) return toast('Journal 
 $('tGuide').onclick=()=>{ hide(sheets.tools,true); syncTabs(); $('btnHelp').click(); };
 $('tVoice').onclick=()=>$('btnMic').click();
 $('tReport').onclick=()=>$('shareLog').click();
+
+
+/* ============================ Partager / importer des entrées de journal ============================ */
+$('toolName').addEventListener('input',e=>store.set('lots.sender',e.target.value.trim()));
+const isFieldPhoto=p=>p.kind!=='doc'&&(!p.src||['terrain','marche','import'].includes(p.src));
+function openShareJ(preLots){ $('sjName').value=store.get('lots.sender','');
+  const lots=[...carnet].sort((a,b)=>(b.updated||b.date||'').localeCompare(a.updated||a.date||'')), pre=new Set(preLots||[]);
+  $('sjLots').innerHTML=lots.length?lots.map(r=>`<li><label><input type="checkbox" value="${esc(r.lot)}" ${pre.has(r.lot)?'checked':''}> Lot ${esc(r.lot)} <span>${esc(r.muni||'')}${r.fav?' · ♥':''}</span></label></li>`).join(''):'<li class="empty">Aucun lot dans ton journal</li>';
+  $('sjWalks').innerHTML=walks.length?walks.map(w=>`<li><label><input type="checkbox" value="${esc(w.id)}"> ${new Date(w.start).toLocaleDateString('fr-CA',{day:'numeric',month:'short'})} · ${fmtDist(w.dist)} <span>${(w.photos||[]).length} photo(s)</span></label></li>`).join(''):'<li class="empty">Aucune marche</li>';
+  $('sjOwner').checked=false; $('sjPhotos').checked=true; $('shareJ').hidden=false; log('share_j_open'); }
+$('shareEntries').onclick=()=>openShareJ(selMode?[...selSet]:[]);
+$('sjClose').onclick=()=>{ $('shareJ').hidden=true; };
+$('sjAllLots').onclick=()=>{ const cb=[...$('sjLots').querySelectorAll('input')]; const all=cb.every(c=>c.checked); cb.forEach(c=>c.checked=!all); };
+$('sjAllWalks').onclick=()=>{ const cb=[...$('sjWalks').querySelectorAll('input')]; const all=cb.every(c=>c.checked); cb.forEach(c=>c.checked=!all); };
+async function buildShare(lotIds,walkIds,opt){ const enc=new TextEncoder(), files=[], now=new Date().toISOString();
+  const lots=carnet.filter(r=>lotIds.includes(r.lot)).map(r=>{ const o={lot:r.lot,muni:r.muni,mrc:r.mrc,lat:r.lat,lng:r.lng,ha:r.ha,geom:r.geom||null,note:r.note||'',tags:r.tags||[],visited:!!r.visited,fav:!!r.fav,centris:r.centris||'',centrisInfo:r.centrisInfo||null,date:r.date||null};
+    if(opt.owner) Object.assign(o,{owner:r.owner||'',addrPost:r.addrPost||'',email:r.email||'',phone:r.phone||'',ownerStatus:r.ownerStatus||''}); return o; });
+  const ws=walks.filter(w=>walkIds.includes(w.id)).map(w=>({id:w.id,start:w.start,end:w.end,secs:w.secs,dist:w.dist,pts:w.pts,lots:w.lots||[],photos:w.photos||[]}));
+  const pmeta=[]; if(opt.photos){ let all=[]; try{ all=await dbAll('photos'); }catch{} const ls=new Set(lots.map(l=>l.lot)), wsSet=new Set(ws.map(w=>w.id));
+    for(const p of all.filter(p=>isFieldPhoto(p)&&((p.lot&&ls.has(p.lot))||(p.walk&&wsSet.has(p.walk))))){ const file=`photos/${p.id}.jpg`; files.push({name:file,data:await blobBytes(p.blob)});
+      pmeta.push({id:p.id,file,lot:p.lot||null,walk:p.walk||null,lat:p.lat??null,lng:p.lng??null,acc:p.acc??null,heading:p.heading??null,t:p.t,title:p.title||'',note:p.note||'',src:p.src||'terrain'}); } }
+  const manifest={format:'lots-partage',v:1,app:'LOTS '+APP_VERSION,sender:opt.name||'',created:now,owner:!!opt.owner,counts:{lots:lots.length,walks:ws.length,photos:pmeta.length}};
+  files.unshift({name:'lots-partage.json',data:enc.encode(JSON.stringify({manifest,lots,walks:ws,photos:pmeta}))});
+  files.push({name:'LISEZMOI.txt',data:enc.encode(`Partage LOTS de ${opt.name||'—'}, ${new Date().toLocaleString('fr-CA')}.\r\nPour l'ouvrir : lots.quebec → Journal → Importer un partage, puis choisis ce fichier.\r\n${lots.length} lot(s), ${ws.length} marche(s), ${pmeta.length} photo(s). Noms et coordonnées : ${opt.owner?'inclus':'exclus'}.`)});
+  return {blob:makeZip(files),manifest}; }
+$('sjGo').onclick=async()=>{ const lotIds=[...$('sjLots').querySelectorAll('input:checked')].map(c=>c.value), walkIds=[...$('sjWalks').querySelectorAll('input:checked')].map(c=>c.value);
+  if(!lotIds.length&&!walkIds.length) return toast('Coche au moins un lot ou une marche'); const name=$('sjName').value.trim(); if(name) store.set('lots.sender',name);
+  if($('sjOwner').checked&&!confirm('Inclure les noms et coordonnées des propriétaires ? Ne le fais qu\'avec une personne de confiance.')) return;
+  const b=$('sjGo'); b.disabled=true; b.textContent='Préparation…';
+  try{ const z=await buildShare(lotIds,walkIds,{name,owner:$('sjOwner').checked,photos:$('sjPhotos').checked}); const fn=`LOTS-partage-${slug(name||'journal')}-${new Date().toISOString().slice(0,10)}.zip`; const file=new File([z.blob],fn,{type:'application/zip'});
+    log('share_j',{...z.manifest.counts,owner:z.manifest.owner});
+    if(navigator.canShare?.({files:[file]})){ try{ await navigator.share({files:[file],title:'Partage LOTS',text:`${name||'Quelqu\'un'} te partage ${lotIds.length} lot(s) et ${walkIds.length} marche(s). Ouvre lots.quebec → Journal → Importer un partage.`}); }catch{} }
+    else { const a=document.createElement('a'); a.href=URL.createObjectURL(z.blob); a.download=fn; a.click(); toast('Fichier de partage téléchargé'); }
+    $('shareJ').hidden=true; }
+  catch(e){ toast('Partage impossible : '+e.message); } finally{ b.disabled=false; b.textContent='Créer le fichier et partager'; } };
+async function readZip(file){ const buf=new Uint8Array(await file.arrayBuffer()), dv=new DataView(buf.buffer,buf.byteOffset,buf.byteLength), dec=new TextDecoder();
+  let e=buf.length-22; while(e>=0&&dv.getUint32(e,true)!==0x06054b50) e--; if(e<0) throw new Error('fichier ZIP illisible');
+  const n=dv.getUint16(e+10,true); let off=dv.getUint32(e+16,true); const out={};
+  for(let i=0;i<n;i++){ if(dv.getUint32(off,true)!==0x02014b50) throw new Error('ZIP endommagé'); const method=dv.getUint16(off+10,true), csize=dv.getUint32(off+20,true), nl=dv.getUint16(off+28,true), xl=dv.getUint16(off+30,true), cl=dv.getUint16(off+32,true), lho=dv.getUint32(off+42,true);
+    const name=dec.decode(buf.subarray(off+46,off+46+nl)); const start=lho+30+dv.getUint16(lho+26,true)+dv.getUint16(lho+28,true); let data=buf.subarray(start,start+csize);
+    if(method===8){ if(typeof DecompressionStream==='undefined') throw new Error('fichier compressé non pris en charge par ce navigateur'); data=new Uint8Array(await new Response(new Blob([data]).stream().pipeThrough(new DecompressionStream('deflate-raw'))).arrayBuffer()); }
+    else if(method!==0) throw new Error('format de compression non pris en charge');
+    out[name]=data; off+=46+nl+xl+cl; } return out; }
+async function importShare(file){ const z=await readZip(file); if(!z['lots-partage.json']) throw new Error('ce fichier n\'est pas un partage LOTS');
+  const d=JSON.parse(new TextDecoder().decode(z['lots-partage.json'])), m=d.manifest||{}; if(m.format!=='lots-partage') throw new Error('format inconnu');
+  const from={name:m.sender||'quelqu\'un',at:m.created||new Date().toISOString()}, c=m.counts||{};
+  if(!confirm(`Importer le partage de ${from.name} ?\n${c.lots||0} lot(s), ${c.walks||0} marche(s), ${c.photos||0} photo(s).\n\nRien de ton journal ne sera écrasé : ce qui existe déjà est complété, signé « ${from.name} ».`)) return null;
+  let nl=0,nc=0,nw=0,np=0; const today=new Date().toISOString().slice(0,10);
+  for(const r of d.lots||[]){ const i=carnet.findIndex(x=>x.lot===r.lot);
+    if(i<0){ carnet.push({...migrate({...r,tags:r.tags||[]}),fav:false,from,date:r.date||today,updated:today}); nl++; }
+    else { const mine=carnet[i]; if(r.note&&!(mine.note||'').includes(r.note)) mine.note=((mine.note?mine.note+'\n':'')+`— ${from.name} : ${r.note}`).trim();
+      ['owner','addrPost','email','phone'].forEach(k=>{ if(r[k]&&!mine[k]) mine[k]=r[k]; }); if(!mine.geom&&r.geom) mine.geom=r.geom; mine.alsoFrom=from; mine.updated=today; nc++; } }
+  for(const w of d.walks||[]){ if(!walks.find(x=>x.id===w.id)){ walks.push({...w,from}); nw++; } }
+  let have=new Set(); try{ have=new Set((await dbAll('photos')).map(p=>p.id)); }catch{}
+  for(const p of d.photos||[]){ if(have.has(p.id)||!z[p.file]) continue; try{ await dbTx('readwrite',st=>st.put({...p,blob:new Blob([z[p.file]],{type:'image/jpeg'}),from})); np++; }catch{} }
+  persist(); store.set('terrain.walks',walks); renderSaved(); renderWalks(); restyleScan();
+  log('import_j',{lots:nl,completed:nc,walks:nw,photos:np}); return {nl,nc,nw,np,from}; }
+$('importShare').onclick=()=>$('importInput').click();
+$('importInput').addEventListener('change',async e=>{ const f=e.target.files[0]; e.target.value=''; if(!f) return;
+  try{ const r=await importShare(f); if(!r) return; renderCarnet(); toast(`Importé de ${r.from.name} : ${r.nl} lot(s) nouveau(x), ${r.nc} complété(s), ${r.nw} marche(s), ${r.np} photo(s)`); }
+  catch(err){ toast('Import impossible : '+err.message); log('import_error',{msg:String(err.message).slice(0,80)}); } });
 
 /* ============================ Couches ============================ */
 let sat=store.get('terrain.sat',false);
@@ -1872,6 +1984,7 @@ function walkUI(){ const on=!!walk, p=on&&walk.paused; document.body.classList.t
   $('walkState').textContent=p?'· en pause, position non enregistrée':'· en marche'; if(on) $('walkStat').textContent=fmtDist(walk.dist); }
 function persistActiveWalk(force){ if(!walk) return; const now=Date.now(); if(!force&&now-(walk._saved||0)<8000) return; walk._saved=now;
   try{ localStorage.setItem('terrain.walkActive',JSON.stringify({id:walk.id,start:walk.start,pts:walk.pts,dist:walk.dist,photos:walk.photos,paused:walk.paused,pausedMs:walk.pausedMs,pausedAt:walk.pausedAt,lots:walk.lots||[]})); }catch{} }
+document.addEventListener('click',e=>{ const a=e.target.closest?.('a[target="_blank"]'); if(a&&/^https?:/.test(a.href)&&!a.hasAttribute('download')&&!a.href.startsWith(location.origin)) a.target='lots-sources'; },true);
 window.addEventListener('pagehide',()=>persistActiveWalk(true)); document.addEventListener('visibilitychange',()=>{ if(document.hidden) persistActiveWalk(true); });
 function resumeWalk(d){ walk={...d,side:1,lastStep:null}; walk.lots=walk.lots||[]; curLot=null; lastBQ=0;
   walk.line=L.polyline(walk.pts.map(q=>[q.lat,q.lng]),{color:'#3F7A4F',weight:3,opacity:.6,dashArray:'2 8',interactive:false}).addTo(walkLayer); walkUI(); log('walk_resume',{pts:walk.pts.length}); toast('Marche reprise — ton tracé est intact'); }
@@ -1911,10 +2024,15 @@ function renderWalks(){ walkLayer.clearLayers(); stepsLayer.clearLayers(); walks
 function renderWalkList(){ renderJournalChrome(); const ul=$('walkList'); ul.innerHTML=''; if(!walks.length){ ul.innerHTML='<li class="empty">Aucune marche. Touche « Marcher » en bas de l\'écran pour tracer tes pas.</li>'; return; }
   walks.forEach(w=>{ const li=document.createElement('li'); const d=new Date(w.start); const nl=carnet.filter(r=>r.geom&&w.pts.some(([la,ln])=>inPoly([ln,la],r.geom))).length; li.innerHTML=`<div class="t"><b>${d.toLocaleDateString('fr-CA',{weekday:'short',day:'numeric',month:'short'})} · ${fmtDist(w.dist)}</b><span>${fmtTime(w.secs??Math.round((w.end-w.start)/1000))} · ${w.photos.length} photo${w.photos.length>1?'s':''}${nl?` · ${nl} lot${nl>1?'s':''} de ton journal`:''} · voir sur la carte ›</span></div><button class="close" aria-label="Supprimer cette marche">×</button>`;
     li.querySelector('.t').onclick=()=>{ hide(sheets.carnet,true); if(w.pts.length) map.fitBounds(L.latLngBounds(w.pts).pad(.3)); };
-    li.querySelector('button').onclick=()=>{ if(!confirm('Supprimer cette marche ?')) return; walks=walks.filter(x=>x.id!==w.id); store.set('terrain.walks',walks); renderWalks(); renderWalkList(); }; ul.appendChild(li); }); }
+    li.querySelector('button').onclick=()=>{ if(!confirm('Supprimer cette marche ?')) return; walks=walks.filter(x=>x.id!==w.id); store.set('terrain.walks',walks); renderWalks(); renderWalkList(); }; if(w.from){ const t=li.querySelector('.t'); if(t) t.insertAdjacentHTML('beforeend',`<span class="jfrom">Importée de ${esc(w.from.name||'')}</span>`); } ul.appendChild(li); }); }
 
 /* ============================ Photo orientée : viser à plat, puis cadrer ============================ */
-function openAim(target){ povTarget=target||null; if(!compassOn) enableCompass(true); aimHeading=null; $('aim').hidden=false; $('peek').hidden=true; log('aim_open',{walking:!!walk,target:!!target}); if(!me) locate().then(showMe).catch(()=>{}); }
+let shotFix=null;
+function aimGpsText(){ const el=$('aimGps'); if(!el) return; if(shotFix?.fresh) el.textContent=`📍 Position à jour · ± ${shotFix.acc||'?'} m`; else if(shotFix) el.textContent=`📍 Position d'il y a ${Math.round((Date.now()-shotFix.t)/1000)} s · ± ${shotFix.acc||'?'} m — GPS lent`; else el.textContent='📍 Localisation en cours…'; el.classList.toggle('bad',!shotFix?.fresh); }
+function openAim(target){ povTarget=target||null; if(!compassOn) enableCompass(true); aimHeading=null; $('aim').hidden=false; $('peek').hidden=true; log('aim_open',{walking:!!walk,target:!!target});
+  shotFix=null; aimGpsText();
+  if(navigator.geolocation) navigator.geolocation.getCurrentPosition(p=>{ showMe(p.coords); shotFix={lat:me[0],lng:me[1],acc:meAcc,t:Date.now(),fresh:true}; map.setView(me,Math.max(map.getZoom(),17)); drawCone(); aimGpsText(); log('aim_fix_gps',{acc:meAcc}); },
+    ()=>{ if(me){ shotFix={lat:me[0],lng:me[1],acc:meAcc,t:meT,fresh:false}; map.setView(me,Math.max(map.getZoom(),17)); } aimGpsText(); log('aim_fix_gps_fail'); },{enableHighAccuracy:true,maximumAge:0,timeout:15000}); }
 $('btnPov').onclick=()=>openAim(null);
 $('btnPhotoLot').onclick=()=>{ if(selected) openAim(selected.lot); };
 $('aimCancel').onclick=()=>{ $('aim').hidden=true; povTarget=null; updatePeek(); };
@@ -1939,8 +2057,8 @@ $('snapShutter').onclick=async()=>{ navigator.vibrate?.(20); const v=$('snapVide
   if(snapTrack&&v.videoWidth){ const digital=!(snapCaps?.zoom); const z=digital?snapZoom:1; const sw=v.videoWidth/z, sh=v.videoHeight/z; c.width=Math.min(1600,Math.round(sw)); c.height=Math.round(c.width*sh/sw); c.getContext('2d').drawImage(v,(v.videoWidth-sw)/2,(v.videoHeight-sh)/2,sw,sh,0,0,c.width,c.height); blob=await new Promise(res=>c.toBlob(res,'image/jpeg',.85)); }
   if(!blob) return toast('Capture impossible — réessaie');
   stopCam(); $('snap').hidden=true;
-  const pos=me?[me[0],me[1]]:null, h=aimHeading; let lotNo=povTarget, auto=null; if(pos){ try{ const j=await lotAt(pos[0],pos[1]); auto=j.features?.[0]?.properties?.NO_LOT||null; }catch{} } if(!lotNo) lotNo=auto;
-  openVerify({blob,pos,acc:pos?meAcc:null,h,lotNo,auto,t:Date.now(),zoom:snapZoom}); };
+  const fix=shotFix||(me?{lat:me[0],lng:me[1],acc:meAcc}:null); const pos=fix?[fix.lat,fix.lng]:null, h=aimHeading; let lotNo=povTarget, auto=null; if(pos){ try{ const j=await lotAt(pos[0],pos[1]); auto=j.features?.[0]?.properties?.NO_LOT||null; }catch{} } if(!lotNo) lotNo=auto;
+  openVerify({blob,pos,acc:fix?.acc??null,h,lotNo,auto,t:Date.now(),zoom:snapZoom,stale:fix&&!fix.fresh}); };
 const CARD=['N','N-N-E','N-E','E-N-E','E','E-S-E','S-E','S-S-E','S','S-S-O','S-O','O-S-O','O','O-N-O','N-O','N-N-O'];
 const cardinal=h=>CARD[Math.round(((h%360)+360)%360/22.5)%16];
 let pendingShot=null, verifyUrl=null;
@@ -1949,7 +2067,8 @@ function openVerify(ps){ pendingShot=ps; if(verifyUrl) URL.revokeObjectURL(verif
   $('vfDir').textContent=ps.h!=null?`${Math.round(ps.h)}° · ${cardinal(ps.h)}`:'Sans direction'; $('vfTime').textContent=new Date(ps.t).toLocaleTimeString('fr-CA',{hour:'2-digit',minute:'2-digit'});
   const opts=[...new Set([ps.lotNo,ps.auto,selected?.lot].filter(Boolean))]; const sel=$('vfLot'); sel.innerHTML=opts.map(n=>`<option value="${esc(n)}">Lot ${esc(n)}${n===ps.auto?' (sous tes pieds)':''}</option>`).join('')+'<option value="">Aucun lot / incertain</option>'; sel.value=ps.lotNo||'';
   $('vfLotNote').textContent=!ps.auto?'Lot non déterminé à ta position : choisis-le ou laisse « incertain ».':(ps.acc&&ps.acc>15?'Près d\'une limite ou GPS imprécis : vérifie le lot.':'');
-  $('vfNote').value=''; $('verify').hidden=false; log('verify_open',{gps:!!ps.pos,h:ps.h!=null,lot:!!ps.lotNo}); }
+  $('vfNote').value=''; $('vfCount').textContent='0/60'; $('verify').hidden=false; log('verify_open',{gps:!!ps.pos,h:ps.h!=null,lot:!!ps.lotNo}); }
+$('vfNote').addEventListener('input',e=>{ $('vfCount').textContent=`${e.target.value.length}/60`; });
 function closeVerify(){ $('verify').hidden=true; pendingShot=null; updatePeek(); }
 $('vfRetake').onclick=()=>{ $('verify').hidden=true; pendingShot=null; log('verify_retake'); openSnap(); };
 $('vfSave').onclick=async()=>{ const ps=pendingShot; if(!ps) return; const lotNo=$('vfLot').value||null, note=$('vfNote').value.trim();
@@ -1959,12 +2078,15 @@ $('vfSave').onclick=async()=>{ const ps=pendingShot; if(!ps) return; const lotNo
   if(walk){ walk.photos.push(id); persistActiveWalk(true); }
   if(heroNext&&selected&&lotNo===selected.lot){ heroId=id; heroNext=false; saveNow(); heroFor(lotNo); }
   log('snap',{h:ps.h!=null?Math.round(ps.h):null,lot:!!lotNo,gps:!!ps.pos,note:!!note}); toast(`Photo enregistrée${lotNo?' · lot '+lotNo:''}${walk?' · ta marche continue':''}`);
-  closeVerify(); renderPov(); if(selected&&selected.lot===lotNo) renderThumbs(lotNo); povTarget=null; };
+  closeVerify(); if(ps.pos) addPovMarker({id,lat:ps.pos[0],lng:ps.pos[1],heading:ps.h,title:note||undefined,blob:ps.blob}); renderPov(); if(selected&&selected.lot===lotNo) renderThumbs(lotNo); povTarget=null; };
 function aimTick(){ if($('aim').hidden) return; const h=heading; $('aimDeg').textContent=h==null?'—°':Math.round(h)+'°'; $('aimRose').style.transform=`rotate(${h==null?0:-h}deg)`; const f=$('aimFlat'); f.classList.toggle('ok',tiltFlat); f.textContent=h==null?'boussole indisponible':(tiltFlat?'Téléphone à plat ✓':'Tiens le téléphone à plat'); $('aimFix').textContent=h==null?'Continuer sans direction':'Fixer le point de vue'; }
 setInterval(aimTick,150);
 function povIcon(h){ return L.divIcon({className:'',html:`<div class="pov"><div class="cone" style="transform:rotate(${(h??0)+180}deg)"></div><div class="dot"></div></div>`,iconSize:[30,30],iconAnchor:[15,15]}); }
-async function renderPov(){ povLayer.clearLayers(); let ph=[]; try{ ph=(await dbAll('photos')).filter(x=>x.lat!=null); }catch{}
-  ph.forEach(p=>{ const mk=L.marker([p.lat,p.lng],{icon:povIcon(p.heading)}).addTo(povLayer); if(p.title) mk.bindTooltip(esc(p.title)); mk.on('click',ev=>{ L.DomEvent.stopPropagation(ev); if(measuring) return addMeasurePoint(ev.latlng); openViewer(p,URL.createObjectURL(p.blob)); }); }); }
+function addPovMarker(p){ const mk=L.marker([p.lat,p.lng],{icon:povIcon(p.heading),zIndexOffset:600}).addTo(povLayer); const cap=p.title&&p.title!=='Photo du lot'?p.title:'';
+  if(cap) mk.bindTooltip(esc(cap),{permanent:true,direction:'right',offset:[14,0],className:'pov-label'});
+  mk.on('click',ev=>{ L.DomEvent.stopPropagation(ev); if(measuring) return addMeasurePoint(ev.latlng); openViewer(p,URL.createObjectURL(p.blob)); }); return mk; }
+async function renderPov(){ let ph=[]; try{ ph=(await dbAll('photos')).filter(x=>x.lat!=null&&x.kind!=='doc'); }catch{ return; } povLayer.clearLayers(); ph.forEach(addPovMarker); }
+const zoomCls=()=>map.getContainer().classList.toggle('z16',map.getZoom()>=16); map.on('zoomend',zoomCls); zoomCls();
 
 /* ============================ Mesure ============================ */
 let measuring=false, mPts=[], mClosed=false;
@@ -2060,6 +2182,36 @@ document.querySelectorAll('#permList button').forEach(b=>b.onclick=()=>askPerm(b
   (async()=>{ if(off) return; const geo=await permState('geolocation'); const firstTime=!store.get('terrain.seenGuide',false);
     if(firstTime){ store.set('terrain.seenGuide',true); try{ openIntro(false); }catch{} return; }
     if(!isStandalone()||geo!=='granted'){ try{ openIntro(true); }catch{} } })(); })();
+
+
+/* ============================ Mise en page : deux piles mesurées, aucun chevauchement ============================ */
+const LAYOUT={top:['offline','search','chips','strip','measureBar'],bottom:['walkStrip','peek','tip']};
+function shown(el){ if(!el||el.hidden) return false; const cs=getComputedStyle(el); return cs.display!=='none'&&cs.visibility!=='hidden'; }
+let layoutRaf=0; function scheduleLayout(){ if(layoutRaf) return; layoutRaf=requestAnimationFrame(()=>{ layoutRaf=0; doLayout(); }); }
+function doLayout(){
+  const top=document.querySelector('.topbar'), nav=document.querySelector('.navbar'), searchOpen=$('search').classList.contains('open');
+  document.body.classList.toggle('searchopen',searchOpen);
+  ['tip','peek'].forEach(id=>$(id)?.classList.remove('lay-hide'));
+  const col=document.querySelector('.mapctl'), me_=document.querySelector('.mectl');
+  const pass=()=>{ let y=top?top.getBoundingClientRect().bottom:0;
+    for(const id of LAYOUT.top){ const el=$(id); if(!el) continue; if(id==='chips'&&searchOpen) continue; if(!shown(el)) continue;
+      el.style.top=y+'px'; const h=el.getBoundingClientRect().height||0; y+=h+(id==='offline'||id==='search'?0:6); }
+    let b=nav?Math.max(0,innerHeight-nav.getBoundingClientRect().top):0;
+    for(const id of LAYOUT.bottom){ const el=$(id); if(!shown(el)||el.classList.contains('lay-hide')) continue; el.style.bottom=(b+8)+'px'; b+=8+(el.getBoundingClientRect().height||0); }
+    if(me_){ me_.style.bottom=(b+10)+'px'; b+=10+(me_.getBoundingClientRect().height||56); }
+    if(col){ col.style.top=(y+8)+'px'; col.classList.remove('compact','tight'); }
+    const room=innerHeight-b-8-(y+8); const need=()=>col?col.getBoundingClientRect().height||0:0;
+    if(col&&need()>room) col.classList.add('compact'); if(col&&need()>room) col.classList.add('tight');
+    return {y,b,fits:!col||need()<=room}; };
+  let r=pass();
+  // Priorités quand la place manque : le conseil s'efface, puis l'aperçu (en marche, le bandeau montre déjà le lot)
+  for(const id of ['tip','peek']){ if(r.fits) break; const el=$(id); if(shown(el)){ el.classList.add('lay-hide'); r=pass(); } }
+  $('toast').style.top=(r.y+6)+'px';
+  document.documentElement.style.setProperty('--free-top',r.y+'px'); document.documentElement.style.setProperty('--free-bottom',r.b+'px'); }
+{ const ro=window.ResizeObserver?new ResizeObserver(scheduleLayout):null; const mo=new MutationObserver(scheduleLayout);
+  [...LAYOUT.top,...LAYOUT.bottom].forEach(id=>{ const el=$(id); if(!el) return; ro?.observe(el); mo.observe(el,{attributes:true,attributeFilter:['hidden','class']}); });
+  ['.topbar','.navbar','.mapctl','.mectl'].forEach(q=>{ const el=document.querySelector(q); if(el){ ro?.observe(el); mo.observe(el,{attributes:true,attributeFilter:['hidden','class']}); } });
+  mo.observe(document.body,{attributes:true,attributeFilter:['class']}); window.addEventListener('resize',scheduleLayout); window.addEventListener('orientationchange',()=>setTimeout(scheduleLayout,300)); scheduleLayout(); }
 
 /* ============================ Démarrage ============================ */
 (()=>{ let d=null; try{ d=JSON.parse(localStorage.getItem('terrain.walkActive')||'null'); }catch{}
