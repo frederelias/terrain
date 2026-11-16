@@ -1,0 +1,316 @@
+[
+ {
+  "mrc": "MRC d'Argenteuil",
+  "url": "https://mrc.argenteuil.qc.ca/wp-content/uploads/2025/05/2025-05-07_Avis-public_vente_non-paiement_taxes_affichage.pdf",
+  "statut": "ok",
+  "date": "2025-05-08",
+  "lots_lus": 12,
+  "lots_places": 12
+ },
+ {
+  "mrc": "MRC des Pays-d'en-Haut",
+  "url": "https://lespaysdenhaut.com/wp-content/uploads/2026/07/2026-07-06_liste_vendus_vpt_2026.pdf",
+  "statut": "ok",
+  "date": "2026-06-17",
+  "lots_lus": 59,
+  "lots_places": 58
+ },
+ {
+  "mrc": "MRC des Pays-d'en-Haut",
+  "url": "https://lespaysdenhaut.com/wp-content/uploads/2026/06/2026-06-15_PRES_VPT.pdf",
+  "statut": "aucun lot trouvé (liste absente ou format non lu)",
+  "date": null
+ },
+ {
+  "mrc": "MRC des Pays-d'en-Haut",
+  "url": "https://lespaysdenhaut.com/wp-content/uploads/2025/12/REGL_521-2025_Date_VPT_2026_WEB.pdf",
+  "statut": "aucun lot trouvé (liste absente ou format non lu)",
+  "date": "2026-06-17"
+ },
+ {
+  "mrc": "MRC des Pays-d'en-Haut",
+  "url": "https://lespaysdenhaut.com/wp-content/uploads/2025/12/2025-11-26_REGL_Date_VPT.pdf",
+  "statut": "aucun lot trouvé (liste absente ou format non lu)",
+  "date": "2026-06-17"
+ },
+ {
+  "mrc": "MRC des Pays-d'en-Haut",
+  "url": "https://lespaysdenhaut.com/wp-content/uploads/2025/02/Regl_504-2025_Date_VPT.pdf",
+  "statut": "aucun lot trouvé (liste absente ou format non lu)",
+  "date": "2025-06-18"
+ },
+ {
+  "mrc": "MRC des Pays-d'en-Haut",
+  "url": "https://lespaysdenhaut.com/wp-content/uploads/2025/06/Liste_17juin2025_WEB.pdf",
+  "statut": "ok",
+  "date": "2025-06-18",
+  "lots_lus": 75,
+  "lots_places": 75
+ },
+ {
+  "mrc": "MRC des Laurentides",
+  "url": "https://mrclaurentides.qc.ca/wp-content/uploads/2026/06/Avis_Public_VPT2026_V2026-06-04.pdf",
+  "statut": "ok",
+  "date": "2026-06-04",
+  "lots_lus": 24,
+  "lots_places": 24
+ },
+ {
+  "mrc": "MRC des Laurentides",
+  "url": "https://mrclaurentides.qc.ca/wp-content/uploads/2026/06/Avis_Public_VPT2026_V2026-06-03_A.pdf",
+  "statut": "version antérieure ignorée",
+  "date": "2026-06-04"
+ },
+ {
+  "mrc": "MRC des Laurentides",
+  "url": "https://mrclaurentides.qc.ca/wp-content/uploads/2026/06/Avis_Public_VPT2026_V2026-06-03.pdf",
+  "statut": "version antérieure ignorée",
+  "date": "2026-06-04"
+ },
+ {
+  "mrc": "MRC des Laurentides",
+  "url": "https://mrclaurentides.qc.ca/wp-content/uploads/2026/06/Avis_Public_VPT2026_V2026-06-02.pdf",
+  "statut": "version antérieure ignorée",
+  "date": "2026-06-04"
+ },
+ {
+  "mrc": "MRC des Laurentides",
+  "url": "https://mrclaurentides.qc.ca/wp-content/uploads/2026/06/Avis_Public_VPT2026_01-06-2026.pdf",
+  "statut": "version antérieure ignorée",
+  "date": "2026-06-04"
+ },
+ {
+  "mrc": "MRC des Laurentides",
+  "url": "https://mrclaurentides.qc.ca/wp-content/uploads/2026/05/Avis_Public_VPT2026_V2026-05-26-2.pdf",
+  "statut": "version antérieure ignorée",
+  "date": "2026-06-04"
+ },
+ {
+  "mrc": "MRC des Laurentides",
+  "url": "https://mrclaurentides.qc.ca/wp-content/uploads/2026/05/Avis_Public_VPT2026_V2026-05-26-1.pdf",
+  "statut": "version antérieure ignorée",
+  "date": "2026-06-04"
+ },
+ {
+  "mrc": "MRC des Laurentides",
+  "url": "https://mrclaurentides.qc.ca/wp-content/uploads/2026/05/Avis_Public_VPT2026_V2026-05-26.pdf",
+  "statut": "version antérieure ignorée",
+  "date": "2026-06-04"
+ },
+ {
+  "mrc": "MRC des Laurentides",
+  "url": "https://mrclaurentides.qc.ca/wp-content/uploads/2026/05/Avis_Public_VPT2026_V2026-05-21.pdf",
+  "statut": "version antérieure ignorée",
+  "date": "2026-06-04"
+ },
+ {
+  "mrc": "MRC des Laurentides",
+  "url": "https://mrclaurentides.qc.ca/wp-content/uploads/2026/05/Avis_Public_VPT2026.pdf",
+  "statut": "version antérieure ignorée",
+  "date": "2026-06-04"
+ },
+ {
+  "mrc": "MRC des Laurentides",
+  "url": "https://mrclaurentides.qc.ca/wp-content/uploads/2026/05/Avis_Public_VPT2026_V2026-04-30.pdf",
+  "statut": "version antérieure ignorée",
+  "date": "2026-06-04"
+ },
+ {
+  "mrc": "MRC des Laurentides",
+  "url": "https://mrclaurentides.qc.ca/wp-content/uploads/2026/04/Avis_Public_VPT2026_V2026-04-20.pdf",
+  "statut": "version antérieure ignorée",
+  "date": "2026-06-04"
+ },
+ {
+  "mrc": "MRC des Laurentides",
+  "url": "https://mrclaurentides.qc.ca/wp-content/uploads/2026/04/Avis_Public_VPT2026_V2026-04-16.pdf",
+  "statut": "version antérieure ignorée",
+  "date": "2026-06-04"
+ },
+ {
+  "mrc": "MRC des Laurentides",
+  "url": "https://mrclaurentides.qc.ca/wp-content/uploads/2026/04/Avis_Public_VPT2026_V2026-04-15.pdf",
+  "statut": "version antérieure ignorée",
+  "date": "2026-06-04"
+ },
+ {
+  "mrc": "MRC des Laurentides",
+  "url": "https://mrclaurentides.qc.ca/wp-content/uploads/2025/04/Avis_Public_VPT2025_V2025-04-14.pdf",
+  "statut": "ok",
+  "date": "2025-06-05",
+  "lots_lus": 135,
+  "lots_places": 135
+ },
+ {
+  "mrc": "MRC des Laurentides",
+  "url": "https://mrclaurentides.qc.ca/wp-content/uploads/2025/04/Avis_Public_VPT2025_V2025-04-10.pdf",
+  "statut": "version antérieure ignorée",
+  "date": "2025-06-05"
+ },
+ {
+  "mrc": "MRC des Laurentides",
+  "url": "https://mrclaurentides.qc.ca/wp-content/uploads/2026/04/2026_Guide_VPT.pdf",
+  "statut": "aucun lot trouvé (liste absente ou format non lu)",
+  "date": "2026-06-04"
+ },
+ {
+  "mrc": "MRC des Laurentides",
+  "url": "https://mrclaurentides.qc.ca/wp-content/uploads/2023/04/Reglement-382-2022-relatif-aux-honnoraires-frais-et-tarifs-payables-a-la-MRC-des-Laurentides-pour-la-procedure-de-vente-des-immeubles-pour-defaut-de-paiement-de-taxes-foncieres.pdf",
+  "statut": "aucun lot trouvé (liste absente ou format non lu)",
+  "date": "2022-08-18"
+ },
+ {
+  "mrc": "MRC de Pontiac",
+  "url": "http://mrcpontiac.qc.ca/wp-content/uploads/2026/09/PROJET-DOCUMENT-VENTE-AVEC-FRAIS-2026-09-10.pdf",
+  "statut": "ok",
+  "date": "2026-09-10",
+  "lots_lus": 35,
+  "lots_places": 35
+ },
+ {
+  "mrc": "MRC de Pontiac",
+  "url": "http://mrcpontiac.qc.ca/wp-content/uploads/2026/04/Deroulement-general-de-la-vente-2026-1.pdf",
+  "statut": "aucun lot trouvé (liste absente ou format non lu)",
+  "date": "2026-09-10"
+ },
+ {
+  "mrc": "MRC de La Haute-Yamaska",
+  "url": "https://haute-yamaska.ca/wp-content/uploads/2026/05/15-avis_public_2026-04-29_abrege-VA-2026-05-13.pdf",
+  "statut": "ok",
+  "date": "2026-06-02",
+  "lots_lus": 6,
+  "lots_places": 6
+ },
+ {
+  "mrc": "MRC de Vaudreuil-Soulanges",
+  "url": "https://mrcvs.ca/wp-content/uploads/2025/04/Ventes-pour-taxes-9-avril.pdf",
+  "statut": "aucun lot trouvé (liste absente ou format non lu)",
+  "date": null
+ },
+ {
+  "mrc": "MRC de Vaudreuil-Soulanges",
+  "url": "https://mrcvs.ca/wp-content/uploads/2025/04/ventes-pour-taxes-8-avril.pdf",
+  "statut": "aucun lot trouvé (liste absente ou format non lu)",
+  "date": null
+ },
+ {
+  "mrc": "MRC de Vaudreuil-Soulanges",
+  "url": "https://www.vsll.ca/fichiersUpload/fichiers/20260729170043-04-certificat-de-publication-vente-pour-taxes-de-la-mrcweb.pdf",
+  "statut": "ok",
+  "date": "2026-04-07",
+  "lots_lus": 1,
+  "lots_places": 1
+ },
+ {
+  "mrc": "MRC de Portneuf",
+  "url": "https://villededonnacona.com/upload/avis-public/avispub_vente_taxes2026_2026-06-18.pdf",
+  "statut": "ok",
+  "date": "2026-06-16",
+  "lots_lus": 3,
+  "lots_places": 3
+ },
+ {
+  "mrc": "MRC de La Rivière-du-Nord",
+  "url": "https://saint-hippolyte.ca/wp-content/uploads/2026/04/AVPU-preavis-defaut-taxes.pdf",
+  "statut": "aucun lot trouvé (liste absente ou format non lu)",
+  "date": "2026-06-11"
+ },
+ {
+  "mrc": "MRC du Haut-Saint-Laurent",
+  "url": "https://mrchsl.com/assets/pdfs/20260505-Avis-vente-pour-taxes-Web-v1.pdf",
+  "statut": "ok",
+  "date": "2026-06-11",
+  "lots_lus": 2,
+  "lots_places": 2
+ },
+ {
+  "mrc": "MRC du Haut-Saint-Laurent",
+  "url": "https://mrchsl.com/assets/pdfs/01-Conditions-de-vente-2026-WEB.pdf",
+  "statut": "aucun lot trouvé (liste absente ou format non lu)",
+  "date": "2026-06-11"
+ },
+ {
+  "mrc": "MRC de Roussillon",
+  "url": "https://www.lery.ca/images/Avis_public_2026_signe_M.Marcoux.pdf",
+  "statut": "injoignable",
+  "detail": "Command '['pdftotext', '-layout', '/tmp/a.pdf', '/tmp/a.txt']' returned non-zero"
+ },
+ {
+  "mrc": "MRC de Lotbinière",
+  "url": "https://www.mrclotbiniere.org/wp-content/uploads/2026/05/Liste-Ventes-pour-taxes_MRC-Lotbiniere_Avis-Public_20260525.pdf",
+  "statut": "ok",
+  "date": "2026-06-11",
+  "lots_lus": 14,
+  "lots_places": 14
+ },
+ {
+  "mrc": "MRC des Appalaches",
+  "url": "https://www.mrcdesappalaches.ca/fichiersUpload/fichiers/20260410092831-1er-avis-public-vente-pour-taxes-2026-04-08-v2-003.pdf",
+  "statut": "ok",
+  "date": "2026-06-09",
+  "lots_lus": 24,
+  "lots_places": 24
+ },
+ {
+  "mrc": "MRC des Chenaux",
+  "url": "https://www.mrcdeschenaux.ca/app/uploads/2026/05/2026-Liste-encadree-WEB-MAJ-2026-05-01.pdf",
+  "statut": "injoignable",
+  "detail": "HTTP Error 404: Not Found"
+ },
+ {
+  "mrc": "MRC d'Arthabaska",
+  "url": "https://steclotildehorton.ca/wp-content/uploads/2026/04/Avis_public_original_signe_MunLoc_SigneOM.pdf",
+  "statut": "ok",
+  "date": "2026-06-11",
+  "lots_lus": 10,
+  "lots_places": 10
+ },
+ {
+  "mrc": "MRC de Nicolet-Yamaska",
+  "url": "https://www.saint-zephirin.ca/upload/avis-public/avis_public_2026__15-04-2026_.pdf",
+  "statut": "ok",
+  "date": "2026-06-16",
+  "lots_lus": 68,
+  "lots_places": 68
+ },
+ {
+  "mrc": "MRC de Manicouagan",
+  "url": "https://www.mrcmanicouagan.qc.ca/images/Upload/avis_public_-_vente_pour_taxes_journal_2026.pdf",
+  "statut": "ok",
+  "date": "2026-06-11",
+  "lots_lus": 14,
+  "lots_places": 14
+ },
+ {
+  "mrc": "MRC de La Haute-Côte-Nord",
+  "url": "https://www.mrchcn.qc.ca/fichiersUpload/fichiers/20260420083342-20260416-preavis-vente-2026-journal.pdf",
+  "statut": "injoignable",
+  "detail": "HTTP Error 404: Not Found"
+ },
+ {
+  "mrc": "MRC du Fjord-du-Saguenay",
+  "url": "https://mrc-fjord.qc.ca/app/uploads/2025/05/avis-public-vpt.pdf",
+  "statut": "ok",
+  "date": "2026-06-04",
+  "lots_lus": 12,
+  "lots_places": 12
+ },
+ {
+  "mrc": "MRC de Minganie",
+  "url": "https://www.natashquan.org/app/uploads/2026/04/personnes-endettees.pdf",
+  "statut": "injoignable",
+  "detail": "HTTP Error 404: Not Found"
+ },
+ {
+  "mrc": "MRC des Pays-d'en-Haut",
+  "url": "https://lespaysdenhaut.com/wp-content/uploads/2025/06/Liste_17juin2025_WEB.pdf",
+  "statut": "vente plus ancienne écartée",
+  "date": "2025-06-18"
+ },
+ {
+  "mrc": "MRC des Laurentides",
+  "url": "https://mrclaurentides.qc.ca/wp-content/uploads/2025/04/Avis_Public_VPT2025_V2025-04-14.pdf",
+  "statut": "vente plus ancienne écartée",
+  "date": "2025-06-05"
+ }
+]
